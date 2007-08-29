@@ -1,7 +1,7 @@
 # RH 6.3.0.0-1.49
 %define name	gdb
 %define version	6.6
-%define release	%mkrel 1
+%define release	%mkrel 2
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
@@ -193,7 +193,7 @@ Patch178: gdb-6.3-catch-debug-registers-error-20060527.patch
 Patch179: gdb-6.3-ia32el-fix-waitpid-20060615.patch
 
 # Bugfix segv on the source display by ^X 1 (fixes Patch130, BZ 200048).
-Patch181: gdb-6.500048-find_line_pc-segv.patch
+Patch181: gdb-6.5-bz200048-find_line_pc-segv.patch
 
 # Bugfix object names completion (fixes Patch116, BZ 193763).
 Patch185: gdb-6.3-bz193763-object-name-completion.patch
@@ -202,14 +202,14 @@ Patch185: gdb-6.3-bz193763-object-name-completion.patch
 Patch187: gdb-6.5-bz196439-valgrind-memcheck-compat-test.patch
 
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
-Patch188: gdb-6.503661-emit-relocs.patch
+Patch188: gdb-6.5-bz203661-emit-relocs.patch
 
 # Security patch: avoid stack overflows in dwarf expression computation.
 # CVE-2006-4146
 Patch190: gdb-6.5-dwarf-stack-overflow.patch
 
 # Fix gdb printf command argument using "%p" (BZ 205551).
-Patch191: gdb-6.505551-printf-p.patch
+Patch191: gdb-6.5-bz205551-printf-p.patch
 
 # Fix attach to stopped process, supersede `gdb-6.3-attach-stop-20051011.patch'.
 # Fix attachment also to a threaded stopped process (BZ 219118).
@@ -256,18 +256,18 @@ Patch209: gdb-6.5-readline-long-line-crash.patch
 Patch213: gdb-6.5-readline-long-line-crash-test.patch
 
 # Fix readline history for input mode commands like `command' (BZ 215816).
-Patch212: gdb-6.515816-readline-from-callback.patch
-Patch219: gdb-6.515816-readline-from-callback-test.patch
+Patch212: gdb-6.5-bz215816-readline-from-callback.patch
+Patch219: gdb-6.5-bz215816-readline-from-callback-test.patch
 
 # Fix bogus 0x0 unwind of the thread's topmost function clone(3) (BZ 216711).
-Patch214: gdb-6.516711-clone-is-outermost.patch
+Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
 
 # Try to reduce sideeffects of skipping ppc .so libs trampolines (BZ 218379).
-Patch215: gdb-6.518379-ppc-solib-trampoline-fix.patch
-Patch216: gdb-6.518379-ppc-solib-trampoline-test.patch
+Patch215: gdb-6.5-bz218379-ppc-solib-trampoline-fix.patch
+Patch216: gdb-6.5-bz218379-ppc-solib-trampoline-test.patch
 
 # Fix lockup on trampoline vs. its function lookup; unreproducible (BZ 218379).
-Patch217: gdb-6.518379-solib-trampoline-lookup-lock-fix.patch
+Patch217: gdb-6.5-bz218379-solib-trampoline-lookup-lock-fix.patch
 
 # Fix unwinding crash on older gcj(1) code (extended CFI support) (BZ 165025).
 Patch221: gdb-6.5-bz165025-DW_CFA_GNU_negative_offset_extended-fix.patch
@@ -289,7 +289,7 @@ Patch229: gdb-6.5-bz140532-ppc-debug_frame-return_address-test.patch
 Patch230: gdb-6.5-testsuite-log.patch
 
 # Testcase for exec() from threaded program (BZ 202689).
-Patch231: gdb-6.302689-exec-from-pthread-test.patch
+Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
 # Backported post gdb-6.6 release ia64 unwinding fixups.
 Patch232: gdb-6.6-ia64-kernel-unwind.patch
@@ -502,5 +502,3 @@ fi
 %{_infodir}/stabs.info*
 %{_menudir}/%{name}
 %{_datadir}/applications/mandriva-%{name}.desktop
-
-
