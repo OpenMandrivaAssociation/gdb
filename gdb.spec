@@ -290,6 +290,10 @@ Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 Patch232: gdb-6.6-ia64-kernel-unwind.patch
 Patch233: gdb-6.6-ia64-pc-unwind.patch
 
+# Fixes a warning (which is treated as an error) in tekhex.c, breaking
+# configure. Fix by blino. - AdamW 2007/09
+Patch234: gdb-6.6-tekhex_warning_fix.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
@@ -402,6 +406,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch231 -p1
 %patch232 -p1
 %patch233 -p1
+%patch234 -p1
 
 rm -rf ./gdb/gdbserver
 
