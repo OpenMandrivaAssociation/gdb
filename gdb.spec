@@ -5,18 +5,13 @@
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
-%if %{mdkversion} >= 1010
-%define mdk_distro_version_file	/etc/release
-%else
-%define mdk_distro_version_file	/etc/mandrake-release
-%endif
-%define mdk_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < %{mdk_distro_version_file})
+%define mdv_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
 
 Summary:	A GNU source-level debugger for C, C++ and Fortran
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-License:	GPL
+License:	GPLv2+ and LGPLv2+
 Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
 Source:		gdb-%{version}%{?cvsdate:-%{cvsdate}}.tar.bz2
@@ -411,7 +406,7 @@ compiler, you may want to install gdb to help you debug your programs.
 rm -rf ./gdb/gdbserver
 
 cat > gdb/version.in << EOF
-%{version}-%{release} (%{mdk_distro_version})
+%{version}-%{release} (%{mdv_distro_version})
 EOF
 
 %build
@@ -441,36 +436,10 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/{configure,libiberty,rluserman}.info*
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
 rm -f $RPM_BUILD_ROOT%{_infodir}/annotate.info*
 
-# MDK menu
-install -d $RPM_BUILD_ROOT%{_menudir}
-cat << EOF > $RPM_BUILD_ROOT%{_menudir}/%{name}
-?package(%{name}): \
- needs="text" \
- section="More Applications/Development/Tools" \
- title="Gdb" \
- longtitle="The GNU debugger" \
- command="gdb" \
- icon="development_tools_section.png"\
- xdg="true"
-EOF
-
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications
-cat > $RPM_BUILD_ROOT%{_datadir}/applications/mandriva-%{name}.desktop << EOF
-[Desktop Entry]
-Name=Gdb
-Comment=The GNU debugger
-Exec=%{_bindir}/gdb
-Icon=development_tools_section.png
-Type=Application
-Categories=X-MandrivaLinux-MoreApplications-Development-Tools;Development;Debugger;
-EOF
-
-
 %clean
 rm -fr $RPM_BUILD_ROOT
 
 %post
-%{update_menus}
 %{_install_info gdb.info}
 %{_install_info gdbint.info}
 %{_install_info stabs.info}
@@ -482,12 +451,9 @@ if [ $1 = 0 ]; then
 %{_remove_install_info stabs.info}
 fi
 
-%postun
-%clean_menus
-
 %files
 %defattr(-,root,root)
-%doc COPYING COPYING.LIB README gdb/NEWS
+%doc README gdb/NEWS
 %{_bindir}/gdb
 %{_bindir}/gdbtui
 %{_bindir}/gstack
@@ -500,5 +466,4 @@ fi
 %{_infodir}/gdb.info*
 %{_infodir}/gdbint.info*
 %{_infodir}/stabs.info*
-%{_menudir}/%{name}
-%{_datadir}/applications/mandriva-%{name}.desktop
+
