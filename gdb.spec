@@ -294,7 +294,6 @@ Patch233: gdb-6.6-ia64-pc-unwind.patch
 # configure. Fix by blino. - AdamW 2007/09
 Patch234: gdb-6.6-tekhex_warning_fix.patch
 
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
 BuildRequires:	ncurses-devel readline-devel texinfo flex bison
