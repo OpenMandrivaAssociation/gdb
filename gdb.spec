@@ -293,6 +293,8 @@ Patch233: gdb-6.6-ia64-pc-unwind.patch
 # Fixes a warning (which is treated as an error) in tekhex.c, breaking
 # configure. Fix by blino. - AdamW 2007/09
 Patch234: gdb-6.6-tekhex_warning_fix.patch
+# (fc) 6.6-4mdv fix build with latest makeinfo (CVS)
+Patch235: gdb-6.6-makeinfoversion.patch
 
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
@@ -407,6 +409,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch232 -p1
 %patch233 -p1
 %patch234 -p1
+%patch235 -p1 -b .makeinfo
 
 rm -rf ./gdb/gdbserver
 
@@ -414,9 +417,18 @@ cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
 EOF
 
-%build
 %define __libtoolize :
-%configure --with-separate-debug-dir=%{_prefix}/lib/debug
+autoreconf
+cd bfd
+autoreconf
+cd -
+cd libiberty
+autoreconf
+cd -
+
+
+%build
+%configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug
 %make
 make info
 
