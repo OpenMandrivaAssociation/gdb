@@ -1,7 +1,7 @@
 # RH 6.3.0.0-1.49
 %define name	gdb
 %define version	6.6
-%define release	%mkrel 4
+%define release	%mkrel 5
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
@@ -296,6 +296,9 @@ Patch234: gdb-6.6-tekhex_warning_fix.patch
 # (fc) 6.6-4mdv fix build with latest makeinfo (CVS)
 Patch235: gdb-6.6-makeinfoversion.patch
 
+# backported:
+Patch236: gdb-6.6-do-not-crash-on-line-info-with-no-file.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
@@ -410,6 +413,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch233 -p1
 %patch234 -p1
 %patch235 -p1 -b .makeinfo
+%patch236 -p1
 
 rm -rf ./gdb/gdbserver
 
