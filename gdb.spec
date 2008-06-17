@@ -259,6 +259,8 @@ Patch266: gdb-6.6-bz247354-leader-exit-test.patch
 
 # New locating of the matching binaries from the pure core file (build-id).
 Patch274: gdb-6.6-buildid-locate.patch
+# Mandriva doesn't have debuginfo-install etc., adapt
+Patch276: gdb-6.8-buildid-locate-mandriva.patch
 
 # Fixed the kernel i386-on-x86_64 VDSO loading (producing `Lowest section in').
 Patch277: gdb-6.6-vdso-i386-on-amd64-warning.patch
@@ -429,6 +431,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch266 -p1
 %patch274 -p1
 %patch275 -p1
+%patch276 -p1
 %patch277 -p1
 %patch280 -p1
 %patch282 -p1
