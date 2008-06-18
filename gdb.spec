@@ -335,7 +335,7 @@ Patch318: gdb-6.8-gcc35998-ada-memory-trash.patch
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
-BuildRequires:	ncurses-devel readline-devel texinfo flex bison
+BuildRequires:	librpm-devel ncurses-devel readline-devel texinfo flex bison
 
 %description
 Gdb is a full featured, command driven debugger. Gdb allows you to
