@@ -10,7 +10,7 @@ Summary:	A GNU source-level debugger for C, C++ and Fortran
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-License:	GPLv2+ and LGPLv2+
+License:	GPLv3+
 Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
 Source:		gdb-%{version}%{?cvsdate:-%{cvsdate}}.tar.bz2
