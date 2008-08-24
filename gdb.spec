@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	6.8
-%define release	%mkrel 1
+%define release	%mkrel 2
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
@@ -457,8 +457,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch318 -p1
 %patch124 -p1
 
-rm -rf ./gdb/gdbserver
-
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
 EOF
@@ -470,7 +468,7 @@ make info
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%makeinstall
+%makeinstall_std
 
 # The above is broken, do this for now:
 mkdir -p $RPM_BUILD_ROOT/%{_infodir}
@@ -508,6 +506,7 @@ fi
 %defattr(-,root,root)
 %doc README gdb/NEWS
 %{_bindir}/gdb
+%{_bindir}/gdbserver
 %{_bindir}/gdbtui
 %{_bindir}/gstack
 %ifarch ppc ppc64
@@ -515,6 +514,7 @@ fi
 %{_mandir}/man1/run.1*
 %endif
 %{_mandir}/man1/gdb.1*
+%{_mandir}/man1/gdbserver.1*
 %{_mandir}/man1/gdbtui.1*
 %{_infodir}/gdb.info*
 %{_infodir}/gdbint.info*
