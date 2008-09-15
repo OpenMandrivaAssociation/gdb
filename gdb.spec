@@ -13,7 +13,7 @@ Release:	%{release}
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
-Source:		gdb-%{version}%{?cvsdate:-%{cvsdate}}.tar.bz2
+Source0:	gdb-%{version}%{?cvsdate:-%{cvsdate}}.tar.bz2
 
 # Fixes a warning (which is treated as an error) in tekhex.c, breaking
 # configure. Fix by blino. - AdamW 2007/09
@@ -332,6 +332,9 @@ Patch317: gdb-6.8-sparc64-silence-memcpy-check.patch
 # Fix memory trashing on binaries from GCC Ada (workaround GCC PR 35998).
 Patch318: gdb-6.8-gcc35998-ada-memory-trash.patch
 
+# Add compatibility for building with rpm5
+Patch319: gdb-6.8-rpm5-compat.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
@@ -456,10 +459,15 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch317 -p1
 %patch318 -p1
 %patch124 -p1
+%patch319 -p1 -b .rpm5
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
 EOF
+
+cd gdb
+autoreconf
+cd ..
 
 %build
 %configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug
@@ -471,7 +479,7 @@ rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
 
 # The above is broken, do this for now:
-mkdir -p $RPM_BUILD_ROOT/%{_infodir}
+mkdir -p $RPM_BUILD_ROOT%{_infodir}
 cp `find . -name "*.info*"` $RPM_BUILD_ROOT/%{_infodir}
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir $RPM_BUILD_ROOT%{_infodir}/dir.info* 
 rm -f $RPM_BUILD_ROOT%{_bindir}/{texindex,texi2dvi,makeinfo,install-info,info}
