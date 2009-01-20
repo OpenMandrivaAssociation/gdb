@@ -1,10 +1,13 @@
 %define name	gdb
 %define version	6.8
-%define release	%mkrel 2
+%define release	%mkrel 3
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
 %define mdv_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
+
+# todo: keep this until patches are rediffed
+%define _default_patch_fuzz 2
 
 Summary:	A GNU source-level debugger for C, C++ and Fortran
 Name:		%{name}
@@ -23,6 +26,9 @@ Patch0: gdb-6.6-tekhex_warning_fix.patch
 Patch1:		gdb-5.2.1-fix-sim-build.patch
 Patch2:		gdb-6.3-system-readline.patch
 Patch3:		gdb-6.0-tracepoint.patch
+
+# Fix build error with -Wformat -Werror=format-security
+Patch4:		gdb-6.8-format-security.patch
 
 ##
 # Red Hat patches
@@ -356,6 +362,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch1 -p1 -b .sim-fixes
 #%patch2 -p1 -b .system-readline
 #%patch3 -p1 -b .tracepoint
+%patch4 -p1
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
@@ -459,7 +466,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch317 -p1
 %patch318 -p1
 %patch124 -p1
-%patch319 -p1 -b .rpm5
+%patch319 -p1
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
