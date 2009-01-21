@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	6.8
-%define release	%mkrel 4
+%define release	%mkrel 5
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
