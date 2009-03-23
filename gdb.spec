@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	6.8
-%define release	%mkrel 5
+%define release	%mkrel 6
 #define cvsdate	20040708
 
 # Extract Mandriva Linux name and version
@@ -432,7 +432,9 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch247 -p1
 %patch249 -p1
 %patch254 -p1
-%patch256 -p1
+## Correct https://qa.mandriva.com/show_bug.cgi?id=37755
+## Se also https://bugzilla.redhat.com/show_bug.cgi?id=453688#c3
+## % patch256 -p1
 %patch258 -p1
 %patch260 -p1
 %patch261 -p1
