@@ -49,6 +49,8 @@ Patch101: gdb-6.3-sigx86-20040621.patch
 # Stop a backtrace when a zero PC is encountered.
 Patch106: gdb-6.3-framepczero-20040927.patch
 
+# Fix upstream `set scheduler-locking step' vs. upstream PPC atomic seqs.
+Patch112: gdb-6.6-scheduler_locking-step-sw-watchpoints2.patch
 # Make upstream `set scheduler-locking step' as default.
 Patch260: gdb-6.6-scheduler_locking-step-is-default.patch
 
@@ -312,6 +314,7 @@ compiler, you may want to install gdb to help you debug your programs.
 
 %patch101 -p1
 %patch106 -p1
+%patch112 -p1
 %patch117 -p1
 %patch118 -p1
 %patch120 -p1
