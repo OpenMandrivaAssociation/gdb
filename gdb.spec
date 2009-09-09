@@ -48,22 +48,9 @@ Patch14: gdb-6.3-rh-testlibunwind1fix-20041202.patch
 # frames are identified as signal frames.
 Patch101: gdb-6.3-sigx86-20040621.patch
 
-# Use convert_from_func_ptr_addr on the solib breakpoint address;
-# simplifies and makes more consistent the logic.
-Patch104: gdb-6.3-ppcdotsolib-20041022.patch
-
-# Better parse 64-bit PPC system call prologues.
-Patch105: gdb-6.3-ppc64syscall-20040622.patch
-
 # Stop a backtrace when a zero PC is encountered.
 Patch106: gdb-6.3-framepczero-20040927.patch
 
-# Include the pc's section when doing a symbol lookup so that the
-# correct symbol is found.
-Patch111: gdb-6.3-ppc64displaysymbol-20041124.patch
-
-# Fix upstream `set scheduler-locking step' vs. upstream PPC atomic seqs.
-Patch112: gdb-6.6-scheduler_locking-step-sw-watchpoints2.patch
 # Make upstream `set scheduler-locking step' as default.
 Patch260: gdb-6.6-scheduler_locking-step-is-default.patch
 
@@ -112,35 +99,17 @@ Patch148: gdb-6.3-inheritance-20050324.patch
 Patch150: gdb-6.3-test-sepcrc-20050402.patch
 Patch151: gdb-6.3-sepcrc-20050402.patch
 
-# Do not issue warning message about first page of storage for ia64 gcore
-Patch153: gdb-6.3-ia64-gcore-page0-20050421.patch
-
 # Security errata for bfd overflow and untrusted .gdbinit
 Patch157: gdb-6.3-security-errata-20050610.patch
 
-# IA64 sigtramp prev register patch
-Patch158: gdb-6.3-ia64-sigtramp-frame-20050708.patch
-
-# IA64 gcore speed-up patch
-Patch160: gdb-6.3-ia64-gcore-speedup-20050714.patch
-
 # Notify observers that the inferior has been created
 Patch161: gdb-6.3-inferior-notification-20050721.patch
-
-# Fix ia64 info frame bug
-Patch162: gdb-6.3-ia64-info-frame-fix-20050725.patch
 
 # Verify printing of inherited members test
 Patch163: gdb-6.3-inheritancetest-20050726.patch
 
 # Add readnever option
 Patch164: gdb-6.3-readnever-20050907.patch
-
-# Fix frame pointer for ia64 sigtramp frame
-Patch166: gdb-6.3-ia64-sigtramp-fp-20050926.patch
-
-# Fix ia64 gdb problem with user-specified SIGILL handling
-Patch169: gdb-6.3-ia64-sigill-20051115.patch
 
 # Allow option to continue backtracing past a zero pc value
 Patch170: gdb-6.3-bt-past-zero-20051201.patch
@@ -202,18 +171,11 @@ Patch213: gdb-6.5-readline-long-line-crash-test.patch
 # Fix bogus 0x0 unwind of the thread's topmost function clone(3) (BZ 216711).
 Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
 
-# Try to reduce sideeffects of skipping ppc .so libs trampolines (BZ 218379).
-Patch215: gdb-6.5-bz218379-ppc-solib-trampoline-fix.patch
-Patch216: gdb-6.5-bz218379-ppc-solib-trampoline-test.patch
-
 # Fix lockup on trampoline vs. its function lookup; unreproducible (BZ 218379).
 Patch217: gdb-6.5-bz218379-solib-trampoline-lookup-lock-fix.patch
 
 # Find symbols properly at their original (included) file (BZ 109921).
 Patch225: gdb-6.5-bz109921-DW_AT_decl_file-test.patch
-
-# Update PPC unwinding patches to their upstream variants (BZ 140532).
-Patch229: gdb-6.3-bz140532-ppc-unwinding-test.patch
 
 # Testcase for exec() from threaded program (BZ 202689).
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
@@ -250,9 +212,6 @@ Patch254: gdb-6.6-testsuite-timeouts.patch
 Patch256: gdb-6.7-bz233852-attach-signalled-fix.patch
 Patch275: gdb-6.7-bz233852-attach-signalled-test.patch
 
-# Support for stepping over PPC atomic instruction sequences (BZ 237572).
-Patch258: gdb-6.6-bz237572-ppc-atomic-sequence-test.patch
-
 # Link with libreadline provided by the operating system.
 Patch261: gdb-6.6-readline-system.patch
 
@@ -282,14 +241,8 @@ Patch282: gdb-6.7-charsign-test.patch
 # Fix rereading of the main executable on its change.
 Patch283: gdb-6.7-reread-exec_bfd.patch
 
-# Test PPC hiding of call-volatile parameter register.
-Patch284: gdb-6.7-ppc-clobbered-registers-O2-test.patch
-
 # Testsuite fixes for more stable/comparable results.
 Patch287: gdb-6.7-testsuite-stable-results.patch
-
-# Test ia64 memory leaks of the code using libunwind.
-Patch289: gdb-6.5-ia64-libunwind-leak-test.patch
 
 # Test hiding unexpected breakpoints on intentional step commands.
 Patch290: gdb-6.5-missed-trap-on-step-test.patch
@@ -329,12 +282,6 @@ Patch314: gdb-6.3-watchpoint-cond-gone-test.patch
 # Test various forms of threads tracking across exec() (BZ 442765).
 Patch315: gdb-6.8-bz442765-threaded-exec-test.patch
 
-# Enable program counter for processing PTID to PC (sparc/sparc64)
-Patch316: gdb-6.8-sparc-fix.patch
-
-# Silence memcpy check which returns false positive (sparc64)
-Patch317: gdb-6.8-sparc64-silence-memcpy-check.patch
-
 # Fix memory trashing on binaries from GCC Ada (workaround GCC PR 35998).
 Patch318: gdb-6.8-gcc35998-ada-memory-trash.patch
 
@@ -369,11 +316,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch14 -p1
 
 %patch101 -p1
-%patch104 -p1
-%patch105 -p1
 %patch106 -p1
-%patch111 -p1
-%patch112 -p1
 %patch117 -p1
 %patch118 -p1
 %patch120 -p1
@@ -389,16 +332,10 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch148 -p1
 %patch150 -p1
 %patch151 -p1
-%patch153 -p1
 %patch157 -p1
-%patch158 -p1
-%patch160 -p1
 %patch161 -p1
-%patch162 -p1
 %patch163 -p1
 %patch164 -p1
-%patch166 -p1
-%patch169 -p1
 %patch170 -p1
 %patch176 -p1
 %patch177 -p1
@@ -418,11 +355,8 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch211 -p1
 %patch213 -p1
 %patch214 -p1
-%patch215 -p1
-%patch216 -p1
 %patch217 -p1
 %patch225 -p1
-%patch229 -p1
 %patch231 -p1
 %patch234 -p1
 %patch235 -p1
@@ -435,7 +369,6 @@ compiler, you may want to install gdb to help you debug your programs.
 ## Correct https://qa.mandriva.com/show_bug.cgi?id=37755
 ## Se also https://bugzilla.redhat.com/show_bug.cgi?id=453688#c3
 ## % patch256 -p1
-%patch258 -p1
 %patch260 -p1
 %patch261 -p1
 %patch263 -p1
@@ -448,9 +381,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch280 -p1
 %patch282 -p1
 %patch283 -p1
-%patch284 -p1
 %patch287 -p1
-%patch289 -p1
 %patch290 -p1
 %patch293 -p1
 %patch294 -p1
@@ -464,8 +395,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch311 -p1
 %patch314 -p1
 %patch315 -p1
-%patch316 -p1
-%patch317 -p1
 %patch318 -p1
 %patch124 -p1
 %patch319 -p1
@@ -526,10 +455,6 @@ fi
 %{_bindir}/gdbserver
 %{_bindir}/gdbtui
 %{_bindir}/gstack
-%ifarch ppc ppc64
-%{_bindir}/run
-%{_mandir}/man1/run.1*
-%endif
 %{_mandir}/man1/gdb.1*
 %{_mandir}/man1/gdbserver.1*
 %{_mandir}/man1/gdbtui.1*
