@@ -104,10 +104,6 @@ Patch176: gdb-6.3-large-core-20051206.patch
 # corrupted or missing PATH.
 Patch177: gdb-6.3-gstack-without-path-20060414.patch
 
-# Cope with waitpid modifying status even when returning zero, as on
-# ia32el.
-Patch179: gdb-6.3-ia32el-fix-waitpid-20060615.patch
-
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
 Patch188: gdb-6.5-bz203661-emit-relocs.patch
 
@@ -287,7 +283,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch170 -p1
 %patch176 -p1
 %patch177 -p1
-%patch179 -p1
 %patch188 -p1
 %patch190 -p1
 %patch194 -p1
