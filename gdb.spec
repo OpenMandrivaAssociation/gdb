@@ -24,8 +24,6 @@ Patch0: gdb-6.6-tekhex_warning_fix.patch
 
 # Fix sim build
 Patch1:		gdb-5.2.1-fix-sim-build.patch
-Patch2:		gdb-6.3-system-readline.patch
-Patch3:		gdb-6.0-tracepoint.patch
 
 # Fix build error with -Wformat -Werror=format-security
 Patch4:		gdb-6.8-format-security.patch
@@ -209,7 +207,6 @@ Patch254: gdb-6.6-testsuite-timeouts.patch
 
 # Fix attaching to stopped processes (BZ 219118, 233852).
 # Fix attaching during a pending signal being delivered.
-Patch256: gdb-6.7-bz233852-attach-signalled-fix.patch
 Patch275: gdb-6.7-bz233852-attach-signalled-test.patch
 
 # Link with libreadline provided by the operating system.
@@ -307,8 +304,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch232 -p1
 %patch0 -p1
 %patch1 -p1 -b .sim-fixes
-#%patch2 -p1 -b .system-readline
-#%patch3 -p1 -b .tracepoint
 %patch4 -p1
 %patch11 -p1
 %patch12 -p1
@@ -366,9 +361,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch247 -p1
 %patch249 -p1
 %patch254 -p1
-## Correct https://qa.mandriva.com/show_bug.cgi?id=37755
-## Se also https://bugzilla.redhat.com/show_bug.cgi?id=453688#c3
-## % patch256 -p1
 %patch260 -p1
 %patch261 -p1
 %patch263 -p1
