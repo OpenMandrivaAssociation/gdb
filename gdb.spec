@@ -154,9 +154,6 @@ Patch225: gdb-6.5-bz109921-DW_AT_decl_file-test.patch
 # Testcase for exec() from threaded program (BZ 202689).
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
-# Backported post gdb-6.8 release fixups.
-Patch232: gdb-6.8-upstream.patch
-
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
 
@@ -263,7 +260,6 @@ compiler, you may want to install gdb to help you debug your programs.
 
 %prep
 %setup -q -n %{name}-%{version}%{?cvsdate:.%{cvsdate}}
-%patch232 -p1
 %patch0 -p1
 %patch1 -p1 -b .sim-fixes
 %patch4 -p1
