@@ -40,11 +40,6 @@ Patch12: gdb-6.3-rh-testversion-20041202.patch
 
 # Check that libunwind works - new test then fix
 Patch13: gdb-6.3-rh-testlibunwind-20041202.patch
-Patch14: gdb-6.3-rh-testlibunwind1fix-20041202.patch
-
-# Recognize i386 signal trampolines before CFI.  Ensures that signal
-# frames are identified as signal frames.
-Patch101: gdb-6.3-sigx86-20040621.patch
 
 # Stop a backtrace when a zero PC is encountered.
 Patch106: gdb-6.3-framepczero-20040927.patch
@@ -54,15 +49,9 @@ Patch112: gdb-6.6-scheduler_locking-step-sw-watchpoints2.patch
 # Make upstream `set scheduler-locking step' as default.
 Patch260: gdb-6.6-scheduler_locking-step-is-default.patch
 
-# Continue removing breakpoints even when failure occurs.
-Patch117: gdb-6.3-removebp-20041130.patch
-
 # Add a wrapper script to GDB that implements pstack using the
 # --readnever option.
 Patch118: gdb-6.3-gstack-20050411.patch
-
-# Fix to ensure types are visible
-Patch120: gdb-6.3-type-fix-20041213.patch
 
 # VSYSCALL and PIE
 Patch124: gdb-6.3-pie-20050110.patch
@@ -76,9 +65,6 @@ Patch128: gdb-6.3-nonthreaded-wp-20050117.patch
 # Fix to support executable moving
 Patch136: gdb-6.3-test-movedir-20050125.patch
 
-# Tolerate DW_AT_type referencing <0>.
-Patch139: gdb-6.3-dwattype0-20050201.patch
-
 # Fix gcore for threads
 Patch140: gdb-6.3-gcore-thread-20050204.patch
 
@@ -88,9 +74,6 @@ Patch259: gdb-6.3-step-thread-exit-20050211-test.patch
 
 # Prevent gdb from being pushed into background
 Patch142: gdb-6.3-terminal-fix-20050214.patch
-
-# Fix unexpected compiler warning messages.
-Patch147: gdb-6.3-warnings-20050317.patch
 
 # Fix printing of inherited members
 Patch148: gdb-6.3-inheritance-20050324.patch
@@ -121,15 +104,9 @@ Patch176: gdb-6.3-large-core-20051206.patch
 # corrupted or missing PATH.
 Patch177: gdb-6.3-gstack-without-path-20060414.patch
 
-# Do not let errors related with debug registers break thread debugging.
-Patch178: gdb-6.3-catch-debug-registers-error-20060527.patch
-
 # Cope with waitpid modifying status even when returning zero, as on
 # ia32el.
 Patch179: gdb-6.3-ia32el-fix-waitpid-20060615.patch
-
-# Testcase for corrupted or missing location list information (BZ 196439).
-Patch187: gdb-6.5-bz196439-valgrind-memcheck-compat-test.patch
 
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
 Patch188: gdb-6.5-bz203661-emit-relocs.patch
@@ -151,9 +128,6 @@ Patch196: gdb-6.5-sharedlibrary-path.patch
 # Suggest fixing your target architecture for gdbserver(1) (BZ 190810).
 # FIXME: It could be autodetected.
 Patch199: gdb-6.5-bz190810-gdbserver-arch-advice.patch
-
-# Fix dereferencing registers for 32bit inferiors on 64bit hosts (BZ 181390).
-Patch200: gdb-6.5-bz181390-memory-address-width.patch
 
 # Fix `gcore' command for 32bit inferiors on 64bit hosts.
 Patch201: gdb-6.5-gcore-i386-on-amd64.patch
@@ -226,19 +200,8 @@ Patch274: gdb-6.6-buildid-locate.patch
 # Mandriva doesn't have debuginfo-install etc., adapt
 Patch276: gdb-6.8-buildid-locate-mandriva.patch
 
-# Fixed the kernel i386-on-x86_64 VDSO loading (producing `Lowest section in').
-Patch277: gdb-6.6-vdso-i386-on-amd64-warning.patch
-
-# Fix hardware watchpoints after inferior forks-off some process.
-# Threaded `set follow-fork-mode child' still not fixed there, glibc fixes reqd.
-# `set detach-on-fork off' not fixed there in general - it already assert-fails.
-Patch280: gdb-6.6-multifork-debugreg.patch
-
 # Fix displaying of numeric char arrays as strings (BZ 224128).
 Patch282: gdb-6.7-charsign-test.patch
-
-# Fix rereading of the main executable on its change.
-Patch283: gdb-6.7-reread-exec_bfd.patch
 
 # Testsuite fixes for more stable/comparable results.
 Patch287: gdb-6.7-testsuite-stable-results.patch
@@ -265,9 +228,6 @@ Patch304: gdb-6.7-kernel-headers-compat.patch
 
 # Fix/implement the Fortran dynamic arrays support (BZ 377541).
 Patch305: gdb-6.8-bz377541-fortran-dynamic-arrays.patch
-
-# Backport fix of a segfault + PIE regression since 6.7.1 on PIE executables.
-Patch306: gdb-6.8-watchpoint-inaccessible-memory.patch
 
 # Test GCORE for shmid 0 shared memory mappings.
 Patch309: gdb-6.3-mapping-zero-inode-test.patch
@@ -310,23 +270,17 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-%patch14 -p1
 
-%patch101 -p1
 %patch106 -p1
 %patch112 -p1
-%patch117 -p1
 %patch118 -p1
-%patch120 -p1
 %patch125 -p1
 %patch128 -p1
 %patch136 -p1
-%patch139 -p1
 %patch140 -p1
 %patch141 -p1
 %patch259 -p1
 %patch142 -p1
-%patch147 -p1
 %patch148 -p1
 %patch150 -p1
 %patch151 -p1
@@ -337,16 +291,13 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch170 -p1
 %patch176 -p1
 %patch177 -p1
-%patch178 -p1
 %patch179 -p1
-%patch187 -p1
 %patch188 -p1
 %patch190 -p1
 %patch194 -p1
 %patch195 -p1
 %patch196 -p1
 %patch199 -p1
-%patch200 -p1
 %patch201 -p1
 %patch208 -p1
 %patch209 -p1
@@ -372,10 +323,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch274 -p1
 %patch275 -p1
 %patch276 -p1
-%patch277 -p1
-%patch280 -p1
 %patch282 -p1
-%patch283 -p1
 %patch287 -p1
 %patch290 -p1
 %patch293 -p1
@@ -385,7 +333,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch301 -p1
 %patch304 -p1
 %patch305 -p1
-%patch306 -p1
 %patch309 -p1
 %patch311 -p1
 %patch314 -p1
