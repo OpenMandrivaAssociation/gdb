@@ -172,7 +172,7 @@ Patch254: gdb-6.6-testsuite-timeouts.patch
 
 # Fix attaching to stopped processes (BZ 219118, 233852).
 # Fix attaching during a pending signal being delivered.
-Patch275: gdb-6.7-bz233852-attach-signalled-test.patch
+Patch275: gdb-6.8-attach-signalled-detach-stopped.patch
 
 # Link with libreadline provided by the operating system.
 Patch261: gdb-6.6-readline-system.patch
