@@ -170,8 +170,7 @@ Patch249: gdb-6.6-gcore32-test.patch
 # Avoid too long timeouts on failing cases of "annota1.exp annota3.exp".
 Patch254: gdb-6.6-testsuite-timeouts.patch
 
-# Fix attaching to stopped processes (BZ 219118, 233852).
-# Fix attaching during a pending signal being delivered.
+# Fix attaching to stopped processes and/or pending signals.
 Patch275: gdb-6.8-attach-signalled-detach-stopped.patch
 
 # Link with libreadline provided by the operating system.
