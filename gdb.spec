@@ -171,7 +171,7 @@ Patch249: gdb-6.6-gcore32-test.patch
 Patch254: gdb-6.6-testsuite-timeouts.patch
 
 # Fix attaching to stopped processes and/or pending signals.
-Patch275: gdb-6.8-attach-signalled-detach-stopped.patch
+Patch255: gdb-6.8-attach-signalled-detach-stopped.patch
 
 # Link with libreadline provided by the operating system.
 Patch261: gdb-6.6-readline-system.patch
@@ -185,6 +185,7 @@ Patch266: gdb-6.6-bz247354-leader-exit-test.patch
 
 # New locating of the matching binaries from the pure core file (build-id).
 Patch274: gdb-6.6-buildid-locate.patch
+Patch275: gdb-6.6-buildid-locate-rpm.patch
 # Mandriva doesn't have debuginfo-install etc., adapt
 Patch276: gdb-6.8-buildid-locate-mandriva.patch
 
@@ -215,7 +216,7 @@ Patch301: gdb-6.6-buildid-readnever-silent.patch
 Patch304: gdb-6.7-kernel-headers-compat.patch
 
 # Fix/implement the Fortran dynamic arrays support (BZ 377541).
-Patch305: gdb-6.8-bz377541-fortran-dynamic-arrays.patch
+#Patch305: gdb-6.8-bz377541-fortran-dynamic-arrays.patch
 
 # Test GCORE for shmid 0 shared memory mappings.
 Patch309: gdb-6.3-mapping-zero-inode-test.patch
@@ -233,7 +234,7 @@ Patch315: gdb-6.8-bz442765-threaded-exec-test.patch
 Patch318: gdb-6.8-gcc35998-ada-memory-trash.patch
 
 # Add compatibility for building with rpm5
-Patch319: gdb-6.8-rpm5-compat.patch
+#Patch319: gdb-6.8-rpm5-compat.patch
 
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
@@ -317,14 +318,15 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch298 -p1
 %patch301 -p1
 %patch304 -p1
-%patch305 -p1
+#%patch305 -p1
 %patch309 -p1
 %patch311 -p1
 %patch314 -p1
 %patch315 -p1
 %patch318 -p1
 %patch124 -p1
-%patch319 -p1
+%patch255 -p1
+#%patch319 -p1
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
