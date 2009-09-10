@@ -18,10 +18,6 @@ Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
 Source0:	gdb-%{version}%{?cvsdate:.%{cvsdate}}.tar.bz2
 
-# Fixes a warning (which is treated as an error) in tekhex.c, breaking
-# configure. Fix by blino. - AdamW 2007/09
-Patch0: gdb-6.6-tekhex_warning_fix.patch
-
 # Fix sim build
 Patch1:		gdb-5.2.1-fix-sim-build.patch
 
@@ -256,7 +252,6 @@ compiler, you may want to install gdb to help you debug your programs.
 
 %prep
 %setup -q -n %{name}-%{version}%{?cvsdate:.%{cvsdate}}
-%patch0 -p1
 %patch1 -p1 -b .sim-fixes
 %patch4 -p1
 %patch11 -p1
