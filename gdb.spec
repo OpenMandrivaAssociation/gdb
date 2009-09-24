@@ -236,6 +236,8 @@ Patch318: gdb-6.8-gcc35998-ada-memory-trash.patch
 # Add compatibility for building with rpm5
 #Patch319: gdb-6.8-rpm5-compat.patch
 
+Patch320: gdb_format_error.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
@@ -327,6 +329,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch124 -p1
 %patch255 -p1
 #%patch319 -p1
+%patch320 -p1
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
