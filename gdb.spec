@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	6.8.50
-%define release	%mkrel 1
+%define release	%mkrel 2
 %define cvsdate	20090908
 
 # Extract Mandriva Linux name and version
@@ -387,6 +387,9 @@ fi
 %{_bindir}/gdbserver
 %{_bindir}/gdbtui
 %{_bindir}/gstack
+%ifarch %mips
+%{_libdir}/lib*-mandriva-linux-gnu-sim.a
+%endif
 %{_mandir}/man1/gdb.1*
 %{_mandir}/man1/gdbserver.1*
 %{_mandir}/man1/gdbtui.1*
