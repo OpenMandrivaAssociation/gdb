@@ -1,7 +1,7 @@
 %define name	gdb
-%define version	6.8.50
-%define release	%mkrel 2
-%define cvsdate	20090908
+%define version	6.8.91
+%define release	%mkrel 1
+%define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
 %define mdv_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
@@ -335,9 +335,7 @@ cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
 EOF
 
-cd gdb
-autoreconf
-cd ..
+autoreconf -fi
 
 %build
 %configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug
