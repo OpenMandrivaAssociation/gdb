@@ -1,7 +1,7 @@
 %define name	gdb
-%define version	6.8.91
+%define version	7.0
 %define release	%mkrel 1
-%define cvsdate	20090929
+#define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
 %define mdv_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
@@ -241,7 +241,7 @@ Patch320: gdb_format_error.patch
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
-BuildRequires:	librpm-devel ncurses-devel readline-devel texinfo flex bison
+BuildRequires:	librpm-devel ncurses-devel readline-devel texinfo flex bison pkgconfig
 
 %description
 Gdb is a full featured, command driven debugger. Gdb allows you to
