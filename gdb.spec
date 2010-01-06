@@ -1,5 +1,5 @@
 %define name	gdb
-%define version	7.0
+%define version	7.0.1
 %define release	%mkrel 1
 #define cvsdate	20090929
 
@@ -176,7 +176,7 @@ Patch229: gdb-6.3-bz140532-ppc-unwinding-test.patch
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
 # Backported post gdb-7.0 fixups.
-Patch232: gdb-7.0-upstream.patch
+#Patch232: gdb-7.0-upstream.patch
 
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
@@ -359,6 +359,7 @@ BuildRequires:	librpm-devel
 BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	texinfo
+BuildRequires:	libcloog-devel
 
 %description
 Gdb is a full featured, command driven debugger. Gdb allows you to
@@ -376,7 +377,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch2 -p1
 %patch4 -p1
 
-%patch232 -p1
+#%patch232 -p1
 %patch349 -p1
 %patch383 -p1
 %patch384 -p1
