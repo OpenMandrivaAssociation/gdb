@@ -359,7 +359,7 @@ BuildRequires:	librpm-devel
 BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	texinfo
-BuildRequires:	libcloog-devel
+BuildRequires:	cloog-devel
 
 %description
 Gdb is a full featured, command driven debugger. Gdb allows you to
