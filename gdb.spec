@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	7.0.1
-%define release	%mkrel 1
+%define release	%mkrel 2
 #define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
@@ -59,6 +59,7 @@ Patch118: gdb-6.3-gstack-20050411.patch
 Patch122: gdb-6.3-test-pie-20050107.patch
 Patch124: gdb-archer-pie.patch
 Patch389: gdb-archer-pie-addons.patch
+Patch394: gdb-archer-pie-addons-keep-disabled.patch
 
 # Get selftest working with sep-debug-info
 Patch125: gdb-6.3-test-self-20050110.patch
@@ -176,7 +177,7 @@ Patch229: gdb-6.3-bz140532-ppc-unwinding-test.patch
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
 # Backported post gdb-7.0 fixups.
-#Patch232: gdb-7.0-upstream.patch
+Patch232: gdb-7.0-upstream.patch
 
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
@@ -259,8 +260,8 @@ Patch309: gdb-6.3-mapping-zero-inode-test.patch
 # Test a crash on `focus cmd', `focus prev' commands.
 Patch311: gdb-6.3-focus-cmd-prev-test.patch
 
-# Test crash on a sw watchpoint condition getting out of the scope.
-Patch314: gdb-6.3-watchpoint-cond-gone-test.patch
+# Fix error on a sw watchpoint active at function epilogue (hit on s390x).
+Patch314: gdb-watchpoint-cond-gone.patch
 
 # Test various forms of threads tracking across exec() (BZ 442765).
 Patch315: gdb-6.8-bz442765-threaded-exec-test.patch
@@ -339,7 +340,7 @@ Patch385: gdb-bz528668-symfile-multi.patch
 # Support GNU IFUNCs - indirect functions (BZ 539590).
 Patch387: gdb-bz539590-gnu-ifunc.patch
 
-# Fix bp conditionals [bp_location-accel] regression (Phil Muldoon, BZ 538626).
+# Fix bp conditionals [bp_location-accel] regression (BZ 538626).
 Patch388: gdb-bz538626-bp_location-accel-bp-cond.patch
 
 # Fix callback-mode readline-6.0 regression for CTRL-C.
@@ -348,10 +349,39 @@ Patch390: gdb-readline-6.0-signal.patch
 # Fix syscall restarts for amd64->i386 biarch.
 Patch391: gdb-x86_64-i386-syscall-restart.patch
 
+# Fix stepping with OMP parallel Fortran sections (BZ 533176).
+Patch392: gdb-bz533176-fortran-omp-step.patch
+
+# Use gfortran44 when running the testsuite on RHEL-5.
+#Patch393: gdb-rhel5-gcc44.patch
+
+# Disable warning messages new for gdb-6.8+ for RHEL-5 backward compatibility.
+# Workaround RHEL-5 kernels for detaching SIGSTOPped processes (BZ 498595).
+#Patch335: gdb-rhel5-compat.patch
+
+# Fix backward compatibility with G++ 4.1 namespaces "::".
+Patch395: gdb-empty-namespace.patch
+
+# Fix regression on re-setting the single ppc watchpoint slot.
+Patch396: gdb-ppc-hw-watchpoint-twice.patch
+
+# Fix regression by python on ia64 due to stale current frame.
+Patch397: gdb-follow-child-stale-parent.patch
+
+# testsuite: Fix false MI "unknown output after running" regression.
+Patch398: gdb-testsuite-unknown-output.patch
+
+# Fix regression of gdb-7.0.1 not preserving typedef of a field.
+Patch399: gdb-bitfield-check_typedef.patch
+
+# Fix related_breakpoint stale ref crash.
+Patch400: gdb-stale-related_breakpoint.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
 BuildRequires:	bison
+Buildrequires:	cloog-ppl-devel
 BuildRequires:	flex
 BuildRequires:	ncurses-devel
 BuildRequires:	libpython-devel
@@ -359,7 +389,6 @@ BuildRequires:	librpm-devel
 BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	texinfo
-BuildRequires:	cloog-devel
 
 %description
 Gdb is a full featured, command driven debugger. Gdb allows you to
@@ -377,11 +406,12 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch2 -p1
 %patch4 -p1
 
-#%patch232 -p1
+%patch232 -p1
 %patch349 -p1
 %patch383 -p1
 %patch384 -p1
 %patch385 -p1
+%patch388 -p1
 %patch124 -p1
 %patch11 -p1
 %patch13 -p1
@@ -485,10 +515,24 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch381 -p1
 %patch382 -p1
 %patch387 -p1
-%patch388 -p1
 %patch389 -p1
 %patch390 -p1
 %patch391 -p1
+%patch392 -p1
+# Always verify its applicability.
+#%patch393 -p1
+#%patch335 -p1
+#%if 0%{!?el5:1}
+#%patch393 -p1 -R
+#%patch335 -p1 -R
+#%endif
+%patch394 -p1
+%patch395 -p1
+%patch396 -p1
+%patch397 -p1
+%patch398 -p1
+%patch399 -p1
+%patch400 -p1
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
