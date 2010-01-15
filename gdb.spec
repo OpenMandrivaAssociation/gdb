@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	7.0.1
-%define release	%mkrel 1
+%define release	%mkrel 2
 #define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
@@ -384,6 +384,7 @@ BuildRequires:	bison
 Buildrequires:	cloog-ppl-devel
 BuildRequires:	flex
 BuildRequires:	ncurses-devel
+BuildRequires:	libexpat-devel
 BuildRequires:	libpython-devel
 BuildRequires:	librpm-devel
 BuildRequires:	pkgconfig
@@ -541,7 +542,7 @@ EOF
 %build
 %configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug \
                --with-pythondir=%{_datadir}/gdb/python \
-               --with-rpm
+               --with-rpm --with-expat
 %make
 make info
 
