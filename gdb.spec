@@ -1,6 +1,6 @@
 %define name	gdb
-%define version	7.0.1
-%define release	%mkrel 2
+%define version	7.1
+%define release	%mkrel 1
 #define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
@@ -57,7 +57,6 @@ Patch118: gdb-6.3-gstack-20050411.patch
 
 # VSYSCALL and PIE
 Patch122: gdb-6.3-test-pie-20050107.patch
-Patch124: gdb-archer-pie.patch
 Patch389: gdb-archer-pie-addons.patch
 Patch394: gdb-archer-pie-addons-keep-disabled.patch
 
@@ -119,10 +118,6 @@ Patch170: gdb-6.3-bt-past-zero-20051201.patch
 # Use bigger numbers than int.
 Patch176: gdb-6.3-large-core-20051206.patch
 
-# Hard-code executable names in gstack, such that it can run with a
-# corrupted or missing PATH.
-Patch177: gdb-6.3-gstack-without-path-20060414.patch
-
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
 Patch188: gdb-6.5-bz203661-emit-relocs.patch
 
@@ -160,8 +155,7 @@ Patch213: gdb-6.5-readline-long-line-crash-test.patch
 # Fix bogus 0x0 unwind of the thread's topmost function clone(3) (BZ 216711).
 Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
 
-# Try to reduce sideeffects of skipping ppc .so libs trampolines (BZ 218379).
-Patch215: gdb-6.5-bz218379-ppc-solib-trampoline-fix.patch
+# Test sideeffects of skipping ppc .so libs trampolines (BZ 218379).
 Patch216: gdb-6.5-bz218379-ppc-solib-trampoline-test.patch
 
 # Fix lockup on trampoline vs. its function lookup; unreproducible (BZ 218379).
@@ -176,8 +170,8 @@ Patch229: gdb-6.3-bz140532-ppc-unwinding-test.patch
 # Testcase for exec() from threaded program (BZ 202689).
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
-# Backported post gdb-7.0 fixups.
-Patch232: gdb-7.0-upstream.patch
+# Backported fixups post the source tarball.
+Patch232: gdb-upstream.patch
 
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
@@ -222,8 +216,9 @@ Patch271: gdb-6.5-bz243845-stale-testing-zombie-test.patch
 # New locating of the matching binaries from the pure core file (build-id).
 Patch274: gdb-6.6-buildid-locate.patch
 Patch353: gdb-6.6-buildid-locate-rpm.patch
+Patch415: gdb-6.6-buildid-locate-core-as-arg.patch
 # Mandriva doesn't have debuginfo-install etc., adapt
-Patch276: gdb-6.8-buildid-locate-mandriva.patch
+Patch276: gdb-7.1-buildid-locate-mandriva.patch
 
 # Fix displaying of numeric char arrays as strings (BZ 224128).
 Patch282: gdb-6.7-charsign-test.patch
@@ -260,9 +255,6 @@ Patch309: gdb-6.3-mapping-zero-inode-test.patch
 # Test a crash on `focus cmd', `focus prev' commands.
 Patch311: gdb-6.3-focus-cmd-prev-test.patch
 
-# Fix error on a sw watchpoint active at function epilogue (hit on s390x).
-Patch314: gdb-watchpoint-cond-gone.patch
-
 # Test various forms of threads tracking across exec() (BZ 442765).
 Patch315: gdb-6.8-bz442765-threaded-exec-test.patch
 
@@ -287,10 +279,6 @@ Patch324: gdb-6.8-glibc-headers-compat.patch
 # Create a single binary `gdb' autodetecting --tui by its argv[0].
 Patch326: gdb-6.8-tui-singlebinary.patch
 
-# Support transparent debugging of inlined functions for an optimized code.
-Patch350: gdb-6.8-inlining-addon.patch
-Patch328: gdb-6.8-inlining-by-name.patch
-
 # Fix PRPSINFO in the core files dumped by gcore (BZ 254229).
 Patch329: gdb-6.8-bz254229-gcore-prpsinfo.patch
 
@@ -314,37 +302,17 @@ Patch348: gdb-6.8-bz466901-backtrace-full-prelinked.patch
 
 # The merged branch `archer' of: http://sourceware.org/gdb/wiki/ProjectArcher
 Patch349: gdb-archer.patch
+Patch420: gdb-archer-ada.patch
 
 # Fix parsing elf64-i386 files for kdump PAE vmcore dumps (BZ 457187).
 # - Turn on 64-bit BFD support, globally enable AC_SYS_LARGEFILE.
-Patch352: gdb-6.8-bz457187-largefile.patch
 Patch360: gdb-6.8-bz457187-largefile-test.patch
-
-# Fix compatibility of --with-system-readline and readline-6.0+.
-Patch375: gdb-readline-6.0.patch
-
-# Fix python pretty printers lookup on x86_64.
-#Patch376: libstdc++-v3-python-common-prefix.patch
 
 # New test for step-resume breakpoint placed in multiple threads at once.
 Patch381: gdb-simultaneous-step-resume-breakpoint-test.patch
 
 # Fix GNU/Linux core open: Can't read pathname for load map: Input/output error.
 Patch382: gdb-core-open-vdso-warning.patch
-
-# Support multiple directories for `set debug-file-directory' (BZ 528668).
-Patch383: gdb-bz528668-symfile-sepcrc.patch
-Patch384: gdb-bz528668-symfile-cleanup.patch
-Patch385: gdb-bz528668-symfile-multi.patch
-
-# Support GNU IFUNCs - indirect functions (BZ 539590).
-Patch387: gdb-bz539590-gnu-ifunc.patch
-
-# Fix bp conditionals [bp_location-accel] regression (BZ 538626).
-Patch388: gdb-bz538626-bp_location-accel-bp-cond.patch
-
-# Fix callback-mode readline-6.0 regression for CTRL-C.
-Patch390: gdb-readline-6.0-signal.patch
 
 # Fix syscall restarts for amd64->i386 biarch.
 Patch391: gdb-x86_64-i386-syscall-restart.patch
@@ -359,23 +327,71 @@ Patch392: gdb-bz533176-fortran-omp-step.patch
 # Workaround RHEL-5 kernels for detaching SIGSTOPped processes (BZ 498595).
 #Patch335: gdb-rhel5-compat.patch
 
-# Fix backward compatibility with G++ 4.1 namespaces "::".
-Patch395: gdb-empty-namespace.patch
-
-# Fix regression on re-setting the single ppc watchpoint slot.
-Patch396: gdb-ppc-hw-watchpoint-twice.patch
-
 # Fix regression by python on ia64 due to stale current frame.
 Patch397: gdb-follow-child-stale-parent.patch
 
-# testsuite: Fix false MI "unknown output after running" regression.
-Patch398: gdb-testsuite-unknown-output.patch
+# Workaround ccache making lineno non-zero for command-line definitions.
+Patch403: gdb-ccache-workaround.patch
 
-# Fix regression of gdb-7.0.1 not preserving typedef of a field.
-Patch399: gdb-bitfield-check_typedef.patch
+# Implement `info common' for Fortran.
+Patch404: gdb-fortran-common-reduce.patch
+Patch405: gdb-fortran-common.patch
 
-# Fix related_breakpoint stale ref crash.
-Patch400: gdb-stale-related_breakpoint.patch
+# Fix Fortran logical-kind=8 (BZ 465310).
+Patch406: gdb-fortran-logical8.patch
+
+# Testcase for "Do not make up line information" fix by Daniel Jacobowitz.
+Patch407: gdb-lineno-makeup-test.patch
+
+# Test power7 ppc disassembly.
+Patch408: gdb-ppc-power7-test.patch
+
+# Revert: Add -Wunused-function to compile flags.
+Patch412: gdb-unused-revert.patch
+
+# Fix i386+x86_64 rwatch+awatch before run, regression against 6.8 (BZ 541866).
+Patch417: gdb-bz541866-rwatch-before-run.patch
+
+# Remove false gdb_assert on $sp underflow.
+Patch422: gdb-infcall-sp-underflow.patch
+
+# Fix double-free on std::terminate handler (Tom Tromey, BZ 562975).
+Patch429: gdb-bz562975-std-terminate-double-free.patch
+
+# PIE: Fix back re-reun.
+Patch430: gdb-pie-rerun.patch
+
+# Do not consider memory error on reading _r_debug->r_map as fatal (BZ 576742).
+Patch432: gdb-solib-memory-error-nonfatal.patch
+
+# testsuite: Fix unstable results of gdb.base/prelink.exp.
+Patch433: gdb-6.7-testsuite-stable-results-prelink.patch
+
+# [patch 1/6] PIE: Attach binary even after re-prelinked underneath
+# [patch 2/6] PIE: Attach binary even after ld.so re-prelinked underneath
+# [patch 3/6] PIE: Fix occasional error attaching i686 binary
+Patch434: gdb-pie-1of6-reprelinked-bin.patch
+Patch435: gdb-pie-2of6-reprelinked-ld.patch
+Patch436: gdb-pie-3of6-relocate-once.patch
+
+# [expr-cumulative] using-directive: Fix memory leak (Sami Wagiaalla).
+Patch437: gdb-using-directive-leak.patch
+
+# Fix dangling displays in separate debuginfo (BZ 574483).
+Patch438: gdb-bz574483-display-sepdebug.patch
+
+# Support AVX registers (BZ 578250).
+Patch439: gdb-bz578250-avx-01of10.patch
+Patch440: gdb-bz578250-avx-02of10.patch
+Patch441: gdb-bz578250-avx-03of10.patch
+Patch442: gdb-bz578250-avx-04of10.patch
+Patch443: gdb-bz578250-avx-05of10.patch
+Patch444: gdb-bz578250-avx-06of10.patch
+Patch445: gdb-bz578250-avx-07of10.patch
+Patch446: gdb-bz578250-avx-08of10.patch
+Patch447: gdb-bz578250-avx-09of10.patch
+Patch448: gdb-bz578250-avx-10of10.patch
+Patch449: gdb-bz578250-avx-10of10-ppc.patch
 
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
@@ -409,11 +425,7 @@ compiler, you may want to install gdb to help you debug your programs.
 
 %patch232 -p1
 %patch349 -p1
-%patch383 -p1
-%patch384 -p1
-%patch385 -p1
-%patch388 -p1
-%patch124 -p1
+%patch420 -p1
 %patch11 -p1
 %patch13 -p1
 %patch104 -p1
@@ -443,7 +455,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch169 -p1
 %patch170 -p1
 %patch176 -p1
-%patch177 -p1
 %patch188 -p1
 %patch190 -p1
 %patch194 -p1
@@ -456,7 +467,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch211 -p1
 %patch213 -p1
 %patch214 -p1
-%patch215 -p1
 %patch216 -p1
 %patch217 -p1
 %patch225 -p1
@@ -492,7 +502,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch304 -p1
 %patch309 -p1
 %patch311 -p1
-%patch314 -p1
 %patch315 -p1
 %patch317 -p1
 %patch318 -p1
@@ -500,8 +509,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch322 -p1
 %patch324 -p1
 %patch326 -p1
-%patch350 -p1
-%patch328 -p1
 %patch329 -p1
 %patch330 -p1
 %patch331 -p1
@@ -509,31 +516,58 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch337 -p1
 %patch343 -p1
 %patch348 -p1
-%patch352 -p1
 %patch360 -p1
-%patch375 -p1
-#patch376 -p1
 %patch381 -p1
 %patch382 -p1
-%patch387 -p1
-%patch389 -p1
-%patch390 -p1
 %patch391 -p1
 %patch392 -p1
+%patch397 -p1
+%patch403 -p1
+%patch404 -p1
+%patch405 -p1
+%patch389 -p1
+%patch394 -p1
+%patch406 -p1
+%patch407 -p1
+%patch408 -p1
+%patch412 -p1
+%patch417 -p1
+%patch422 -p1
+%patch429 -p1
+%patch430 -p1
+%patch432 -p1
+%patch433 -p1
+%patch434 -p1
+%patch435 -p1
+%patch436 -p1
+%patch437 -p1
+%patch438 -p1
+%patch439 -p1
+%patch440 -p1
+%patch441 -p1
+%patch442 -p1
+%patch443 -p1
+%patch444 -p1
+%patch445 -p1
+%patch446 -p1
+%patch447 -p1
+%patch448 -p1
+%patch449 -p1
+
 # Always verify its applicability.
+%patch415 -p1
 #%patch393 -p1
 #%patch335 -p1
+# Patch415: gdb-6.6-buildid-locate-core-as-arg.patch
+# Currently disabled for RHEL as it is a new experimental feature not present
+# in FSF GDB and possibly affecting new user scripts.
+#%if 0%{?rhel:1}
+#%patch415 -p1 -R
+#%endif
 #%if 0%{!?el5:1}
 #%patch393 -p1 -R
 #%patch335 -p1 -R
 #%endif
-%patch394 -p1
-%patch395 -p1
-%patch396 -p1
-%patch397 -p1
-%patch398 -p1
-%patch399 -p1
-%patch400 -p1
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
