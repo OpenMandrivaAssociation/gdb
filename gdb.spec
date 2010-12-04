@@ -405,7 +405,7 @@ BuildRequires:	flex
 BuildRequires:	ncurses-devel
 BuildRequires:	libexpat-devel
 BuildRequires:	libpython-devel
-BuildRequires:	librpm-devel
+BuildRequires:	librpm-devel >= 1:5.3
 BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	texinfo
