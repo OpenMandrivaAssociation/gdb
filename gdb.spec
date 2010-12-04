@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	7.1
-%define release	%mkrel 2
+%define release	%mkrel 3
 #define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
@@ -393,6 +393,9 @@ Patch447: gdb-bz578250-avx-09of10.patch
 Patch448: gdb-bz578250-avx-10of10.patch
 Patch449: gdb-bz578250-avx-10of10-ppc.patch
 
+
+Patch1000: gdb-7.1-rpm5.patch
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
@@ -556,18 +559,21 @@ compiler, you may want to install gdb to help you debug your programs.
 
 # Always verify its applicability.
 %patch415 -p1
-#%patch393 -p1
-#%patch335 -p1
+#%%patch393 -p1
+#%%patch335 -p1
 # Patch415: gdb-6.6-buildid-locate-core-as-arg.patch
 # Currently disabled for RHEL as it is a new experimental feature not present
 # in FSF GDB and possibly affecting new user scripts.
 #%if 0%{?rhel:1}
-#%patch415 -p1 -R
+#%%patch415 -p1 -R
 #%endif
 #%if 0%{!?el5:1}
-#%patch393 -p1 -R
-#%patch335 -p1 -R
+#%%patch393 -p1 -R
+#%%patch335 -p1 -R
 #%endif
+
+# if need for creating new release before rpm5 switch, just back out this one..
+%patch1000 -p1 -b .rpm5~
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
