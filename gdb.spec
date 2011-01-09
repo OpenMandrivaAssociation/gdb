@@ -1,6 +1,6 @@
 %define name	gdb
 %define version	7.1
-%define release	%mkrel 3
+%define release	%mkrel 4
 #define cvsdate	20090929
 
 # Extract Mandriva Linux name and version
@@ -395,6 +395,7 @@ Patch449: gdb-bz578250-avx-10of10-ppc.patch
 
 
 Patch1000: gdb-7.1-rpm5.patch
+Patch1001: gdb-7.1-python2.7-support.patch
 
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
@@ -574,6 +575,7 @@ compiler, you may want to install gdb to help you debug your programs.
 
 # if need for creating new release before rpm5 switch, just back out this one..
 %patch1000 -p1 -b .rpm5~
+%patch1001 -p1 -b .python2.7~
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{mdv_distro_version})
@@ -629,8 +631,10 @@ fi
 %{_bindir}/gdbserver
 %{_bindir}/gdbtui
 %{_bindir}/gstack
-%{_datadir}/gdb
-%ifarch %mips
+%dir %{_datadir}/gdb
+%{_datadir}/gdb/python
+%{_datadir}/gdb/syscalls
+%ifarch %{mips}
 %{_libdir}/lib*-mandriva-linux-gnu-sim.a
 %endif
 %{_mandir}/man1/gdb.1*
