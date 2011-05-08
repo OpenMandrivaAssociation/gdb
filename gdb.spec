@@ -584,7 +584,7 @@ EOF
 %build
 %configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug \
                --with-pythondir=%{_datadir}/gdb/python \
-               --with-rpm --with-expat
+               --with-rpm --with-expat --disable-werror
 %make
 make info
 
