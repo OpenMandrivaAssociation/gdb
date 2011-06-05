@@ -634,8 +634,8 @@ fi
 %dir %{_datadir}/gdb
 %{_datadir}/gdb/python
 %{_datadir}/gdb/syscalls
-%ifarch %{mips}
-%{_libdir}/lib*-mandriva-linux-gnu-sim.a
+%ifarch %{mips} %{arm}
+%{_libdir}/lib*-mandriva-linux-gnu*-sim.a
 %endif
 %{_mandir}/man1/gdb.1*
 %{_mandir}/man1/gdbserver.1*
