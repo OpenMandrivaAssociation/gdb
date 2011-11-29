@@ -4,7 +4,7 @@
 Summary:	A GNU source-level debugger for C, C++ and Fortran
 Name:		gdb
 Version:	7.3.50.20110722
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
@@ -517,7 +517,7 @@ If you are going to develop C and/or C++ programs and use the GNU gcc
 compiler, you may want to install gdb to help you debug your programs.
 
 %prep
-%setup -q -n %{name}-%{version}%{?cvsdate:.%{cvsdate}}
+%setup -q -n %{name}-%{version}%{?cvsdate:.%{cvsdate}} -a5
 %patch1 -p1
 
 %patch12 -p1
@@ -639,7 +639,7 @@ compiler, you may want to install gdb to help you debug your programs.
 
 %patch393 -p1
 %patch335 -p1
-#patch487 -p1
+%patch487 -p1
 
 %patch1000 -p1 -b .rpm5~
 
@@ -656,9 +656,6 @@ EOF
 		--with-system-gdbinit=%{_sysconfdir}/gdbinit
 %make
 make info
-
-%check
-gcc -o ./orphanripper %{SOURCE2} -Wall -lutil -ggdb2
 
 %install
 %makeinstall_std
