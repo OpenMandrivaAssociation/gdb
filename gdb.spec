@@ -649,15 +649,21 @@ cat > gdb/version.in << EOF
 EOF
 
 %build
-%configure2_5x --with-separate-debug-dir=%{_prefix}/lib/debug \
-               --with-pythondir=%{_datadir}/gdb/python \
-               --with-rpm --with-expat --disable-werror
+%configure2_5x	--with-separate-debug-dir=%{_prefix}/lib/debug \
+		--with-pythondir=%{_datadir}/gdb/python \
+		--with-rpm \
+		--with-expat \
+		--disable-werror \
+		--with-system-gdbinit=%{_sysconfdir}/gdbinit
 %make
 make info
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
+
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
+sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >$RPM_BUILD_ROOT%{_sysconfdir}/gdbinit
 
 # The above is broken, do this for now:
 mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -699,6 +705,8 @@ fi
 %{_bindir}/gdbtui
 %{_bindir}/gstack
 %{_bindir}/gdb-add-index
+%{_sysconfdir}/gdbinit
+%{_sysconfdir}/gdbinit.d
 %dir %{_datadir}/gdb
 %{_datadir}/gdb/python
 %{_datadir}/gdb/syscalls
