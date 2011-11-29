@@ -657,6 +657,9 @@ EOF
 %make
 make info
 
+%check
+gcc -o ./orphanripper %{SOURCE2} -Wall -lutil -ggdb2
+
 %install
 %makeinstall_std
 
@@ -679,6 +682,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libmmalloc.a
 rm -f $RPM_BUILD_ROOT%{_infodir}/{configure,libiberty,rluserman}.info*
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
 rm -f $RPM_BUILD_ROOT%{_infodir}/annotate.info*
+
+install -m644 %{SOURCE3} -D $RPM_BUILD_ROOT%{_mandir}/man1/gstack.1
 
 %post
 %{_install_info gdb.info}
@@ -713,6 +718,7 @@ fi
 %{_mandir}/man1/gdb.1*
 %{_mandir}/man1/gdbserver.1*
 %{_mandir}/man1/gdbtui.1*
+%{_mandir}/man1/gstack.1*
 %{_infodir}/gdb.info*
 %{_infodir}/gdbint.info*
 %{_infodir}/stabs.info*
