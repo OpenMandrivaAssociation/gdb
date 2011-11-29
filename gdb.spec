@@ -494,7 +494,6 @@ Patch634: gdb-runtest-pie-override.patch
 
 Patch1000: gdb-7.3.50.20110722-rpm5.patch
 
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires(post):	info-install
 Requires(preun):	info-install
 BuildRequires:	bison
@@ -659,7 +658,6 @@ EOF
 make info
 
 %install
-rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
@@ -682,9 +680,6 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/{configure,libiberty,rluserman}.info*
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
 rm -f $RPM_BUILD_ROOT%{_infodir}/annotate.info*
 
-%clean
-rm -fr $RPM_BUILD_ROOT
-
 %post
 %{_install_info gdb.info}
 %{_install_info gdbint.info}
@@ -698,7 +693,6 @@ if [ $1 = 0 ]; then
 fi
 
 %files
-%defattr(-,root,root)
 %doc README gdb/NEWS
 %{_bindir}/gdb
 %{_bindir}/gdbserver
@@ -722,4 +716,3 @@ fi
 %{_infodir}/gdb.info*
 %{_infodir}/gdbint.info*
 %{_infodir}/stabs.info*
-
