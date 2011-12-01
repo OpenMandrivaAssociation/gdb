@@ -660,27 +660,27 @@ make info
 %install
 %makeinstall_std
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
-sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >$RPM_BUILD_ROOT%{_sysconfdir}/gdbinit
+mkdir -p %{buildroot}%{_sysconfdir}/gdbinit.d
+sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >%{buildroot}%{_sysconfdir}/gdbinit
 
 # The above is broken, do this for now:
-mkdir -p $RPM_BUILD_ROOT%{_infodir}
-cp `find . -name "*.info*"` $RPM_BUILD_ROOT/%{_infodir}
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir $RPM_BUILD_ROOT%{_infodir}/dir.info* 
-rm -f $RPM_BUILD_ROOT%{_bindir}/{texindex,texi2dvi,makeinfo,install-info,info}
+mkdir -p %{buildroot}%{_infodir}
+cp `find . -name "*.info*"` %{buildroot}/%{_infodir}
+rm -f %{buildroot}%{_infodir}/dir %{buildroot}%{_infodir}/dir.info* 
+rm -f %{buildroot}%{_bindir}/{texindex,texi2dvi,makeinfo,install-info,info}
 
 # These are part of binutils
-rm -f $RPM_BUILD_ROOT%{_infodir}/{bfd,standard,readline,history,info,texinfo}*
-rm -fr $RPM_BUILD_ROOT%{_includedir}
-rm -fr $RPM_BUILD_ROOT%{_libdir}/lib{bfd*,opcodes*,iberty*}
+rm -f %{buildroot}%{_infodir}/{bfd,standard,readline,history,info,texinfo}*
+rm -fr %{buildroot}%{_includedir}
+rm -fr %{buildroot}%{_libdir}/lib{bfd*,opcodes*,iberty*}
 
 # Remove even more unpackaged files
-rm -f $RPM_BUILD_ROOT%{_libdir}/libmmalloc.a
-rm -f $RPM_BUILD_ROOT%{_infodir}/{configure,libiberty,rluserman}.info*
-rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
-rm -f $RPM_BUILD_ROOT%{_infodir}/annotate.info*
+rm -f %{buildroot}%{_libdir}/libmmalloc.a
+rm -f %{buildroot}%{_infodir}/{configure,libiberty,rluserman}.info*
+rm -rf %{buildroot}%{_datadir}/locale/
+rm -f %{buildroot}%{_infodir}/annotate.info*
 
-install -m644 %{SOURCE3} -D $RPM_BUILD_ROOT%{_mandir}/man1/gstack.1
+install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 
 %post
 %{_install_info gdb.info}
