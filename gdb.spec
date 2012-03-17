@@ -499,10 +499,10 @@ Requires(preun):	info-install
 BuildRequires:	bison
 Buildrequires:	cloog-ppl-devel
 BuildRequires:	flex
-BuildRequires:	ncurses-devel
+BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	libexpat-devel
-BuildRequires:	libpython-devel
-BuildRequires:	librpm-devel >= 1:5.3
+BuildRequires:	pkgconfig(python)
+BuildRequires:	pkgconfig(rpm) >= 5.3
 BuildRequires:	pkgconfig
 BuildRequires:	readline-devel
 BuildRequires:	texinfo
