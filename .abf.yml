@@ -1,0 +1,6 @@
+sources:
+  "gdb-7.3.50.20110722.tar.bz2:"	304e73c015a112dcb53e8417c4c35147d62733f1
+  "gdb-gstack.man:"	6cc32270412f4c05bcd7fb4de4a12c4bfb9f0c64
+  "gdbinit:"	4b501ef6e8cd7168736370342b6d72fe53f43c35
+  "gdb-orphanripper.c:"	d5cdd62593a8d0e4c4cebc047975083096ddbe55
+  "libstdc++-v3-python-r155978.tar.bz2:"	0c8151ce702731e5ca59ee151f450b8300d94499
