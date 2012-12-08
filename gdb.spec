@@ -706,3 +706,235 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 %{_infodir}/gdb.info*
 %{_infodir}/gdbint.info*
 %{_infodir}/stabs.info*
+
+
+%changelog
+* Wed Jun 06 2012 Andrey Bondrov <abondrov@mandriva.org> 7.3.50.20110722-4
++ Revision: 802906
+- Drop some legacy junk
+
+* Sat Mar 17 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-3
++ Revision: 785440
+- debug packages has now '-debuginfo' as suffix, rather than '-debug'
+- use pkgconfig() deps for buildrequires
+
+* Tue Nov 29 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-2
++ Revision: 735290
+- enable P487
+
+* Tue Nov 29 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-1
++ Revision: 735285
+- add gstack.1 man page
+- remove legacy rpm stuff
+- provide stub %%{_sysconfdir}/gdbinit (rhbz#651232)
+- sync version & patches with gdb-7.3.50.20110722-11 from Fedora
+
+  + Matthew Dawkins <mattydaw@mandriva.org>
+    - added arm support
+    - _gnu in arm is -gnueabi
+
+* Sun May 08 2011 Funda Wang <fwang@mandriva.org> 7.1-5
++ Revision: 672383
+- disable werror
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - mass rebuild
+
+* Sun Jan 09 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.1-4mdv2011.0
++ Revision: 630736
+- fix python 2.7 support (P1001)
+
+* Sat Dec 04 2010 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.1-3mdv2011.0
++ Revision: 608927
+- add versioned rpm-devel build requires
+- port to rpm5 API (P1000)
+
+* Sun Oct 31 2010 Funda Wang <fwang@mandriva.org> 7.1-2mdv2011.0
++ Revision: 590743
+- rebuild for py2.7
+
+* Fri Apr 16 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.1-1mdv2010.1
++ Revision: 535538
+- Updated gdb to version 7.1
+- Sync Fedora patches with gdb-7.1-12.fc13
+- Update buildid-locate-mandriva patch for new gdb.
+
+* Fri Jan 15 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0.1-2mdv2010.1
++ Revision: 491836
+- Make sure we always build with libexpat.
+
+* Wed Jan 06 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0.1-1mdv2010.1
++ Revision: 486873
+- Sync fedora patches with 7.0.1-19.fc12
+
+  + Emmanuel Andry <eandry@mandriva.org>
+    - New version 7.0.1
+    - drop p232 (merged upstream)
+    - BR libcloog-devel
+
+* Fri Dec 18 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0-1mdv2010.1
++ Revision: 479987
+- Rediff fix-sim-build, buildid-locate-mandriva.
+- Sync patches with Fedora gdb package (7.0-9.fc12).
+
+  + Christophe Fergeau <cfergeau@mandriva.com>
+    - upload gdb 7.0 tarball (still not building :-/)
+    - readd patches I didn't mean to remove just yet
+    - update to first 7.0 prerelease, still not working because of autoconf issues :(
+    - rediff patches against new gdb tarball
+      add gdb-6.6-buildid-locate-rpm.patch from fedora (they split gdb-6.6-buildid-locate.patch in 2 separate patches)
+      comment out 2 patches that haven't been rediffed yet
+    - fix patch comment to be in line with fedora .spec comment
+    - pick attach-signalled patch from fedora to replace ours
+    - drop no longer useful patch (after switch to gcc 4.4?)
+    - Patch179 has been dropped from RedHat too
+    - sync RedHat patches to latest version
+    - remove no longer used patches
+    - patch backporting upstream fixes is no longer necessary
+    - drop patches that are no longer in fedora package
+    - use 6.8.50 CVS snapshot instead of the old 6.8 release
+    - fix Patch176 (depended on an ia64 patch)
+    - Patch112 is needed by Patch141, readd it
+    - remove obsolete patches
+    - drop unused patches
+    - fix cvs snapshot handling
+    - delete dropped patches
+    - drop ppc, ia64 and sparc patches
+
+  + Olivier Blin <blino@mandriva.org>
+    - add mips support (from Arnaud Patard)
+    - fix a format error in sim-utils (from Arnaud Patard)
+
+* Wed Sep 02 2009 Christophe Fergeau <cfergeau@mandriva.com> 6.8-7mdv2010.0
++ Revision: 424577
+- rebuild
+
+* Mon Mar 23 2009 Paulo Andrade <pcpa@mandriva.com.br> 6.8-6mdv2009.1
++ Revision: 360759
+- Correct #37755. See https://bugzilla.redhat.com/show_bug.cgi?id=453688#c3
+  for more information. This basically allows 'valgrind --db-attach=yes' to
+  work again, as this feature is missing since 2008.0. This patch is not
+  fully correct as it depends on corrections in kernel code, but is enough
+  to get gdb to stop at the proper moment memory corruption happened, and
+  to allow checking contents of global and stack variables (of the current
+  function, stack frame information is lost).
+
+* Wed Jan 21 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-5mdv2009.1
++ Revision: 332266
+- Really fix display of missing debug packages (#47170).
+
+* Wed Jan 21 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-4mdv2009.1
++ Revision: 332195
+- Fix display of missing debug packages (#47170).
+
+* Tue Jan 20 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-3mdv2009.1
++ Revision: 332036
+- Reset _default_patch_fuzz to 2 until patches are rediffed.
+- Updated buildid-locate patch from Fedora (reported by Pixel).
+- Redid buildid-locate-mandriva patch.
+- Rediffed rpm5-compat patch.
+
+  + Per Øyvind Karlsen <peroyvind@mandriva.org>
+    - add rpm5.org compatibility (P319)
+
+* Sun Aug 24 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-2mdv2009.0
++ Revision: 275428
+- Provide again gdbserver (#41257). For some unknown reason it was being
+  removed on the spec, no explanation or changelog explaining this.
+
+  + Götz Waschk <waschk@mandriva.org>
+    - fix license
+
+* Wed Jun 18 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-1mdv2009.0
++ Revision: 224207
+- Add BuildRequires for librpm-devel
+- Mandriva doesn't have debuginfo-install etc., quick adapt for
+  buildid-locate patch from Fedora (we should stop to share/sync all
+  patches...)
+- Updated to version 6.8
+- Removed already applied patches:
+  gdb-6.6-makeinfoversion.patch
+  gdb-6.6-do-not-crash-on-line-info-with-no-file.patch
+- Sync fedora patches with their latest gdb package (gdb-6.8-10.fc10).
+
+* Tue Jun 17 2008 Thierry Vignaud <tv@mandriva.org> 6.6-6mdv2009.0
++ Revision: 221044
+- rebuild
+
+* Mon Mar 31 2008 Pixel <pixel@mandriva.com> 6.6-5mdv2008.1
++ Revision: 191243
+- fixes gdb crashing when using kdelibs-debug (#29755)
+  (without this patch, kcrash/drkonqi fails with a weird error message)
+
+  + Frederic Crozat <fcrozat@mandriva.com>
+    - Patch235 (CVS): fix rebuild with latest makeinfo
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - rebuild
+    - kill re-definition of %%buildroot on Pixel's request
+
+  + Olivier Blin <blino@mandriva.org>
+    - restore BuildRoot
+
+* Mon Sep 10 2007 Adam Williamson <awilliamson@mandriva.org> 6.6-3mdv2008.0
++ Revision: 84260
+- rediff patch234 (spaces vs. tabs...)
+- better version of patch234
+- add patch234 suggested by blino to fix a warning which breaks %%configure
+- don't package COPYING and COPYING.LIB
+- drop menu entries (#27065)
+- Fedora license policy, correct license
+- drop old (10.1) conditionals
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - sync with gdb-6.6-1mdv2007.1.src.rpm
+
+
+* Sun Jan 28 2007 Per Øyvind Karlsen <pkarlsen@mandriva.com> 6.6-1mdv2007.0
++ Revision: 114460
+- new release: 6.6
+  sync with fedora
+  fix prereq
+- Import gdb
+
+* Tue Sep 19 2006 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-8mdv2007.0
+- Rebuild
+
+* Mon Jul 17 2006 Nicolas L�cureuil <neoclust@mandriva.org> 6.3-7mdv2007.0
+- XDG
+
+* Wed Oct 05 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-6mdk
+- ppc64 fixes
+
+* Mon Aug 01 2005 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.3-5mdk
+- add BuildRequires: bison
+
+* Wed Jul 27 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-4mdk
+- merge with RH 6.3.0.0-1.49
+
+* Thu Jan 20 2005 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 6.3-3mdk
+- rebuild for new readline
+- wipe out buildroot at the beginning of %%install
+
+* Sun Nov 14 2004 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.3-2mdk
+- add BuildRequires: flex
+
+* Wed Nov 10 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.3-1mdk
+- 6.3
+
+* Fri Aug 27 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.2-2mdk
+- Improved i386 prologue analyzer from 6.2-branch (2004/07/08)
+
+* Thu Aug 26 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.2-1mdk
+- 6.2
+
+* Sat Aug 14 2004 Laurent MONTEL <lmontel@mandrakesoft.com> 6.1.1-2mdk
+- Rebuild for new conversion table menu
+
+* Sat Jul 31 2004 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.1.1-1mdk
+- package ppc-specific files
+- 6.1.1
+
+* Tue May 25 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.1-1mdk
+- 6.1
+
