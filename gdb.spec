@@ -499,7 +499,7 @@ BuildRequires:	bison
 Buildrequires:	cloog-ppl-devel
 BuildRequires:	flex
 BuildRequires:	pkgconfig(ncurses)
-BuildRequires:	libexpat-devel
+BuildRequires:	expat-devel
 BuildRequires:	pkgconfig(python)
 BuildRequires:	pkgconfig(rpm) >= 5.3
 BuildRequires:	pkgconfig
@@ -713,16 +713,16 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 + Revision: 802906
 - Drop some legacy junk
 
-* Sat Mar 17 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-3
+* Sat Mar 17 2012 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-3
 + Revision: 785440
 - debug packages has now '-debuginfo' as suffix, rather than '-debug'
 - use pkgconfig() deps for buildrequires
 
-* Tue Nov 29 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-2
+* Tue Nov 29 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-2
 + Revision: 735290
 - enable P487
 
-* Tue Nov 29 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-1
+* Tue Nov 29 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-1
 + Revision: 735285
 - add gstack.1 man page
 - remove legacy rpm stuff
@@ -740,11 +740,11 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
   + Oden Eriksson <oeriksson@mandriva.com>
     - mass rebuild
 
-* Sun Jan 09 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.1-4mdv2011.0
+* Sun Jan 09 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.1-4mdv2011.0
 + Revision: 630736
 - fix python 2.7 support (P1001)
 
-* Sat Dec 04 2010 Per Øyvind Karlsen <peroyvind@mandriva.org> 7.1-3mdv2011.0
+* Sat Dec 04 2010 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.1-3mdv2011.0
 + Revision: 608927
 - add versioned rpm-devel build requires
 - port to rpm5 API (P1000)
@@ -834,7 +834,7 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 - Redid buildid-locate-mandriva patch.
 - Rediffed rpm5-compat patch.
 
-  + Per Øyvind Karlsen <peroyvind@mandriva.org>
+  + Per Ãyvind Karlsen <peroyvind@mandriva.org>
     - add rpm5.org compatibility (P319)
 
 * Sun Aug 24 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-2mdv2009.0
@@ -842,7 +842,7 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 - Provide again gdbserver (#41257). For some unknown reason it was being
   removed on the spec, no explanation or changelog explaining this.
 
-  + Götz Waschk <waschk@mandriva.org>
+  + GÃ¶tz Waschk <waschk@mandriva.org>
     - fix license
 
 * Wed Jun 18 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-1mdv2009.0
@@ -890,7 +890,7 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
     - sync with gdb-6.6-1mdv2007.1.src.rpm
 
 
-* Sun Jan 28 2007 Per Øyvind Karlsen <pkarlsen@mandriva.com> 6.6-1mdv2007.0
+* Sun Jan 28 2007 Per Ãyvind Karlsen <pkarlsen@mandriva.com> 6.6-1mdv2007.0
 + Revision: 114460
 - new release: 6.6
   sync with fedora
@@ -900,7 +900,7 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 * Tue Sep 19 2006 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-8mdv2007.0
 - Rebuild
 
-* Mon Jul 17 2006 Nicolas L�cureuil <neoclust@mandriva.org> 6.3-7mdv2007.0
+* Mon Jul 17 2006 Nicolas Lécureuil <neoclust@mandriva.org> 6.3-7mdv2007.0
 - XDG
 
 * Wed Oct 05 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-6mdk
@@ -912,7 +912,7 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 * Wed Jul 27 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-4mdk
 - merge with RH 6.3.0.0-1.49
 
-* Thu Jan 20 2005 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 6.3-3mdk
+* Thu Jan 20 2005 Per Ãyvind Karlsen <peroyvind@linux-mandrake.com> 6.3-3mdk
 - rebuild for new readline
 - wipe out buildroot at the beginning of %%install
 
