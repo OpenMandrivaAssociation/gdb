@@ -1,8 +1,8 @@
-Index: gdb-7.0.50.20100115/gdb/linux-nat.c
+Index: gdb-7.4.50.20120703/gdb/linux-nat.c
 ===================================================================
---- gdb-7.0.50.20100115.orig/gdb/linux-nat.c	2010-01-15 11:53:34.000000000 +0100
-+++ gdb-7.0.50.20100115/gdb/linux-nat.c	2010-01-15 12:13:53.000000000 +0100
-@@ -208,6 +208,9 @@ blocked.  */
+--- gdb-7.4.50.20120703.orig/gdb/linux-nat.c	2012-07-03 17:46:55.000000000 +0200
++++ gdb-7.4.50.20120703/gdb/linux-nat.c	2012-07-03 17:57:29.608734933 +0200
+@@ -180,6 +180,9 @@ blocked.  */
  static struct target_ops *linux_ops;
  static struct target_ops linux_ops_saved;
  
@@ -10,9 +10,9 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
 +static pid_t pid_was_stopped;
 +
  /* The method to call, if any, when a new thread is attached.  */
- static void (*linux_nat_new_thread) (ptid_t);
+ static void (*linux_nat_new_thread) (struct lwp_info *);
  
-@@ -933,7 +936,14 @@ Attaching after process %d fork to child
+@@ -909,7 +912,14 @@ holding the child stopped.  Try \"set de
  	  parent_inf->waiting_for_vfork_done = 0;
  	}
        else if (detach_fork)
@@ -28,7 +28,7 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
  
        /* Note that the detach above makes PARENT_INF dangling.  */
  
-@@ -1427,6 +1437,7 @@ linux_nat_post_attach_wait (ptid_t ptid,
+@@ -1377,6 +1387,7 @@ linux_nat_post_attach_wait (ptid_t ptid,
        if (debug_linux_nat)
  	fprintf_unfiltered (gdb_stdlog,
  			    "LNPAW: Attaching to a stopped process\n");
@@ -36,8 +36,8 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
  
        /* The process is definitely stopped.  It is in a job control
  	 stop, unless the kernel predates the TASK_STOPPED /
-@@ -1757,6 +1768,9 @@ GPT: lwp %s had signal %s, but it is in 
- 			    target_signal_to_string (signo));
+@@ -1805,6 +1816,9 @@ get_pending_status (struct lwp_info *lp,
+ 			    gdb_signal_to_string (signo));
      }
  
 +  if (*status == 0 && GET_PID (lp->ptid) == pid_was_stopped)
@@ -46,7 +46,7 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
    return 0;
  }
  
-@@ -1866,6 +1880,8 @@ linux_nat_detach (struct target_ops *ops
+@@ -1918,6 +1932,8 @@ linux_nat_detach (struct target_ops *ops
      }
    else
      linux_ops->to_detach (ops, args, from_tty);
@@ -55,8 +55,8 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
  }
  
  /* Resume LP.  */
-@@ -2031,6 +2047,14 @@ linux_nat_resume (struct target_ops *ops
-      resume_callback.  */
+@@ -2104,6 +2120,14 @@ linux_nat_resume (struct target_ops *ops
+      linux_nat_resume_callback.  */
    lp->stopped = 0;
  
 +  /* At this point, we are going to resume the inferior and if we
@@ -68,9 +68,9 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
 +    pid_was_stopped = 0;
 +
    if (resume_many)
-     iterate_over_lwps (ptid, resume_callback, NULL);
+     iterate_over_lwps (ptid, linux_nat_resume_callback, NULL);
  
-@@ -3923,6 +3947,8 @@ linux_nat_mourn_inferior (struct target_
+@@ -4129,6 +4153,8 @@ linux_nat_mourn_inferior (struct target_
         there are other viable forks to debug.  Delete the exiting
         one and context-switch to the first available.  */
      linux_fork_mourn_inferior ();
@@ -79,11 +79,11 @@ Index: gdb-7.0.50.20100115/gdb/linux-nat.c
  }
  
  /* Convert a native/host siginfo object, into/from the siginfo in the
-Index: gdb-7.0.50.20100115/gdb/testsuite/gdb.threads/attach-stopped.exp
+Index: gdb-7.4.50.20120703/gdb/testsuite/gdb.threads/attach-stopped.exp
 ===================================================================
---- gdb-7.0.50.20100115.orig/gdb/testsuite/gdb.threads/attach-stopped.exp	2010-01-01 08:32:06.000000000 +0100
-+++ gdb-7.0.50.20100115/gdb/testsuite/gdb.threads/attach-stopped.exp	2010-01-15 11:54:57.000000000 +0100
-@@ -62,7 +62,65 @@ proc corefunc { threadtype } {
+--- gdb-7.4.50.20120703.orig/gdb/testsuite/gdb.threads/attach-stopped.exp	2012-06-26 21:23:20.000000000 +0200
++++ gdb-7.4.50.20120703/gdb/testsuite/gdb.threads/attach-stopped.exp	2012-07-03 17:56:43.797790120 +0200
+@@ -61,7 +61,65 @@ proc corefunc { threadtype } {
      gdb_reinitialize_dir $srcdir/$subdir
      gdb_load ${binfile}
  
@@ -150,34 +150,3 @@ Index: gdb-7.0.50.20100115/gdb/testsuite/gdb.threads/attach-stopped.exp
         
      set test "$threadtype: attach2 to stopped, after setting file"
      gdb_test_multiple "attach $testpid" "$test" {
-Index: gdb-7.0.50.20100115/gdb/testsuite/gdb.threads/attachstop-mt.exp
-===================================================================
---- gdb-7.0.50.20100115.orig/gdb/testsuite/gdb.threads/attachstop-mt.exp	2010-01-01 08:32:06.000000000 +0100
-+++ gdb-7.0.50.20100115/gdb/testsuite/gdb.threads/attachstop-mt.exp	2010-01-15 11:54:57.000000000 +0100
-@@ -176,12 +176,23 @@ gdb_test "bt" ".*sleep.*(func|main).*" "
- # Exit and detach the process.
- gdb_exit
- 
--# Stop the program 
--remote_exec build "kill -s STOP ${testpid}"
--
- # No race
- sleep 2
- 
-+set fileid3 [open $status2 r];
-+gets $fileid3 line1;
-+gets $fileid3 line2;
-+close $fileid3;
-+
-+set test "attach3, exit leaves process stopped"
-+if {[string match "*(stopped)*" $line2]} {
-+  pass $test
-+} else {
-+  fail $test
-+}
-+
-+# At this point, the process should still be stopped
-+
- # Continue the test as we would hit another expected bug regarding
- # 	Program received signal SIGSTOP, Stopped (signal).
- # across NPTL threads.

@@ -1,0 +1,23 @@
+http://sourceware.org/ml/gdb-cvs/2012-07/msg00173.html
+
+### src/gdb/ChangeLog	2012/07/20 17:54:05	1.14507
+### src/gdb/ChangeLog	2012/07/22 16:52:39	1.14508
+## -1,3 +1,7 @@
++2012-07-22  Siddhesh Poyarekar  <siddhesh@redhat.com>
++
++	* sh-tdep.c (sh_treat_as_flt_p): Remove unused variable LEN.
++
+ 2012-07-20  Jeff Kenton  <jkenton@tilera.com>
+ 
+ 	* tilegx-linux-tdep.c (tilegx_linux_sigframe_init): Fix
+--- src/gdb/sh-tdep.c	2012/06/08 14:24:57	1.245
++++ src/gdb/sh-tdep.c	2012/07/22 16:52:41	1.246
+@@ -1032,8 +1032,6 @@
+ static int
+ sh_treat_as_flt_p (struct type *type)
+ {
+-  int len = TYPE_LENGTH (type);
+-
+   /* Ordinary float types are obviously treated as float.  */
+   if (TYPE_CODE (type) == TYPE_CODE_FLT)
+     return 1;

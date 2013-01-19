@@ -1,0 +1,701 @@
+http://sourceware.org/ml/gdb-patches/2012-09/msg00629.html
+Subject: [PATCH 3/4] Expand watchpoint lengths to LONGEST
+
+
+--MP_/6HRlH6vpyqtSy4CYyMrX6b2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,
+
+This is part three of the bitpos expansion change.  Some architectures
+allow arbitrary length watchpoints and combined with the fact that type
+lengths could be large enough, we need LONGEST for watchpoint lengths.
+It is architecture dependent however, whether the LONGEST is needed or
+not.  This patch updates the signatures of watchpoint insertion and
+removal functions of all architectures (to comply with the function
+signatures in the callback struct), but expands types only in
+architectures that need it.  Tested on Fedora 16 x86_64.
+
+Regards,
+Siddhesh
+--MP_/6HRlH6vpyqtSy4CYyMrX6b2
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename=ChangeLog-wp
+
+gdb/ChangeLog:
+
+	* arm-linux-nat.c (arm_linux_insert_watchpoint): Expand
+	parameter LEN to LONGEST.
+	(arm_linux_remove_watchpoint): Likewise.
+	(arm_linux_watchpoint_addr_within_range): Expand parameter
+	LENGTH to LONGEST.
+	* i386-nat.c (i386_insert_watchpoint): Expand parameter LEN to
+	LONGEST.
+	(i386_remove_watchpoint): Likewise.
+	* ia64-linux-nat.c (ia64_linux_insert_watchpoint): Likewise.
+	(ia64_linux_remove_watchpoint): Likewise.
+	* inf-ttrace.c (inf_ttrace_insert_watchpoint): Likewise.
+	Expand NUM_PAGES, PAGE to LONGEST.
+	(inf_ttrace_remove_watchpoint): Likewise.
+	* mips-linux-nat.c (mips_linux_insert_watchpoint): Expand
+	parameter LEN to LONGEST.
+	(mips_linux_remove_watchpoint): Likewise.
+	* nto-procfs.c (procfs_remove_hw_watchpoint): Likewise.
+	(procfs_insert_hw_watchpoint): Likewise.
+	* ppc-linux-nat.c (calculate_dvc): Likewise.  Expand I,
+	NUM_BYTE_ENABLE to LONGEST.
+	(check_condition): Expand parameter LEN to point to LONGEST.
+	(ppc_linux_can_accel_watchpoint_condition): Expand parameter
+	LEN to LONGEST.
+	(create_watchpoint_request): Likewise.
+	(ppc_linux_insert_watchpoint): Likewise.
+	(ppc_linux_remove_watchpoint): Likewise.
+	(ppc_linux_watchpoint_addr_within_range): Expand parameter
+	LENGTH to LONGEST.
+	* procfs.c (proc_set_watchpoint): Expand parameter LEN to
+	LONGEST.
+	(procfs_set_watchpoint): Likewise.
+	(procfs_insert_watchpoint): Likewise.
+	(procfs_remove_watchpoint): Likewise.
+	* remote-m32r-sdi.c (m32r_insert_watchpoint): Likewise.  Use
+	plongest to format print LEN.
+	(m32r_remove_watchpoint): Likewise.
+	* remote-mips.c (mips_insert_watchpoint): Expand parameter LEN
+	to LONGEST.
+	(mips_remove_watchpoint): Likewise.
+	* remote.c (remote_insert_watchpoint): Likewise.
+	Use phex_nz to format print LEN.
+	(remote_remove_watchpoint): Likewise.
+	(remote_watchpoint_addr_within_range): Expand parameter LENGTH
+	to LONGEST.
+	* s390-nat.c (s390_insert_watchpoint): Expand parameter LEN to
+	LONGEST.
+	(s390_remove_watchpoint): Likewise.
+	* target.c (update_current_target): Expand parameter LEN for
+	callbacks to TO_INSERT_WATCHPOINT, TO_REMOVE_WATCHPOINT,
+	TO_CAN_ACCEL_WATCHPOINT_CONDITION, to LONGEST.
+	(default_watchpoint_addr_within_range): Expand parameter
+	LENGTH to LONGEST.
+	(debug_to_can_accel_watchpoint_condition): Expand parameter LEN
+	to LONGEST.  Use plongest to format print LEN.
+	(debug_to_watchpoint_addr_within_range): Expand parameter LENGTH
+	to LONGEST.  Use plongest to format print LENGTH.
+	(debug_to_insert_watchpoint): Expand parameter LEN to LONGEST.
+	Use plongest to format print LEN.
+	(debug_to_remove_watchpoint): Likewise.
+	* target.h (struct target_ops): Expand parameter LEN of
+	TO_REMOVE_WATCHPOINT, TO_INSERT_WATCHPOINT,
+	TO_WATCHPOINT_ADDR_WITHIN_RANGE and
+	TO_CAN_ACCEL_WATCHPOINT_CONDITION to LONGEST.
+
+--MP_/6HRlH6vpyqtSy4CYyMrX6b2
+Content-Type: text/x-patch
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=bitpos-wp.patch
+
+diff --git a/gdb/arm-linux-nat.c b/gdb/arm-linux-nat.c
+index 231b008..6deb23d 100644
+--- a/gdb/arm-linux-nat.c
++++ b/gdb/arm-linux-nat.c
+@@ -1105,7 +1105,7 @@ arm_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ 
+ /* Insert a Hardware breakpoint.  */
+ static int
+-arm_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
++arm_linux_insert_watchpoint (CORE_ADDR addr, LONGEST len, int rw,
+ 			     struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -1123,7 +1123,7 @@ arm_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
+ 
+ /* Remove a hardware breakpoint.  */
+ static int
+-arm_linux_remove_watchpoint (CORE_ADDR addr, int len, int rw,
++arm_linux_remove_watchpoint (CORE_ADDR addr, LONGEST len, int rw,
+ 			     struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -1180,7 +1180,7 @@ arm_linux_stopped_by_watchpoint (void)
+ static int
+ arm_linux_watchpoint_addr_within_range (struct target_ops *target,
+ 					CORE_ADDR addr,
+-					CORE_ADDR start, int length)
++					CORE_ADDR start, LONGEST length)
+ {
+   return start <= addr && start + length - 1 >= addr;
+ }
+diff --git a/gdb/i386-nat.c b/gdb/i386-nat.c
+index 76c51a8..9e293fe 100644
+--- a/gdb/i386-nat.c
++++ b/gdb/i386-nat.c
+@@ -592,7 +592,7 @@ i386_update_inferior_debug_regs (struct i386_debug_reg_state *new_state)
+    of the type TYPE.  Return 0 on success, -1 on failure.  */
+ 
+ static int
+-i386_insert_watchpoint (CORE_ADDR addr, int len, int type,
++i386_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   struct i386_debug_reg_state *state = i386_debug_reg_state ();
+@@ -629,7 +629,7 @@ i386_insert_watchpoint (CORE_ADDR addr, int len, int type,
+    address ADDR, whose length is LEN bytes, and for accesses of the
+    type TYPE.  Return 0 on success, -1 on failure.  */
+ static int
+-i386_remove_watchpoint (CORE_ADDR addr, int len, int type,
++i386_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   struct i386_debug_reg_state *state = i386_debug_reg_state ();
+diff --git a/gdb/ia64-linux-nat.c b/gdb/ia64-linux-nat.c
+index 9b5fbf3..6061eae 100644
+--- a/gdb/ia64-linux-nat.c
++++ b/gdb/ia64-linux-nat.c
+@@ -542,7 +542,7 @@ is_power_of_2 (int val)
+ }
+ 
+ static int
+-ia64_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
++ia64_linux_insert_watchpoint (CORE_ADDR addr, LONGEST len, int rw,
+ 			      struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -596,7 +596,7 @@ ia64_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
+ }
+ 
+ static int
+-ia64_linux_remove_watchpoint (CORE_ADDR addr, int len, int type,
++ia64_linux_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			      struct expression *cond)
+ {
+   int idx;
+diff --git a/gdb/inf-ttrace.c b/gdb/inf-ttrace.c
+index d60eddb..c33db45 100644
+--- a/gdb/inf-ttrace.c
++++ b/gdb/inf-ttrace.c
+@@ -313,14 +313,14 @@ inf_ttrace_disable_page_protections (pid_t pid)
+    type TYPE.  */
+ 
+ static int
+-inf_ttrace_insert_watchpoint (CORE_ADDR addr, int len, int type,
++inf_ttrace_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			      struct expression *cond)
+ {
+   const int pagesize = inf_ttrace_page_dict.pagesize;
+   pid_t pid = ptid_get_pid (inferior_ptid);
+   CORE_ADDR page_addr;
+-  int num_pages;
+-  int page;
++  LONGEST num_pages;
++  LONGEST page;
+ 
+   gdb_assert (type == hw_write);
+ 
+@@ -337,14 +337,14 @@ inf_ttrace_insert_watchpoint (CORE_ADDR addr, int len, int type,
+    type TYPE.  */
+ 
+ static int
+-inf_ttrace_remove_watchpoint (CORE_ADDR addr, int len, int type,
++inf_ttrace_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			      struct expression *cond)
+ {
+   const int pagesize = inf_ttrace_page_dict.pagesize;
+   pid_t pid = ptid_get_pid (inferior_ptid);
+   CORE_ADDR page_addr;
+-  int num_pages;
+-  int page;
++  LONGEST num_pages;
++  LONGEST page;
+ 
+   gdb_assert (type == hw_write);
+ 
+diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
+index 5566d0c..7467d11 100644
+--- a/gdb/mips-linux-nat.c
++++ b/gdb/mips-linux-nat.c
+@@ -1017,7 +1017,7 @@ populate_regs_from_watches (struct pt_watch_regs *regs)
+    watch.  Return zero on success.  */
+ 
+ static int
+-mips_linux_insert_watchpoint (CORE_ADDR addr, int len, int type,
++mips_linux_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			      struct expression *cond)
+ {
+   struct pt_watch_regs regs;
+@@ -1067,7 +1067,7 @@ mips_linux_insert_watchpoint (CORE_ADDR addr, int len, int type,
+    Return zero on success.  */
+ 
+ static int
+-mips_linux_remove_watchpoint (CORE_ADDR addr, int len, int type,
++mips_linux_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			      struct expression *cond)
+ {
+   int retval;
+diff --git a/gdb/nto-procfs.c b/gdb/nto-procfs.c
+index b58f318..25fecf3 100644
+--- a/gdb/nto-procfs.c
++++ b/gdb/nto-procfs.c
+@@ -69,10 +69,10 @@ static ptid_t do_attach (ptid_t ptid);
+ 
+ static int procfs_can_use_hw_breakpoint (int, int, int);
+ 
+-static int procfs_insert_hw_watchpoint (CORE_ADDR addr, int len, int type,
++static int procfs_insert_hw_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 					struct expression *cond);
+ 
+-static int procfs_remove_hw_watchpoint (CORE_ADDR addr, int len, int type,
++static int procfs_remove_hw_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 					struct expression *cond);
+ 
+ static int procfs_stopped_by_watchpoint (void);
+@@ -1493,14 +1493,14 @@ procfs_can_use_hw_breakpoint (int type, int cnt, int othertype)
+ }
+ 
+ static int
+-procfs_remove_hw_watchpoint (CORE_ADDR addr, int len, int type,
++procfs_remove_hw_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			     struct expression *cond)
+ {
+   return procfs_hw_watchpoint (addr, -1, type);
+ }
+ 
+ static int
+-procfs_insert_hw_watchpoint (CORE_ADDR addr, int len, int type,
++procfs_insert_hw_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			     struct expression *cond)
+ {
+   return procfs_hw_watchpoint (addr, len, type);
+diff --git a/gdb/ppc-linux-nat.c b/gdb/ppc-linux-nat.c
+index 67e1cac..abfb2fc 100644
+--- a/gdb/ppc-linux-nat.c
++++ b/gdb/ppc-linux-nat.c
+@@ -1839,11 +1839,11 @@ can_use_watchpoint_cond_accel (void)
+    CONDITION_VALUE will hold the value which should be put in the
+    DVC register.  */
+ static void
+-calculate_dvc (CORE_ADDR addr, int len, CORE_ADDR data_value,
++calculate_dvc (CORE_ADDR addr, LONGEST len, CORE_ADDR data_value,
+ 	       uint32_t *condition_mode, uint64_t *condition_value)
+ {
+-  int i, num_byte_enable, align_offset, num_bytes_off_dvc,
+-      rightmost_enabled_byte;
++  LONGEST i, num_byte_enable;
++  int align_offset, num_bytes_off_dvc, rightmost_enabled_byte;
+   CORE_ADDR addr_end_data, addr_end_dvc;
+ 
+   /* The DVC register compares bytes within fixed-length windows which
+@@ -1930,7 +1930,7 @@ num_memory_accesses (struct value *v)
+    of the constant.  */
+ static int
+ check_condition (CORE_ADDR watch_addr, struct expression *cond,
+-		 CORE_ADDR *data_value, int *len)
++		 CORE_ADDR *data_value, LONGEST *len)
+ {
+   int pc = 1, num_accesses_left, num_accesses_right;
+   struct value *left_val, *right_val, *left_chain, *right_chain;
+@@ -1997,7 +1997,7 @@ check_condition (CORE_ADDR watch_addr, struct expression *cond,
+    the condition expression, thus only triggering the watchpoint when it is
+    true.  */
+ static int
+-ppc_linux_can_accel_watchpoint_condition (CORE_ADDR addr, int len, int rw,
++ppc_linux_can_accel_watchpoint_condition (CORE_ADDR addr, LONGEST len, int rw,
+ 					  struct expression *cond)
+ {
+   CORE_ADDR data_value;
+@@ -2014,7 +2014,7 @@ ppc_linux_can_accel_watchpoint_condition (CORE_ADDR addr, int len, int rw,
+ 
+ static void
+ create_watchpoint_request (struct ppc_hw_breakpoint *p, CORE_ADDR addr,
+-			   int len, int rw, struct expression *cond,
++			   LONGEST len, int rw, struct expression *cond,
+ 			   int insert)
+ {
+   if (len == 1
+@@ -2059,7 +2059,7 @@ create_watchpoint_request (struct ppc_hw_breakpoint *p, CORE_ADDR addr,
+ }
+ 
+ static int
+-ppc_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
++ppc_linux_insert_watchpoint (CORE_ADDR addr, LONGEST len, int rw,
+ 			     struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -2127,7 +2127,7 @@ ppc_linux_insert_watchpoint (CORE_ADDR addr, int len, int rw,
+ }
+ 
+ static int
+-ppc_linux_remove_watchpoint (CORE_ADDR addr, int len, int rw,
++ppc_linux_remove_watchpoint (CORE_ADDR addr, LONGEST len, int rw,
+ 			     struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -2267,7 +2267,7 @@ ppc_linux_stopped_by_watchpoint (void)
+ static int
+ ppc_linux_watchpoint_addr_within_range (struct target_ops *target,
+ 					CORE_ADDR addr,
+-					CORE_ADDR start, int length)
++					CORE_ADDR start, LONGEST length)
+ {
+   int mask;
+ 
+diff --git a/gdb/procfs.c b/gdb/procfs.c
+index 4a9336f..26accd8 100644
+--- a/gdb/procfs.c
++++ b/gdb/procfs.c
+@@ -2470,7 +2470,7 @@ procfs_address_to_host_pointer (CORE_ADDR addr)
+ #endif
+ 
+ static int
+-proc_set_watchpoint (procinfo *pi, CORE_ADDR addr, int len, int wflags)
++proc_set_watchpoint (procinfo *pi, CORE_ADDR addr, LONGEST len, int wflags)
+ {
+ #if !defined (PCWATCH) && !defined (PIOCSWATCH)
+   /* If neither or these is defined, we can't support watchpoints.
+@@ -4816,7 +4816,7 @@ procfs_pid_to_str (struct target_ops *ops, ptid_t ptid)
+ /* Insert a watchpoint.  */
+ 
+ static int
+-procfs_set_watchpoint (ptid_t ptid, CORE_ADDR addr, int len, int rwflag,
++procfs_set_watchpoint (ptid_t ptid, CORE_ADDR addr, LONGEST len, int rwflag,
+ 		       int after)
+ {
+ #ifndef UNIXWARE
+@@ -4938,7 +4938,7 @@ procfs_stopped_data_address (struct target_ops *targ, CORE_ADDR *addr)
+ }
+ 
+ static int
+-procfs_insert_watchpoint (CORE_ADDR addr, int len, int type,
++procfs_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			  struct expression *cond)
+ {
+   if (!target_have_steppable_watchpoint
+@@ -4960,7 +4960,7 @@ procfs_insert_watchpoint (CORE_ADDR addr, int len, int type,
+ }
+ 
+ static int
+-procfs_remove_watchpoint (CORE_ADDR addr, int len, int type,
++procfs_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			  struct expression *cond)
+ {
+   return procfs_set_watchpoint (inferior_ptid, addr, 0, 0, 0);
+diff --git a/gdb/remote-m32r-sdi.c b/gdb/remote-m32r-sdi.c
+index 748aeba..b385c3f 100644
+--- a/gdb/remote-m32r-sdi.c
++++ b/gdb/remote-m32r-sdi.c
+@@ -1417,14 +1417,14 @@ m32r_can_use_hw_watchpoint (int type, int cnt, int othertype)
+    watchpoint.  */
+ 
+ static int
+-m32r_insert_watchpoint (CORE_ADDR addr, int len, int type,
++m32r_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   int i;
+ 
+   if (remote_debug)
+-    fprintf_unfiltered (gdb_stdlog, "m32r_insert_watchpoint(%s,%d,%d)\n",
+-			paddress (target_gdbarch, addr), len, type);
++    fprintf_unfiltered (gdb_stdlog, "m32r_insert_watchpoint(%s,%s,%d)\n",
++			paddress (target_gdbarch, addr), plongest (len), type);
+ 
+   for (i = 0; i < MAX_ACCESS_BREAKS; i++)
+     {
+@@ -1442,14 +1442,14 @@ m32r_insert_watchpoint (CORE_ADDR addr, int len, int type,
+ }
+ 
+ static int
+-m32r_remove_watchpoint (CORE_ADDR addr, int len, int type,
++m32r_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   int i;
+ 
+   if (remote_debug)
+-    fprintf_unfiltered (gdb_stdlog, "m32r_remove_watchpoint(%s,%d,%d)\n",
+-			paddress (target_gdbarch, addr), len, type);
++    fprintf_unfiltered (gdb_stdlog, "m32r_remove_watchpoint(%s,%s,%d)\n",
++			paddress (target_gdbarch, addr), plongest (len), type);
+ 
+   for (i = 0; i < MAX_ACCESS_BREAKS; i++)
+     {
+diff --git a/gdb/remote-mips.c b/gdb/remote-mips.c
+index eee2460..9a9265a 100644
+--- a/gdb/remote-mips.c
++++ b/gdb/remote-mips.c
+@@ -2419,7 +2419,7 @@ calculate_mask (CORE_ADDR addr, int len)
+    watchpoint.  */
+ 
+ static int
+-mips_insert_watchpoint (CORE_ADDR addr, int len, int type,
++mips_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   if (mips_set_breakpoint (addr, len, type))
+@@ -2431,7 +2431,7 @@ mips_insert_watchpoint (CORE_ADDR addr, int len, int type,
+ /* Remove a watchpoint.  */
+ 
+ static int
+-mips_remove_watchpoint (CORE_ADDR addr, int len, int type,
++mips_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   if (mips_clear_breakpoint (addr, len, type))
+diff --git a/gdb/remote.c b/gdb/remote.c
+index 8c27390..bcec331 100644
+--- a/gdb/remote.c
++++ b/gdb/remote.c
+@@ -8035,7 +8035,7 @@ watchpoint_to_Z_packet (int type)
+ }
+ 
+ static int
+-remote_insert_watchpoint (CORE_ADDR addr, int len, int type,
++remote_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			  struct expression *cond)
+ {
+   struct remote_state *rs = get_remote_state ();
+@@ -8050,7 +8050,7 @@ remote_insert_watchpoint (CORE_ADDR addr, int len, int type,
+   p = strchr (rs->buf, '\0');
+   addr = remote_address_masked (addr);
+   p += hexnumstr (p, (ULONGEST) addr);
+-  xsnprintf (p, endbuf - p, ",%x", len);
++  xsnprintf (p, endbuf - p, ",%s", phex_nz (len, sizeof (len)));
+ 
+   putpkt (rs->buf);
+   getpkt (&rs->buf, &rs->buf_size, 0);
+@@ -8070,7 +8070,7 @@ remote_insert_watchpoint (CORE_ADDR addr, int len, int type,
+ 
+ static int
+ remote_watchpoint_addr_within_range (struct target_ops *target, CORE_ADDR addr,
+-				     CORE_ADDR start, int length)
++				     CORE_ADDR start, LONGEST length)
+ {
+   CORE_ADDR diff = remote_address_masked (addr - start);
+ 
+@@ -8079,7 +8079,7 @@ remote_watchpoint_addr_within_range (struct target_ops *target, CORE_ADDR addr,
+ 
+ 
+ static int
+-remote_remove_watchpoint (CORE_ADDR addr, int len, int type,
++remote_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			  struct expression *cond)
+ {
+   struct remote_state *rs = get_remote_state ();
+@@ -8094,7 +8094,7 @@ remote_remove_watchpoint (CORE_ADDR addr, int len, int type,
+   p = strchr (rs->buf, '\0');
+   addr = remote_address_masked (addr);
+   p += hexnumstr (p, (ULONGEST) addr);
+-  xsnprintf (p, endbuf - p, ",%x", len);
++  xsnprintf (p, endbuf - p, ",%s", phex_nz (len, sizeof (len)));
+   putpkt (rs->buf);
+   getpkt (&rs->buf, &rs->buf_size, 0);
+ 
+diff --git a/gdb/s390-nat.c b/gdb/s390-nat.c
+index 4974bad..3f41519 100644
+--- a/gdb/s390-nat.c
++++ b/gdb/s390-nat.c
+@@ -517,7 +517,7 @@ s390_fix_watch_points (struct lwp_info *lp)
+ }
+ 
+ static int
+-s390_insert_watchpoint (CORE_ADDR addr, int len, int type,
++s390_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   struct lwp_info *lp;
+@@ -538,7 +538,7 @@ s390_insert_watchpoint (CORE_ADDR addr, int len, int type,
+ }
+ 
+ static int
+-s390_remove_watchpoint (CORE_ADDR addr, int len, int type,
++s390_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			struct expression *cond)
+ {
+   struct lwp_info *lp;
+diff --git a/gdb/target.c b/gdb/target.c
+index f7207c0..a69fb06 100644
+--- a/gdb/target.c
++++ b/gdb/target.c
+@@ -49,7 +49,8 @@ static void target_info (char *, int);
+ static void default_terminal_info (char *, int);
+ 
+ static int default_watchpoint_addr_within_range (struct target_ops *,
+-						 CORE_ADDR, CORE_ADDR, int);
++						 CORE_ADDR, CORE_ADDR,
++						 LONGEST);
+ 
+ static int default_region_ok_for_hw_watchpoint (CORE_ADDR, LONGEST);
+ 
+@@ -114,10 +115,10 @@ static int debug_to_insert_hw_breakpoint (struct gdbarch *,
+ static int debug_to_remove_hw_breakpoint (struct gdbarch *,
+ 					  struct bp_target_info *);
+ 
+-static int debug_to_insert_watchpoint (CORE_ADDR, int, int,
++static int debug_to_insert_watchpoint (CORE_ADDR, LONGEST, int,
+ 				       struct expression *);
+ 
+-static int debug_to_remove_watchpoint (CORE_ADDR, int, int,
++static int debug_to_remove_watchpoint (CORE_ADDR, LONGEST, int,
+ 				       struct expression *);
+ 
+ static int debug_to_stopped_by_watchpoint (void);
+@@ -125,11 +126,12 @@ static int debug_to_stopped_by_watchpoint (void);
+ static int debug_to_stopped_data_address (struct target_ops *, CORE_ADDR *);
+ 
+ static int debug_to_watchpoint_addr_within_range (struct target_ops *,
+-						  CORE_ADDR, CORE_ADDR, int);
++						  CORE_ADDR, CORE_ADDR,
++						  LONGEST);
+ 
+ static int debug_to_region_ok_for_hw_watchpoint (CORE_ADDR, LONGEST);
+ 
+-static int debug_to_can_accel_watchpoint_condition (CORE_ADDR, int, int,
++static int debug_to_can_accel_watchpoint_condition (CORE_ADDR, LONGEST, int,
+ 						    struct expression *);
+ 
+ static void debug_to_terminal_init (void);
+@@ -751,10 +753,10 @@ update_current_target (void)
+ 	    (int (*) (struct gdbarch *, struct bp_target_info *))
+ 	    return_minus_one);
+   de_fault (to_insert_watchpoint,
+-	    (int (*) (CORE_ADDR, int, int, struct expression *))
++	    (int (*) (CORE_ADDR, LONGEST, int, struct expression *))
+ 	    return_minus_one);
+   de_fault (to_remove_watchpoint,
+-	    (int (*) (CORE_ADDR, int, int, struct expression *))
++	    (int (*) (CORE_ADDR, LONGEST, int, struct expression *))
+ 	    return_minus_one);
+   de_fault (to_stopped_by_watchpoint,
+ 	    (int (*) (void))
+@@ -767,7 +769,7 @@ update_current_target (void)
+   de_fault (to_region_ok_for_hw_watchpoint,
+ 	    default_region_ok_for_hw_watchpoint);
+   de_fault (to_can_accel_watchpoint_condition,
+-            (int (*) (CORE_ADDR, int, int, struct expression *))
++            (int (*) (CORE_ADDR, LONGEST, int, struct expression *))
+             return_zero);
+   de_fault (to_terminal_init,
+ 	    (void (*) (void))
+@@ -3558,7 +3560,7 @@ default_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ static int
+ default_watchpoint_addr_within_range (struct target_ops *target,
+ 				      CORE_ADDR addr,
+-				      CORE_ADDR start, int length)
++				      CORE_ADDR start, LONGEST length)
+ {
+   return addr >= start && addr < start + length;
+ }
+@@ -4263,7 +4265,7 @@ debug_to_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ }
+ 
+ static int
+-debug_to_can_accel_watchpoint_condition (CORE_ADDR addr, int len, int rw,
++debug_to_can_accel_watchpoint_condition (CORE_ADDR addr, LONGEST len, int rw,
+ 					 struct expression *cond)
+ {
+   int retval;
+@@ -4273,8 +4275,8 @@ debug_to_can_accel_watchpoint_condition (CORE_ADDR addr, int len, int rw,
+ 
+   fprintf_unfiltered (gdb_stdlog,
+ 		      "target_can_accel_watchpoint_condition "
+-		      "(%s, %d, %d, %s) = %ld\n",
+-		      core_addr_to_string (addr), len, rw,
++		      "(%s, %s, %d, %s) = %ld\n",
++		      core_addr_to_string (addr), plongest (len), rw,
+ 		      host_address_to_string (cond), (unsigned long) retval);
+   return retval;
+ }
+@@ -4309,7 +4311,7 @@ debug_to_stopped_data_address (struct target_ops *target, CORE_ADDR *addr)
+ static int
+ debug_to_watchpoint_addr_within_range (struct target_ops *target,
+ 				       CORE_ADDR addr,
+-				       CORE_ADDR start, int length)
++				       CORE_ADDR start, LONGEST length)
+ {
+   int retval;
+ 
+@@ -4317,9 +4319,9 @@ debug_to_watchpoint_addr_within_range (struct target_ops *target,
+ 							 start, length);
+ 
+   fprintf_filtered (gdb_stdlog,
+-		    "target_watchpoint_addr_within_range (%s, %s, %d) = %d\n",
++		    "target_watchpoint_addr_within_range (%s, %s, %s) = %d\n",
+ 		    core_addr_to_string (addr), core_addr_to_string (start),
+-		    length, retval);
++		    plongest (length), retval);
+   return retval;
+ }
+ 
+@@ -4354,7 +4356,7 @@ debug_to_remove_hw_breakpoint (struct gdbarch *gdbarch,
+ }
+ 
+ static int
+-debug_to_insert_watchpoint (CORE_ADDR addr, int len, int type,
++debug_to_insert_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			    struct expression *cond)
+ {
+   int retval;
+@@ -4362,14 +4364,14 @@ debug_to_insert_watchpoint (CORE_ADDR addr, int len, int type,
+   retval = debug_target.to_insert_watchpoint (addr, len, type, cond);
+ 
+   fprintf_unfiltered (gdb_stdlog,
+-		      "target_insert_watchpoint (%s, %d, %d, %s) = %ld\n",
+-		      core_addr_to_string (addr), len, type,
++		      "target_insert_watchpoint (%s, %s, %d, %s) = %ld\n",
++		      core_addr_to_string (addr), plongest (len), type,
+ 		      host_address_to_string (cond), (unsigned long) retval);
+   return retval;
+ }
+ 
+ static int
+-debug_to_remove_watchpoint (CORE_ADDR addr, int len, int type,
++debug_to_remove_watchpoint (CORE_ADDR addr, LONGEST len, int type,
+ 			    struct expression *cond)
+ {
+   int retval;
+@@ -4377,8 +4379,8 @@ debug_to_remove_watchpoint (CORE_ADDR addr, int len, int type,
+   retval = debug_target.to_remove_watchpoint (addr, len, type, cond);
+ 
+   fprintf_unfiltered (gdb_stdlog,
+-		      "target_remove_watchpoint (%s, %d, %d, %s) = %ld\n",
+-		      core_addr_to_string (addr), len, type,
++		      "target_remove_watchpoint (%s, %s, %d, %s) = %ld\n",
++		      core_addr_to_string (addr), plongest (len), type,
+ 		      host_address_to_string (cond), (unsigned long) retval);
+   return retval;
+ }
+diff --git a/gdb/target.h b/gdb/target.h
+index 69228e1..4b52d53 100644
+--- a/gdb/target.h
++++ b/gdb/target.h
+@@ -466,8 +466,8 @@ struct target_ops
+ 
+     /* Documentation of what the two routines below are expected to do is
+        provided with the corresponding target_* macros.  */
+-    int (*to_remove_watchpoint) (CORE_ADDR, int, int, struct expression *);
+-    int (*to_insert_watchpoint) (CORE_ADDR, int, int, struct expression *);
++    int (*to_remove_watchpoint) (CORE_ADDR, LONGEST, int, struct expression *);
++    int (*to_insert_watchpoint) (CORE_ADDR, LONGEST, int, struct expression *);
+ 
+     int (*to_insert_mask_watchpoint) (struct target_ops *,
+ 				      CORE_ADDR, CORE_ADDR, int);
+@@ -478,13 +478,13 @@ struct target_ops
+     int to_have_continuable_watchpoint;
+     int (*to_stopped_data_address) (struct target_ops *, CORE_ADDR *);
+     int (*to_watchpoint_addr_within_range) (struct target_ops *,
+-					    CORE_ADDR, CORE_ADDR, int);
++					    CORE_ADDR, CORE_ADDR, LONGEST);
+ 
+     /* Documentation of this routine is provided with the corresponding
+        target_* macro.  */
+     int (*to_region_ok_for_hw_watchpoint) (CORE_ADDR, LONGEST);
+ 
+-    int (*to_can_accel_watchpoint_condition) (CORE_ADDR, int, int,
++    int (*to_can_accel_watchpoint_condition) (CORE_ADDR, LONGEST, int,
+ 					      struct expression *);
+     int (*to_masked_watch_num_registers) (struct target_ops *,
+ 					  CORE_ADDR, CORE_ADDR);
+
+--MP_/6HRlH6vpyqtSy4CYyMrX6b2--
+

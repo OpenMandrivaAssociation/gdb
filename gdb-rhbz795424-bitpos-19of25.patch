@@ -1,0 +1,260 @@
+http://sourceware.org/ml/gdb-cvs/2012-09/msg00147.html
+
+### src/gdb/ChangeLog	2012/09/26 02:06:51	1.14698
+### src/gdb/ChangeLog	2012/09/26 07:52:44	1.14699
+## -1,5 +1,19 @@
+ 2012-09-26  Siddhesh Poyarekar  <siddhesh@redhat.com>
+ 
++	* amd64-tdep.c (amd64_return_value): Use TYPE_LENGTH directly.
++	* bfin-tdep.c (bfin_extract_return_value): Likewise.
++	(bfin_store_return_value): Likewise.
++	* cris-tdep.c (cris_store_return_value): Likewise.
++	(cris_extract_return_value): Likewise.
++	* h8300-tdep.c (h8300_extract_return_value): Likewise.
++	* hppa-tdep.c (hppa64_return_value): Likewise.
++	* lm32-tdep.c (lm32_store_return_value): Likewise.
++	* microblaze-tdep.c (microblaze_store_return_value): Likewise.
++	* spu-tdep.c (spu_value_from_register): Likewise.
++	* vax-tdep.c (vax_return_value): Likewise.
++
++2012-09-26  Siddhesh Poyarekar  <siddhesh@redhat.com>
++
+ 	* breakpoint.c (invalidate_bp_value_on_memory_change): Expand
+ 	parameter LEN to ssize_t.
+ 
+--- src/gdb/amd64-tdep.c	2012/09/25 12:48:52	1.110
++++ src/gdb/amd64-tdep.c	2012/09/26 07:52:47	1.111
+@@ -637,7 +637,7 @@
+     }
+ 
+   gdb_assert (class[1] != AMD64_MEMORY);
+-  gdb_assert (len <= 16);
++  gdb_assert (TYPE_LENGTH (type) <= 16);
+ 
+   for (i = 0; len > 0; i++, len -= 8)
+     {
+--- src/gdb/bfin-tdep.c	2012/09/25 12:48:52	1.11
++++ src/gdb/bfin-tdep.c	2012/09/26 07:52:47	1.12
+@@ -615,7 +615,7 @@
+   ULONGEST tmp;
+   int regno = BFIN_R0_REGNUM;
+ 
+-  gdb_assert (len <= 8);
++  gdb_assert (TYPE_LENGTH (type) <= 8);
+ 
+   while (len > 0)
+     {
+@@ -643,7 +643,7 @@
+   int len = TYPE_LENGTH (type);
+   int regno = BFIN_R0_REGNUM;
+ 
+-  gdb_assert (len <= 8);
++  gdb_assert (TYPE_LENGTH (type) <= 8);
+ 
+   while (len > 0)
+     {
+--- src/gdb/cris-tdep.c	2012/05/18 21:02:47	1.185
++++ src/gdb/cris-tdep.c	2012/09/26 07:52:47	1.186
+@@ -1662,20 +1662,20 @@
+   struct gdbarch *gdbarch = get_regcache_arch (regcache);
+   enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+   ULONGEST val;
+-  int len = TYPE_LENGTH (type);
+   
+-  if (len <= 4)
++  if (TYPE_LENGTH (type) <= 4)
+     {
+       /* Put the return value in R10.  */
+-      val = extract_unsigned_integer (valbuf, len, byte_order);
++      val = extract_unsigned_integer (valbuf, TYPE_LENGTH (type), byte_order);
+       regcache_cooked_write_unsigned (regcache, ARG1_REGNUM, val);
+     }
+-  else if (len <= 8)
++  else if (TYPE_LENGTH (type) <= 8)
+     {
+       /* Put the return value in R10 and R11.  */
+       val = extract_unsigned_integer (valbuf, 4, byte_order);
+       regcache_cooked_write_unsigned (regcache, ARG1_REGNUM, val);
+-      val = extract_unsigned_integer ((char *)valbuf + 4, len - 4, byte_order);
++      val = extract_unsigned_integer ((char *)valbuf + 4,
++				      TYPE_LENGTH (type) - 4, byte_order);
+       regcache_cooked_write_unsigned (regcache, ARG2_REGNUM, val);
+     }
+   else
+@@ -1833,21 +1833,21 @@
+   struct gdbarch *gdbarch = get_regcache_arch (regcache);
+   enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+   ULONGEST val;
+-  int len = TYPE_LENGTH (type);
+   
+-  if (len <= 4)
++  if (TYPE_LENGTH (type) <= 4)
+     {
+       /* Get the return value from R10.  */
+       regcache_cooked_read_unsigned (regcache, ARG1_REGNUM, &val);
+-      store_unsigned_integer (valbuf, len, byte_order, val);
++      store_unsigned_integer (valbuf, TYPE_LENGTH (type), byte_order, val);
+     }
+-  else if (len <= 8)
++  else if (TYPE_LENGTH (type) <= 8)
+     {
+       /* Get the return value from R10 and R11.  */
+       regcache_cooked_read_unsigned (regcache, ARG1_REGNUM, &val);
+       store_unsigned_integer (valbuf, 4, byte_order, val);
+       regcache_cooked_read_unsigned (regcache, ARG2_REGNUM, &val);
+-      store_unsigned_integer ((char *)valbuf + 4, len - 4, byte_order, val);
++      store_unsigned_integer ((char *)valbuf + 4, TYPE_LENGTH (type) - 4,
++			      byte_order, val);
+     }
+   else
+     error (_("cris_extract_return_value: type length too large"));
+--- src/gdb/h8300-tdep.c	2012/09/25 12:48:53	1.136
++++ src/gdb/h8300-tdep.c	2012/09/26 07:52:48	1.137
+@@ -751,12 +751,12 @@
+   int len = TYPE_LENGTH (type);
+   ULONGEST c, addr;
+ 
+-  switch (len)
++  switch (TYPE_LENGTH (type))
+     {
+     case 1:
+     case 2:
+       regcache_cooked_read_unsigned (regcache, E_RET0_REGNUM, &c);
+-      store_unsigned_integer (valbuf, len, byte_order, c);
++      store_unsigned_integer (valbuf, TYPE_LENGTH (type), byte_order, c);
+       break;
+     case 4:			/* Needs two registers on plain H8/300 */
+       regcache_cooked_read_unsigned (regcache, E_RET0_REGNUM, &c);
+@@ -768,8 +768,9 @@
+       if (TYPE_CODE (type) == TYPE_CODE_INT)
+ 	{
+ 	  regcache_cooked_read_unsigned (regcache, E_RET0_REGNUM, &addr);
+-	  c = read_memory_unsigned_integer ((CORE_ADDR) addr, len, byte_order);
+-	  store_unsigned_integer (valbuf, len, byte_order, c);
++	  c = read_memory_unsigned_integer ((CORE_ADDR) addr,
++					    TYPE_LENGTH (type), byte_order);
++	  store_unsigned_integer (valbuf, TYPE_LENGTH (type), byte_order, c);
+ 	}
+       else
+ 	{
+--- src/gdb/hppa-tdep.c	2012/05/18 21:02:48	1.281
++++ src/gdb/hppa-tdep.c	2012/09/26 07:52:48	1.282
+@@ -1160,7 +1160,7 @@
+   int len = TYPE_LENGTH (type);
+   int regnum, offset;
+ 
+-  if (len > 16)
++  if (TYPE_LENGTH (type) > 16)
+     {
+       /* All return values larget than 128 bits must be aggregate
+          return values.  */
+--- src/gdb/lm32-tdep.c	2012/09/25 12:48:53	1.13
++++ src/gdb/lm32-tdep.c	2012/09/26 07:52:48	1.14
+@@ -349,18 +349,18 @@
+   struct gdbarch *gdbarch = get_regcache_arch (regcache);
+   enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+   ULONGEST val;
+-  int len = TYPE_LENGTH (type);
+ 
+-  if (len <= 4)
++  if (TYPE_LENGTH (type) <= 4)
+     {
+-      val = extract_unsigned_integer (valbuf, len, byte_order);
++      val = extract_unsigned_integer (valbuf, TYPE_LENGTH (type), byte_order);
+       regcache_cooked_write_unsigned (regcache, SIM_LM32_R1_REGNUM, val);
+     }
+-  else if (len <= 8)
++  else if (TYPE_LENGTH (type) <= 8)
+     {
+       val = extract_unsigned_integer (valbuf, 4, byte_order);
+       regcache_cooked_write_unsigned (regcache, SIM_LM32_R1_REGNUM, val);
+-      val = extract_unsigned_integer (valbuf + 4, len - 4, byte_order);
++      val = extract_unsigned_integer (valbuf + 4, TYPE_LENGTH (type) - 4,
++				      byte_order);
+       regcache_cooked_write_unsigned (regcache, SIM_LM32_R2_REGNUM, val);
+     }
+   else
+--- src/gdb/microblaze-tdep.c	2012/08/02 09:36:39	1.13
++++ src/gdb/microblaze-tdep.c	2012/09/26 07:52:48	1.14
+@@ -590,22 +590,21 @@
+ microblaze_store_return_value (struct type *type, struct regcache *regcache,
+ 			       const gdb_byte *valbuf)
+ {
+-  int len = TYPE_LENGTH (type);
+   gdb_byte buf[8];
+ 
+   memset (buf, 0, sizeof(buf));
+ 
+   /* Integral and pointer return values.  */
+ 
+-  if (len > 4)
++  if (TYPE_LENGTH (type) > 4)
+     {
+-       gdb_assert (len == 8);
++       gdb_assert (TYPE_LENGTH (type) == 8);
+        memcpy (buf, valbuf, 8);
+        regcache_cooked_write (regcache, MICROBLAZE_RETVAL_REGNUM+1, buf + 4);
+     }
+   else
+     /* ??? Do we need to do any sign-extension here?  */
+-    memcpy (buf + 4 - len, valbuf, len);
++    memcpy (buf + 4 - TYPE_LENGTH (type), valbuf, TYPE_LENGTH (type));
+ 
+   regcache_cooked_write (regcache, MICROBLAZE_RETVAL_REGNUM, buf);
+ }
+--- src/gdb/spu-tdep.c	2012/09/17 08:52:18	1.82
++++ src/gdb/spu-tdep.c	2012/09/26 07:52:48	1.83
+@@ -316,11 +316,10 @@
+ 			 struct frame_info *frame)
+ {
+   struct value *value = default_value_from_register (type, regnum, frame);
+-  int len = TYPE_LENGTH (type);
+ 
+-  if (regnum < SPU_NUM_GPRS && len < 16)
++  if (regnum < SPU_NUM_GPRS && TYPE_LENGTH (type) < 16)
+     {
+-      int preferred_slot = len < 4 ? 4 - len : 0;
++      int preferred_slot = TYPE_LENGTH (type) < 4 ? 4 - TYPE_LENGTH (type) : 0;
+       set_value_offset (value, preferred_slot);
+     }
+ 
+--- src/gdb/vax-tdep.c	2012/05/16 14:35:08	1.112
++++ src/gdb/vax-tdep.c	2012/09/26 07:52:48	1.113
+@@ -208,7 +208,6 @@
+ 		  struct type *type, struct regcache *regcache,
+ 		  gdb_byte *readbuf, const gdb_byte *writebuf)
+ {
+-  int len = TYPE_LENGTH (type);
+   gdb_byte buf[8];
+ 
+   if (TYPE_CODE (type) == TYPE_CODE_STRUCT
+@@ -224,7 +223,7 @@
+ 	  ULONGEST addr;
+ 
+ 	  regcache_raw_read_unsigned (regcache, VAX_R0_REGNUM, &addr);
+-	  read_memory (addr, readbuf, len);
++	  read_memory (addr, readbuf, TYPE_LENGTH (type));
+ 	}
+ 
+       return RETURN_VALUE_ABI_RETURNS_ADDRESS;
+@@ -234,16 +233,16 @@
+     {
+       /* Read the contents of R0 and (if necessary) R1.  */
+       regcache_cooked_read (regcache, VAX_R0_REGNUM, buf);
+-      if (len > 4)
++      if (TYPE_LENGTH (type) > 4)
+ 	regcache_cooked_read (regcache, VAX_R1_REGNUM, buf + 4);
+-      memcpy (readbuf, buf, len);
++      memcpy (readbuf, buf, TYPE_LENGTH (type));
+     }
+   if (writebuf)
+     {
+       /* Read the contents to R0 and (if necessary) R1.  */
+-      memcpy (buf, writebuf, len);
++      memcpy (buf, writebuf, TYPE_LENGTH (type));
+       regcache_cooked_write (regcache, VAX_R0_REGNUM, buf);
+-      if (len > 4)
++      if (TYPE_LENGTH (type) > 4)
+ 	regcache_cooked_write (regcache, VAX_R1_REGNUM, buf + 4);
+     }
+ 

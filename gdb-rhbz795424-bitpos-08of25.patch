@@ -1,0 +1,139 @@
+http://sourceware.org/ml/gdb-cvs/2012-07/msg00213.html
+
+### src/gdb/ChangeLog	2012/07/25 20:14:17	1.14531
+### src/gdb/ChangeLog	2012/07/26 02:03:14	1.14532
+## -1,3 +1,17 @@
++2012-07-26  Siddhesh Poyarekar  <siddhesh@redhat.com>
++
++	* dwarf2loc.c (dwarf2_evaluate_loc_desc_full): Expand parameter
++	SIZE to size_t.
++	(dwarf2_evaluate_loc_desc): Likewise.
++	(dwarf2_loc_desc_needs_frame): Likewise.
++	(locexpr_describe_location_1): Likewise.
++	* dwarf2loc.h (struct dwarf2_locexpr_baton): Make SIZE as
++	size_t.
++	(struct dwarf2_loclist_baton): Likewise.
++	* dwarf2read.c (struct dwarf_block): Likewise.
++	(dump_die_shallow): Use pulongest to print dwarf_block.size.
++	(decode_locdesc): Expand SIZE and I to size_t.
++
+ 2012-07-25  Jan Kratochvil  <jan.kratochvil@redhat.com>
+ 
+ 	* contrib/cc-with-tweaks.sh: Put into comment path gdb/contrib/.
+--- src/gdb/dwarf2loc.c	2012/07/13 20:15:50	1.152
++++ src/gdb/dwarf2loc.c	2012/07/26 02:03:16	1.153
+@@ -54,8 +54,8 @@
+ static struct value *dwarf2_evaluate_loc_desc_full (struct type *type,
+ 						    struct frame_info *frame,
+ 						    const gdb_byte *data,
+-						    unsigned short size,
+-					      struct dwarf2_per_cu_data *per_cu,
++						    size_t size,
++						    struct dwarf2_per_cu_data *per_cu,
+ 						    LONGEST byte_offset);
+ 
+ /* Until these have formal names, we define these here.
+@@ -2111,7 +2111,7 @@
+ 
+ static struct value *
+ dwarf2_evaluate_loc_desc_full (struct type *type, struct frame_info *frame,
+-			       const gdb_byte *data, unsigned short size,
++			       const gdb_byte *data, size_t size,
+ 			       struct dwarf2_per_cu_data *per_cu,
+ 			       LONGEST byte_offset)
+ {
+@@ -2312,7 +2312,7 @@
+ 
+ struct value *
+ dwarf2_evaluate_loc_desc (struct type *type, struct frame_info *frame,
+-			  const gdb_byte *data, unsigned short size,
++			  const gdb_byte *data, size_t size,
+ 			  struct dwarf2_per_cu_data *per_cu)
+ {
+   return dwarf2_evaluate_loc_desc_full (type, frame, data, size, per_cu, 0);
+@@ -2433,7 +2433,7 @@
+    requires a frame to evaluate.  */
+ 
+ static int
+-dwarf2_loc_desc_needs_frame (const gdb_byte *data, unsigned short size,
++dwarf2_loc_desc_needs_frame (const gdb_byte *data, size_t size,
+ 			     struct dwarf2_per_cu_data *per_cu)
+ {
+   struct needs_frame_baton baton;
+@@ -3827,7 +3827,7 @@
+ static void
+ locexpr_describe_location_1 (struct symbol *symbol, CORE_ADDR addr,
+ 			     struct ui_file *stream,
+-			     const gdb_byte *data, int size,
++			     const gdb_byte *data, size_t size,
+ 			     struct objfile *objfile, unsigned int addr_size,
+ 			     int offset_size, struct dwarf2_per_cu_data *per_cu)
+ {
+--- src/gdb/dwarf2loc.h	2012/05/22 18:45:22	1.33
++++ src/gdb/dwarf2loc.h	2012/07/26 02:03:16	1.34
+@@ -77,7 +77,7 @@
+ struct value *dwarf2_evaluate_loc_desc (struct type *type,
+ 					struct frame_info *frame,
+ 					const gdb_byte *data,
+-					unsigned short size,
++					size_t size,
+ 					struct dwarf2_per_cu_data *per_cu);
+ 
+ CORE_ADDR dwarf2_read_addr_index (struct dwarf2_per_cu_data *per_cu,
+@@ -97,7 +97,7 @@
+ 
+   /* Length of the location expression.  For optimized out expressions it is
+      zero.  */
+-  unsigned long size;
++  size_t size;
+ 
+   /* The compilation unit containing the symbol whose location
+      we're computing.  */
+@@ -114,7 +114,7 @@
+   const gdb_byte *data;
+ 
+   /* Length of the location list.  */
+-  unsigned long size;
++  size_t size;
+ 
+   /* The compilation unit containing the symbol whose location
+      we're computing.  */
+--- src/gdb/dwarf2read.c	2012/07/20 17:38:04	1.697
++++ src/gdb/dwarf2read.c	2012/07/26 02:03:16	1.698
+@@ -990,7 +990,7 @@
+ /* Blocks are a bunch of untyped bytes.  */
+ struct dwarf_block
+   {
+-    unsigned int size;
++    size_t size;
+ 
+     /* Valid only if SIZE is not zero.  */
+     gdb_byte *data;
+@@ -16197,12 +16197,12 @@
+ 	case DW_FORM_block4:
+ 	case DW_FORM_block:
+ 	case DW_FORM_block1:
+-	  fprintf_unfiltered (f, "block: size %d",
+-			      DW_BLOCK (&die->attrs[i])->size);
++	  fprintf_unfiltered (f, "block: size %s",
++			      pulongest (DW_BLOCK (&die->attrs[i])->size));
+ 	  break;
+ 	case DW_FORM_exprloc:
+-	  fprintf_unfiltered (f, "expression: size %u",
+-			      DW_BLOCK (&die->attrs[i])->size);
++	  fprintf_unfiltered (f, "expression: size %s",
++			      pulongest (DW_BLOCK (&die->attrs[i])->size));
+ 	  break;
+ 	case DW_FORM_ref_addr:
+ 	  fprintf_unfiltered (f, "ref address: ");
+@@ -16746,8 +16746,8 @@
+ decode_locdesc (struct dwarf_block *blk, struct dwarf2_cu *cu)
+ {
+   struct objfile *objfile = cu->objfile;
+-  int i;
+-  int size = blk->size;
++  size_t i;
++  size_t size = blk->size;
+   gdb_byte *data = blk->data;
+   CORE_ADDR stack[64];
+   int stacki;

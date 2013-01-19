@@ -1,0 +1,27 @@
+http://sourceware.org/ml/gdb-cvs/2012-09/msg00138.html
+
+### src/gdb/ChangeLog	2012/09/24 10:25:07	1.14692
+### src/gdb/ChangeLog	2012/09/25 12:20:35	1.14693
+## -1,3 +1,8 @@
++2012-09-25  Siddhesh Poyarekar  <siddhesh@redhat.com>
++
++	* c-typeprint.c (c_type_print_varspec_suffix): Remove cast and
++	use plongest to print the array size.
++
+ 2012-09-24  Siddhesh Poyarekar  <siddhesh@redhat.com>
+ 
+ 	* m2-typeprint.c (m2_enum): Expand LASTVAL to LONGEST.
+Index: gdb-7.5.0.20120926/gdb/c-typeprint.c
+===================================================================
+--- gdb-7.5.0.20120926.orig/gdb/c-typeprint.c	2012-11-07 22:00:40.000000000 +0100
++++ gdb-7.5.0.20120926/gdb/c-typeprint.c	2012-11-07 22:03:39.269650157 +0100
+@@ -631,7 +631,8 @@ c_type_print_varspec_suffix (struct type
+ 	    fprintf_filtered (stream, "variable");
+ 	  }
+ 	else if (get_array_bounds (type, &low_bound, &high_bound))
+-	  fprintf_filtered (stream, "%d", (int) (high_bound - low_bound + 1));
++	  fprintf_filtered (stream, "%s", 
++			    plongest (high_bound - low_bound + 1));
+ 	fprintf_filtered (stream, "]");
+ 
+ 	c_type_print_varspec_suffix (TYPE_TARGET_TYPE (type), stream,

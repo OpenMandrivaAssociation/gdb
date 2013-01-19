@@ -15,7 +15,7 @@ But there is a problem with testsuite.unix non-unique subdir name and also
 a problem with make -j parallelization of the testsuite.
 
 --- gdb-7.3.50.20110722/gdb/testsuite/lib/future.exp	2011-10-11 16:44:05.000000000 +0200
-+++ gdb-7.3.50.20110722/gdb/testsuite/lib/future.exp2	2011-10-11 16:44:10.000000000 +0200
++++ gdb-7.3.50.20110722/gdb/testsuite/lib/future.exp	2011-10-11 16:44:10.000000000 +0200
 @@ -77,6 +77,10 @@ proc gdb_default_target_compile {source
      set ldflags ""
      set dest [target_info name]

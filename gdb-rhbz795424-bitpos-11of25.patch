@@ -1,0 +1,34 @@
+http://sourceware.org/ml/gdb-cvs/2012-09/msg00065.html
+
+### src/gdb/ChangeLog	2012/09/14 00:54:57	1.14656
+### src/gdb/ChangeLog	2012/09/14 07:00:37	1.14657
+## -1,3 +1,8 @@
++2012-09-14  Siddhesh Poyarekar  <siddhesh@redhat.com>
++
++	* printcmd.c (ui_printf): Eliminate single-use variable
++	PARAM_LEN.
++
+ 2012-09-14  Yao Qi  <yao@codesourcery.com>
+ 	    Pedro Alves  <palves@redhat.com>
+ 
+--- src/gdb/printcmd.c	2012/09/11 21:26:16	1.211
++++ src/gdb/printcmd.c	2012/09/14 07:00:42	1.212
+@@ -2267,7 +2267,6 @@
+ 
+ 	      /* Parameter data.  */
+ 	      struct type *param_type = value_type (val_args[i]);
+-	      unsigned int param_len = TYPE_LENGTH (param_type);
+ 	      struct gdbarch *gdbarch = get_type_arch (param_type);
+ 	      enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+ 
+@@ -2329,8 +2328,8 @@
+ 
+ 	      /* Conversion between different DFP types.  */
+ 	      if (TYPE_CODE (param_type) == TYPE_CODE_DECFLOAT)
+-		decimal_convert (param_ptr, param_len, byte_order,
+-				 dec, dfp_len, byte_order);
++		decimal_convert (param_ptr, TYPE_LENGTH (param_type),
++				 byte_order, dec, dfp_len, byte_order);
+ 	      else
+ 		/* If this is a non-trivial conversion, just output 0.
+ 		   A correct converted value can be displayed by explicitly
