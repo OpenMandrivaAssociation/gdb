@@ -717,6 +717,9 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 %{_bindir}/gdb
 %{_bindir}/gdbserver
 %{_bindir}/gstack
+%ifarch %arm
+%{_bindir}/run
+%endif
 %{_bindir}/gdb-add-index
 %{_sysconfdir}/gdbinit
 %{_sysconfdir}/gdbinit.d
@@ -730,6 +733,9 @@ install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
 %{_libdir}/libinproctrace.so
 %endif
 %{_mandir}/man1/gdb.1*
+%ifarch %arm
+%{_mandir}/man1/run.1*
+%endif
 %{_mandir}/man1/gdbserver.1*
 %{_mandir}/man1/gstack.1*
 %{_infodir}/gdb.info*
