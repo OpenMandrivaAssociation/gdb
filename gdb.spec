@@ -7,7 +7,7 @@
 Summary:	A GNU source-level debugger for C, C++ and Fortran
 Name:		gdb
 Version:	%{branch}_%linaro
-Release:	4
+Release:	5
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://www.gnu.org/software/gdb/
