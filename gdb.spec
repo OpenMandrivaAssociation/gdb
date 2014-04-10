@@ -1,33 +1,68 @@
-# Extract Mandriva Linux name and version
-%define mdv_distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
+# rpmbuild parameters:
+# --with testsuite: Run the testsuite (biarch if possible).  Default is without.
+# --with asan: gcc -fsanitize=address
+# --with debug: Build without optimizations and without splitting the debuginfo.
+# --without python: No python support.
+# --with profile: gcc -fprofile-generate / -fprofile-use: Before better
+#                 workload gets run it decreases the general performance now.
 
-%define branch 7.5
-%define linaro 2012.12
+# Extract OpenMandriva Linux name and version
+%define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
+%define Werror_cflags %nil
 
-Summary:	A GNU source-level debugger for C, C++ and Fortran
-Name:		gdb
-Version:	%{branch}_%linaro
-Release:	9
-License:	GPLv3+
+Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
+Name: gdb%{?_withi_debug:-debug}
+
+#global snap       20140108
+Version:	7.7
+Release:	1
+License:	GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and BSD and Public Domain
 Group:		Development/Other
-URL:		http://www.gnu.org/software/gdb/
-# See also http://launchpad.net/gdb-linaro
-Source0:	gdb-linaro-%branch-%linaro-1.tar.bz2
+# Do not provide URL for snapshots as the file lasts there only for 2 days.
+# ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{version}.tar.bz2
+# ftp://sourceware.org/pub/gdb/snapshots/branch/gdb-%{version}.tar.bz2
+# ftp://sourceware.org/pub/gdb/releases/gdb-%{version}.tar.bz2
+Source0:	ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{version}.tar.bz2
+URL:		http://gnu.org/software/gdb/
+
+# For our convenience
+%define gdb_src gdb-%{version}
+%define gdb_build build-%{_target_platform}
+%define gdb_docdir %{_docdir}/%{name}-doc
+
+%if 0%{?_with_debug:1}
+# Define this if you want to skip the strip step and preserve debug info.
+# Useful for testing.
+%define __debug_install_post : > %{_builddir}/%{?buildsubdir}/debugfiles.list
+%define debug_package %{nil}
+%endif
+
+# eu-strip: -g recognizes .gdb_index as a debugging section. (#631997)
+Conflicts: elfutils < 0.149
+
+# GDB patches have the format `gdb-<version>-bz<red-hat-bz-#>-<desc>.patch'.
+# They should be created using patch level 1: diff -up ./gdb (or gdb-6.3/gdb).
+
+#=
+#push=Should be pushed upstream.
+#maybepush=Should be pushed upstream unless it got obsoleted there.
+#fedora=Should stay as a Fedora patch.
+#ia64=Drop after RHEL-5 rebases and rebuilds are no longer meaningful.
+#fedoratest=Keep it in Fedora only as a regression test safety.
+#+ppc=Specific for ppc32/ppc64/ppc*
+#+work=Requires some nontrivial work.
+
 # Cleanup any leftover testsuite processes as it may stuck mock(1) builds.
 #=push
-Source2:	gdb-orphanripper.c
+Source2: gdb-orphanripper.c
 
 # Man page for gstack(1).
 #=push
-Source3:	gdb-gstack.man
+Source3: gdb-gstack.man
 
 # /etc/gdbinit (from Debian but with Fedora compliant location).
 #=fedora
-Source4:	gdbinit
-
-# libstdc++ pretty printers from GCC SVN HEAD (4.5 experimental).
-%define libstdcxxpython libstdc++-v3-python-r155978
-Source5:	%{libstdcxxpython}.tar.bz2
+Source4: gdbinit
 
 # Work around out-of-date dejagnu that does not have KFAIL
 #=drop: That dejagnu is too old to be supported.
@@ -36,10 +71,6 @@ Patch1: gdb-6.3-rh-dummykfail-20041202.patch
 # Match the Fedora's version info.
 #=fedora
 Patch2: gdb-6.3-rh-testversion-20041202.patch
-
-# Check that libunwind works - new test then fix
-#=ia64
-Patch3: gdb-6.3-rh-testlibunwind-20041202.patch
 
 # Better parse 64-bit PPC system call prologues.
 #=maybepush+ppc: Write new testcase.
@@ -82,33 +113,13 @@ Patch133: gdb-6.3-test-dtorfix-20050121.patch
 #=fedoratest
 Patch136: gdb-6.3-test-movedir-20050125.patch
 
-# Fix gcore for threads
-#=ia64
-Patch140: gdb-6.3-gcore-thread-20050204.patch
-
 # Test sibling threads to set threaded watchpoints for x86 and x86-64
 #=fedoratest
 Patch145: gdb-6.3-threaded-watchpoints2-20050225.patch
 
-# Do not issue warning message about first page of storage for ia64 gcore
-#=ia64
-Patch153: gdb-6.3-ia64-gcore-page0-20050421.patch
-
-# IA64 sigtramp prev register patch
-#=ia64
-Patch158: gdb-6.3-ia64-sigtramp-frame-20050708.patch
-
-# IA64 gcore speed-up patch
-#=ia64
-Patch160: gdb-6.3-ia64-gcore-speedup-20050714.patch
-
 # Notify observers that the inferior has been created
 #=fedoratest
 Patch161: gdb-6.3-inferior-notification-20050721.patch
-
-# Fix ia64 info frame bug
-#=ia64
-Patch162: gdb-6.3-ia64-info-frame-fix-20050725.patch
 
 # Verify printing of inherited members test
 #=fedoratest
@@ -117,10 +128,6 @@ Patch163: gdb-6.3-inheritancetest-20050726.patch
 # Add readnever option
 #=push
 Patch164: gdb-6.3-readnever-20050907.patch
-
-# Fix ia64 gdb problem with user-specified SIGILL handling
-#=ia64
-Patch169: gdb-6.3-ia64-sigill-20051115.patch
 
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
 #=push+work: There was some mail thread about it, this patch may be a hack.
@@ -225,6 +232,8 @@ Patch415: gdb-6.6-buildid-locate-core-as-arg.patch
 # Workaround librpm BZ 643031 due to its unexpected exit() calls (BZ 642879).
 #=push
 Patch519: gdb-6.6-buildid-locate-rpm-librpm-workaround.patch
+# [SCL] Skip deprecated .gdb_index warning for Red Hat built files (BZ 953585).
+Patch833: gdb-6.6-buildid-locate-rpm-scl.patch
 
 # Add kernel vDSO workaround (`no loadable ...') on RHEL-5 (kernel BZ 765875).
 #=push
@@ -237,10 +246,6 @@ Patch282: gdb-6.7-charsign-test.patch
 # Test PPC hiding of call-volatile parameter register.
 #=fedoratest+ppc
 Patch284: gdb-6.7-ppc-clobbered-registers-O2-test.patch
-
-# Testsuite fixes for more stable/comparable results.
-#=fedoratest
-Patch287: gdb-6.7-testsuite-stable-results.patch
 
 # Test ia64 memory leaks of the code using libunwind.
 #=fedoratest
@@ -283,17 +288,21 @@ Patch317: gdb-6.8-sparc64-silence-memcpy-check.patch
 #=fedoratest
 Patch320: gdb-6.5-section-num-fixup-test.patch
 
-# Fix PRPSINFO in the core files dumped by gcore (BZ 254229).
-#=push
-Patch329: gdb-6.8-bz254229-gcore-prpsinfo.patch
-
 # Fix register assignments with no GDB stack frames (BZ 436037).
 #=push+work: This fix is incorrect.
 Patch330: gdb-6.8-bz436037-reg-no-longer-active.patch
 
 # Make the GDB quit processing non-abortable to cleanup everything properly.
-#=push: It was useful only after gdb-6.8-attach-signalled-detach-stopped.patch .
+#=fedora: It was useful only after gdb-6.8-attach-signalled-detach-stopped.patch .
 Patch331: gdb-6.8-quit-never-aborts.patch
+
+# [RHEL5] Workaround kernel for detaching SIGSTOPped processes (BZ 809382).
+#=fedora
+Patch335: gdb-rhel5-compat.patch
+
+# [RHEL5,RHEL6] Fix attaching to stopped processes.
+#=fedora
+Patch337: gdb-6.8-attach-signalled-detach-stopped.patch
 
 # Test the watchpoints conditionals works.
 #=fedoratest
@@ -330,6 +339,10 @@ Patch391: gdb-x86_64-i386-syscall-restart.patch
 #=push+work: It requires some better DWARF annotations.
 Patch392: gdb-bz533176-fortran-omp-step.patch
 
+# Use gfortran44 when running the testsuite on RHEL-5.
+#=fedoratest
+Patch393: gdb-rhel5-gcc44.patch
+
 # Fix regression by python on ia64 due to stale current frame.
 #=push
 Patch397: gdb-follow-child-stale-parent.patch
@@ -337,12 +350,6 @@ Patch397: gdb-follow-child-stale-parent.patch
 # Workaround ccache making lineno non-zero for command-line definitions.
 #=fedoratest: ccache is rarely used and it is even fixed now.
 Patch403: gdb-ccache-workaround.patch
-
-# Implement `info common' for Fortran.
-#=push
-Patch404: gdb-fortran-common-reduce.patch
-#=push
-Patch405: gdb-fortran-common.patch
 
 # Testcase for "Do not make up line information" fix by Daniel Jacobowitz.
 #=fedoratest
@@ -381,10 +388,6 @@ Patch491: gdb-gdb-add-index-script.patch
 #=drop+work: Inferior objects should be read in parts, then this patch gets obsoleted.
 Patch496: gdb-bz568248-oom-is-error.patch
 
-# Fix gcore writer for -Wl,-z,relro (PR corefiles/11804).
-#=push: There is different patch on gdb-patches, waiting now for resolution in kernel.
-Patch504: gdb-bz623749-gcore-relro.patch
-
 # Verify GDB Python built-in function gdb.solib_address exists (BZ # 634108).
 #=fedoratest
 Patch526: gdb-bz634108-solib_address.patch
@@ -415,18 +418,6 @@ Patch548: gdb-test-expr-cumulative-archer.patch
 #=push+work
 Patch579: gdb-7.2.50-sparc-add-workaround-to-broken-debug-files.patch
 
-# Fix dlopen of libpthread.so, patched glibc required (Gary Benson, BZ 669432).
-#=push
-Patch618: gdb-dlopen-stap-probe-1of7.patch
-Patch717: gdb-dlopen-stap-probe-2of7.patch
-Patch718: gdb-dlopen-stap-probe-3of7.patch
-Patch719: gdb-dlopen-stap-probe-4of7.patch
-Patch720: gdb-dlopen-stap-probe-5of7.patch
-Patch721: gdb-dlopen-stap-probe-6of7.patch
-Patch722: gdb-dlopen-stap-probe-7of7.patch
-Patch619: gdb-dlopen-stap-probe-test.patch
-Patch723: gdb-dlopen-stap-probe-test2.patch
-
 # Work around PR libc/13097 "linux-vdso.so.1" warning message.
 #=push
 Patch627: gdb-glibc-vdso-workaround.patch
@@ -435,22 +426,20 @@ Patch627: gdb-glibc-vdso-workaround.patch
 #=fedoratest
 Patch634: gdb-runtest-pie-override.patch
 
-# Enable smaller %{_bindir}/gdb in future by no longer using -rdynamic.
-#=push
-Patch643: gdb-python-rdynamic.patch
+# Work around readline-6.2 incompatibility not asking for --more-- (BZ 701131).
+#=fedora
+Patch642: gdb-readline62-ask-more-rh.patch
 
 # Print reasons for failed attach/spawn incl. SELinux deny_ptrace (BZ 786878).
 #=push
 Patch653: gdb-attach-fail-reasons-5of5.patch
-#=fedora
-Patch657: gdb-attach-fail-reasons-5of5configure.patch
 
 # Workaround crashes from stale frame_info pointer (BZ 804256).
 #=fedora
 Patch661: gdb-stale-frame_info.patch
 
 # Workaround PR libc/14166 for inferior calls of strstr.
-#=push+work: But push it to glibc.
+#=fedora: Compatibility with RHELs (unchecked which ones).
 Patch690: gdb-glibc-strstr-workaround.patch
 
 # Include testcase for `Unable to see a variable inside a module (XLF)' (BZ 823789).
@@ -462,78 +451,87 @@ Patch698: gdb-rhel5.9-testcase-xlf-var-inside-mod.patch
 #=fedoratest
 Patch703: gdb-rhbz-818343-set-solib-absolute-prefix-testcase.patch
 
-# Implement MiniDebugInfo F-18 Feature consumer (Alexander Larsson, BZ 834068).
-#=fedora
-Patch716: gdb-minidebuginfo.patch
-
-# Fix crash printing classes (BZ 849357, Tom Tromey).
-Patch726: gdb-print-class.patch
-
-# Permit passing pointers as address number even for C++ methods (Keith Seitz).
-Patch728: gdb-check-type.patch
-
-# entry values: Fix resolving in inlined frames.
-Patch729: gdb-entryval-inlined.patch
-
 # Fix `GDB cannot access struct member whose offset is larger than 256MB'
 # (RH BZ 795424).
-Patch797: gdb-rhbz795424-bitpos-06of25.patch
-Patch798: gdb-rhbz795424-bitpos-07of25.patch
-Patch799: gdb-rhbz795424-bitpos-08of25.patch
-Patch800: gdb-rhbz795424-bitpos-09of25.patch
-Patch801: gdb-rhbz795424-bitpos-10of25.patch
-Patch802: gdb-rhbz795424-bitpos-11of25.patch
-Patch803: gdb-rhbz795424-bitpos-12of25.patch
-Patch804: gdb-rhbz795424-bitpos-13of25.patch
-Patch805: gdb-rhbz795424-bitpos-14of25.patch
-Patch806: gdb-rhbz795424-bitpos-15of25.patch
-Patch807: gdb-rhbz795424-bitpos-16of25.patch
-Patch808: gdb-rhbz795424-bitpos-17of25.patch
-Patch809: gdb-rhbz795424-bitpos-18of25.patch
-Patch810: gdb-rhbz795424-bitpos-19of25.patch
+#=push+work
 Patch811: gdb-rhbz795424-bitpos-20of25.patch
 Patch812: gdb-rhbz795424-bitpos-21of25.patch
 Patch813: gdb-rhbz795424-bitpos-22of25.patch
 Patch814: gdb-rhbz795424-bitpos-23of25.patch
-Patch815: gdb-rhbz795424-bitpos-24of25.patch
 Patch816: gdb-rhbz795424-bitpos-25of25.patch
 Patch817: gdb-rhbz795424-bitpos-25of25-test.patch
 Patch818: gdb-rhbz795424-bitpos-lazyvalue.patch
 
-# Fix DW_OP_GNU_implicit_pointer offset bug (Tom Tromey).
-Patch819: gdb-implicitpointer-offset.patch
+# Import regression test for `gdb/findvar.c:417: internal-error:
+# read_var_value: Assertion `frame' failed.' (RH BZ 947564) from RHEL 6.5.
+#=fedoratest
+Patch832: gdb-rhbz947564-findvar-assertion-frame-failed-testcase.patch
 
-Patch1000:	gdb-7.3.50.20110722-rpm5.patch
+# Fix crash on 'enable count' (Simon Marchi, BZ 993118).
+Patch843: gdb-enable-count-crash.patch
 
-BuildRequires:	bison
-Buildrequires:	cloog-devel
-BuildRequires:	flex
-BuildRequires:	pkgconfig(ncurses)
-BuildRequires:	expat-devel
-BuildRequires:	pkgconfig(python)
-BuildRequires:	pkgconfig(rpm) >= 5.3
-BuildRequires:	pkgconfig
-BuildRequires:	readline-devel
-BuildRequires:	texinfo
+# Fix testsuite "ERROR: no fileid for".
+Patch846: gdb-testsuite-nohostid.patch
+
+# Fix Python stack corruption.
+Patch847: gdb-python-stacksmash.patch
+
+# [rhel6] DTS backward Python compatibility API (BZ 1020004, Phil Muldoon).
+Patch848: gdb-dts-rhel6-python-compat.patch
+
+# Fix gdb-7.7 auto-load from /usr/share/gdb/auto-load/ regression.
+Patch849: gdb-auto-load-lost-path-7.7.patch
+
+# Fix crash of -readnow /usr/lib/debug/usr/bin/gnatbind.debug (BZ 1069211).
+Patch850: gdb-gnat-dwarf-crash-1of3.patch
+Patch851: gdb-gnat-dwarf-crash-2of3.patch
+Patch852: gdb-gnat-dwarf-crash-3of3.patch
+# RPM5 patch
+Patch1000: gdb-7.3.50.20110722-rpm5.patch
+
+# OMV/MGA have urpmi instead of yum:
+Patch10000: gdb-7.1-buildid-locate-mageia.patch
+
+# http://svnweb.mageia.org/soft/rpm/debuginfo-install/trunk/debuginfo-install
+Source1000: debuginfo-install
+
+BuildRequires:  bison
+Buildrequires:  cloog-devel
+BuildRequires:  flex
+BuildRequires:  pkgconfig(ncurses)
+BuildRequires:  expat-devel
+BuildRequires:  pkgconfig(python)
+BuildRequires:  pkgconfig(rpm) >= 5.3
+BuildRequires:  pkgconfig
+BuildRequires:  readline-devel
+BuildRequires:  texinfo
+BuildRequires:	texlive
+
 
 %description
-Gdb is a full featured, command driven debugger. Gdb allows you to
-trace the execution of programs and examine their internal state at
-any time.  Gdb works for C and C++ compiled with the GNU C compiler
-gcc.
-
-If you are going to develop C and/or C++ programs and use the GNU gcc
-compiler, you may want to install gdb to help you debug your programs.
+GDB, the GNU debugger, allows you to debug programs written in C, C++,
+Java, and other languages, by executing them in a controlled fashion
+and printing their data.
 
 %prep
-%setup -q -n gdb-linaro-%branch-%linaro-1 -a5
 
+# This allows the tarball name to be different from our
+# version-release name.
+
+%setup -q -n %{gdb_src}
+
+# Files have `# <number> <file>' statements breaking VPATH / find-debuginfo.sh .
+rm -f gdb/ada-exp.c gdb/ada-lex.c gdb/c-exp.c gdb/cp-name-parser.c gdb/f-exp.c
+rm -f gdb/jv-exp.c gdb/m2-exp.c gdb/objc-exp.c gdb/p-exp.c gdb/go-exp.c
+
+# Apply patches defined above.
+
+# Match the Fedora's version info.
 %patch2 -p1
 
 %patch349 -p1
 %patch232 -p1
 %patch1 -p1
-%patch3 -p1
 
 %patch105 -p1
 %patch111 -p1
@@ -543,16 +541,10 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch125 -p1
 %patch133 -p1
 %patch136 -p1
-%patch140 -p1
 %patch145 -p1
-%patch153 -p1
-%patch158 -p1
-%patch160 -p1
 %patch161 -p1
-%patch162 -p1
 %patch163 -p1
 %patch164 -p1
-%patch169 -p1
 %patch188 -p1
 %patch194 -p1
 %patch196 -p1
@@ -581,7 +573,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch276 -p1
 %patch282 -p1
 %patch284 -p1
-%patch287 -p1
 %patch289 -p1
 %patch290 -p1
 %patch294 -p1
@@ -592,9 +583,7 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch315 -p1
 %patch317 -p1
 %patch320 -p1
-%patch329 -p1
 %patch330 -p1
-%patch331 -p1
 %patch343 -p1
 %patch348 -p1
 %patch360 -p1
@@ -604,8 +593,6 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch392 -p1
 %patch397 -p1
 %patch403 -p1
-%patch404 -p1
-%patch405 -p1
 %patch389 -p1
 %patch394 -p1
 %patch407 -p1
@@ -619,357 +606,336 @@ compiler, you may want to install gdb to help you debug your programs.
 %patch490 -p1
 %patch491 -p1
 %patch496 -p1
-%patch504 -p1
 %patch526 -p1
 %patch542 -p1
 %patch547 -p1
 %patch548 -p1
 %patch579 -p1
-%patch618 -p1
-%patch717 -p1
-%patch718 -p1
-%patch719 -p1
-%patch720 -p1
-%patch721 -p1
-%patch722 -p1
-%patch723 -p1
-%patch619 -p1
 %patch627 -p1
 %patch634 -p1
-%patch643 -p1
 %patch653 -p1
-%patch657 -p1
 %patch661 -p1
 %patch690 -p1
 %patch698 -p1
 %patch703 -p1
-%patch716 -p1
-%patch726 -p1
-%patch728 -p1
-%patch729 -p1
-%patch797 -p1
-%patch798 -p1
-%patch799 -p1
-%patch800 -p1
-%patch801 -p1
-%patch802 -p1
-%patch803 -p1
-%patch804 -p1
-%patch805 -p1
-%patch806 -p1
-%patch807 -p1
-%patch808 -p1
-%patch809 -p1
-%patch810 -p1
 %patch811 -p1
 %patch812 -p1
 %patch813 -p1
 %patch814 -p1
-%patch815 -p1
 %patch816 -p1
 %patch817 -p1
 %patch818 -p1
-%patch819 -p1
+%patch832 -p1
+%patch843 -p1
+%patch846 -p1
+%patch847 -p1
+%patch849 -p1
+%patch850 -p1
+%patch851 -p1
+%patch852 -p1
 
-%patch1000 -p1 -b .rpm5~
+%patch1000 -p1
+
+find -name "*.orig" | xargs rm -f
+! find -name "*.rej" # Should not happen.
 
 cat > gdb/version.in << EOF
-%{version}-%{release} (%{mdv_distro_version})
+%{version}-%{release} (%{distro_version})
 EOF
 
+# Remove the info and other generated files added by the FSF release
+# process.
+rm -f libdecnumber/gstdint.h
+rm -f bfd/doc/*.info
+rm -f bfd/doc/*.info-*
+rm -f gdb/doc/*.info
+rm -f gdb/doc/*.info-*
+
+# RL_STATE_FEDORA_GDB would not be found for:
+# Patch642: gdb-readline62-ask-more-rh.patch
+# --with-system-readline
+mv -f readline/doc readline-doc
+rm -rf readline/*
+mv -f readline-doc readline/doc
+
 %build
-%configure2_5x	--with-separate-debug-dir=%{_prefix}/lib/debug \
-		--with-pythondir=%{_datadir}/gdb/python \
-		--with-rpm \
-		--with-expat \
-		--disable-werror \
-		--with-system-gdbinit=%{_sysconfdir}/gdbinit
-%make
-make info
+
+# Identify the build directory with the version of gdb as well as the
+# architecture, to allow for mutliple versions to be installed and
+# built.
+# Initially we're in the %{gdb_src} directory.
+
+for fprofile in %{?_with_profile:-fprofile} ""
+do
+
+mkdir %{gdb_build}$fprofile
+cd %{gdb_build}$fprofile
+
+export CFLAGS="$RPM_OPT_FLAGS"
+
+%if 0%{?_with_debug:1}
+# --enable-werror could conflict with `-Wall -O0' but this is no longer true
+# for recent GCCs.
+CFLAGS="$CFLAGS -O0 -ggdb2"
+%endif
+
+../configure							\
+	--prefix=%{_prefix}					\
+	--libdir=%{_libdir}					\
+	--sysconfdir=%{_sysconfdir}				\
+	--mandir=%{_mandir}					\
+	--infodir=%{_infodir}					\
+	--htmldir=%{gdb_docdir}					\
+	--pdfdir=%{gdb_docdir}					\
+	--with-system-gdbinit=%{_sysconfdir}/gdbinit		\
+	--with-gdb-datadir=%{_datadir}/gdb			\
+	--enable-gdb-build-warnings=,-Wno-unused		\
+	--with-separate-debug-dir=/usr/lib/debug		\
+	--disable-werror					\
+	--disable-rpath						\
+	--with-lzma						\
+	--with-system-readline				\
+	--with-expat						\
+$(: ppc64 host build crashes on ppc variant of libexpat.so )	\
+	--without-libexpat-prefix				\
+	--disable-tui						\
+%if 0%{!?_without_python:1}
+	--with-python						\
+%else
+	--without-python					\
+%endif
+	--with-rpm						\
+	--without-libunwind					\
+	--enable-64-bit-bfd					\
+%if 0%{?_with_debug:1}
+	--enable-static --disable-shared --enable-debug		\
+%endif
+	--enable-targets=s390-linux-gnu,powerpc-linux-gnu,arm-linux-gnu,aarch64-linux-gnu \
+	%{_target_platform}
+
+if [ -z "%{!?_with_profile:no}" ]
+then
+  # Run all the configure tests being incompatible with $FPROFILE_CFLAGS.
+  %make configure-host configure-target
+  %make clean
+
+  # Workaround -fprofile-use:
+  # linux-x86-low.c:2225: Error: symbol `start_i386_goto' is already defined
+  %make -C gdb/gdbserver linux-x86-low.o
+fi
+
+# Global CFLAGS would fail on:
+# conftest.c:1:1: error: coverage mismatch for function 'main' while reading counter 'arcs'
+if [ "$fprofile" = "-fprofile" ]
+then
+  FPROFILE_CFLAGS='-fprofile-generate'
+elif [ -z "%{!?_with_profile:no}" ]
+then
+  FPROFILE_CFLAGS='-fprofile-use'
+  # We cannot use -fprofile-dir as the bare filenames clash.
+  (cd ../%{gdb_build}-fprofile;
+   # It was 333 on x86_64.
+   test $(find -name "*.gcda"|wc -l) -gt 300
+   find -name "*.gcda" | while read -r i
+   do
+     ln $i ../%{gdb_build}/$i
+   done
+  )
+else
+  FPROFILE_CFLAGS=""
+fi
+
+%make CFLAGS="$CFLAGS $FPROFILE_CFLAGS" LDFLAGS="$FPROFILE_CFLAGS"
+
+if [ "$fprofile" = "-fprofile" ]
+then
+  cd gdb
+  cp -p gdb gdb-withindex
+  PATH="$PWD:$PATH" sh ../../gdb/gdb-add-index $PWD/gdb-withindex
+  ./gdb -nx -ex q ./gdb-withindex
+  ./gdb -nx -readnow -ex q ./gdb-withindex
+  cd ..
+fi
+
+cd ..
+
+done	# fprofile
+
+cd %{gdb_build}
+
+%make info
+%make -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split
+
+grep '#define HAVE_ZLIB_H 1' gdb/config.h
+
+# Copy the <sourcetree>/gdb/NEWS file to the directory above it.
+cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
+
+%check
+# Initially we're in the %{gdb_src} directory.
+cd %{gdb_build}
+
+%if 0%{!?_with_testsuite:1}
+echo ====================TESTSUITE DISABLED=========================
+%else
+echo ====================TESTING=========================
+cd gdb
+gcc -o ./orphanripper %{SOURCE2} -Wall -lutil -ggdb2
+# Need to use a single --ignore option, second use overrides first.
+# No `%{?_smp_mflags}' here as it may race.
+# WARNING: can't generate a core file - core tests suppressed - check ulimit
+# "readline-overflow.exp" - Testcase is broken, functionality is OK.
+(
+  # ULIMIT required for `gdb.base/auxv.exp'.
+  ulimit -H -c
+  ulimit -c unlimited || :
+
+  # Setup $CHECK as `check//unix/' or `check//unix/-m64' for explicit bitsize.
+  # Never use two different bitsizes as it fails on ppc64.
+  echo 'int main (void) { return 0; }' >biarch.c
+  CHECK=""
+  for BI in -m64 -m32 -m31 ""
+  do
+    # Do not use size-less options if any of the sizes works.
+    # On ia64 there is no -m64 flag while we must not leave a bare `check' here
+    # as it would switch over some testing scripts to the backward compatibility
+    # mode: when `make check' was executed from inside the testsuite/ directory.
+    if [ -z "$BI" -a -n "$CHECK" ];then
+      continue
+    fi
+    # Do not use $RPM_OPT_FLAGS as the other non-size options will not be used
+    # in the real run of the testsuite.
+    if ! gcc $BI -o biarch biarch.c
+    then
+      continue
+    fi
+    CHECK="$CHECK check//unix/$BI"
+  done
+  # Do not try -m64 inferiors for -m32 GDB as it cannot handle inferiors larger
+  # than itself.
+  # s390 -m31 still uses the standard ELF32 binary format.
+  gcc $RPM_OPT_FLAGS -o biarch biarch.c
+  RPM_SIZE="$(file ./biarch|sed -n 's/^.*: ELF \(32\|64\)-bit .*$/\1/p')"
+  if [ "$RPM_SIZE" != "64" ]
+  then
+    CHECK="$(echo " $CHECK "|sed 's# check//unix/-m64 # #')"
+  fi
+
+  # Disable some problematic testcases.
+  # RUNTESTFLAGS='--ignore ...' is not used below as it gets separated by the
+  # `check//...' target spawn and too much escaping there would be dense.
+  for test in				\
+    gdb.base/readline-overflow.exp	\
+    gdb.base/bigcore.exp		\
+  ; do
+    mv -f ../../gdb/testsuite/$test ../gdb/testsuite/$test-DISABLED || :
+  done
+
+  # Run all the scheduled testsuite runs also in the PIE mode.
+  # Upstream GDB would lock up the testsuite run for too long on its failures.
+  CHECK="$(echo $CHECK|sed 's#check//unix/[^ ]*#& &/-fPIE/-pie#g')"
+
+  ./orphanripper %make -k $CHECK \
+$(: Serialize the output to keep the order for regression checks. ) \
+%if 0%{?el5:1}
+    RUNTESTFLAGS="--tool gdb" \
+%endif
+    || :
+)
+for t in sum log
+do
+  for file in testsuite*/gdb.$t
+  do
+    suffix="${file#testsuite.unix.}"
+    suffix="${suffix%/gdb.$t}"
+    ln $file gdb-%{_target_platform}$suffix.$t || :
+  done
+done
+# `tar | bzip2 | uuencode' may have some piping problems in Brew.
+tar cjf gdb-%{_target_platform}.tar.bz2 gdb-%{_target_platform}*.{sum,log}
+uuencode gdb-%{_target_platform}.tar.bz2 gdb-%{_target_platform}.tar.bz2
+cd ../..
+echo ====================TESTING END=====================
+%endif
 
 %install
+# Initially we're in the %{gdb_src} directory.
+cd %{gdb_build}
+
 %makeinstall_std
 
 mkdir -p %{buildroot}%{_sysconfdir}/gdbinit.d
 sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >%{buildroot}%{_sysconfdir}/gdbinit
 
-# The above is broken, do this for now:
-mkdir -p %{buildroot}%{_infodir}
-cp `find . -name "*.info*"` %{buildroot}/%{_infodir}
-rm -f %{buildroot}%{_infodir}/dir %{buildroot}%{_infodir}/dir.info* 
-rm -f %{buildroot}%{_bindir}/{texindex,texi2dvi,makeinfo,install-info,info}
+for i in `find %{buildroot}%{_datadir}/gdb/python/gdb -name "*.py"`
+do
+  # Files could be also patched getting the current time.
+  touch -r $RPM_BUILD_DIR/%{gdb_src}/gdb/ChangeLog $i
+done
 
+install -m 0775 %{SOURCE1000} %{buildroot}%{_bindir}
+
+# Remove the files that are part of a gdb build but that are owned and
+# provided by other packages.
 # These are part of binutils
-rm -f %{buildroot}%{_infodir}/{bfd,standard,readline,history,info,texinfo}*
-rm -fr %{buildroot}%{_includedir}
-rm -fr %{buildroot}%{_libdir}/lib{bfd*,opcodes*,iberty*}
 
-# Remove even more unpackaged files
-rm -f %{buildroot}%{_libdir}/libmmalloc.a
-rm -f %{buildroot}%{_infodir}/{configure,libiberty,rluserman}.info*
 rm -rf %{buildroot}%{_datadir}/locale/
-rm -f %{buildroot}%{_infodir}/annotate.info*
+rm -f %{buildroot}%{_infodir}/bfd*
+rm -f %{buildroot}%{_infodir}/standard*
+rm -f %{buildroot}%{_infodir}/mmalloc*
+rm -f %{buildroot}%{_infodir}/configure*
+rm -f %{buildroot}%{_infodir}/gdbint*
+rm -f %{buildroot}%{_infodir}/stabs*
+rm -rf %{buildroot}%{_includedir}
+rm -rf %{buildroot}/%{_libdir}/lib{bfd*,opcodes*,iberty*,mmalloc*}
 
-install -m644 %{SOURCE3} -D %{buildroot}%{_mandir}/man1/gstack.1
+# Delete this too because the dir file will be updated at rpm install time.
+# We don't want a gdb specific one overwriting the system wide one.
+
+rm -f %{buildroot}%{_infodir}/dir
+
+# pstack obsoletion
+cp -p %{SOURCE3} %{buildroot}%{_mandir}/man1/gstack.1
+ln -s gstack.1 %{buildroot}%{_mandir}/man1/pstack.1
+ln -s gstack %{buildroot}%{_bindir}/pstack
+
+# Packaged GDB is not a cross-target one.
+(cd %{buildroot}%{_datadir}/gdb/syscalls
+ rm -f mips*.xml
+ rm -f sparc*.xml
+%ifnarch x86_64
+ rm -f amd64-linux.xml
+%endif
+%ifnarch %{ix86} x86_64
+ rm -f i386-linux.xml
+%endif
+%ifnarch ppc ppc64
+ rm -f ppc{,64}-linux.xml
+%endif
+)
 
 %files
-%doc README gdb/NEWS
+%doc COPYING3 COPYING COPYING.LIB README NEWS
+%{_bindir}/gcore
 %{_bindir}/gdb
-%{_bindir}/gdbserver
-%{_bindir}/gstack
-%ifarch %arm
-%{_bindir}/run
-%endif
-%{_bindir}/gdb-add-index
-%{_sysconfdir}/gdbinit
+%{_bindir}/debuginfo-install
+%config(noreplace) %{_sysconfdir}/gdbinit
 %{_sysconfdir}/gdbinit.d
-%dir %{_datadir}/gdb
-%{_datadir}/gdb/python
-%{_datadir}/gdb/syscalls
-%ifarch %{mips} %{arm}
-%{_libdir}/lib*-mandriva-linux-gnu*-sim.a
-%endif
+%{_mandir}/*/gdbinit.5*
+%{_mandir}/*/gdb.1*
+%{_mandir}/*/gcore.1*
+%{_mandir}/*/gdb-add-index.1*
+%{_bindir}/gstack
+%{_mandir}/*/gstack.1*
+%{_bindir}/gdb-add-index
+%{_bindir}/pstack
+%{_mandir}/*/pstack.1*
+%{_datadir}/gdb
+# don't include the files in include, they are part of binutils
+%{_bindir}/gdbserver
+%{_mandir}/*/gdbserver.1*
 %ifarch %{ix86} x86_64
 %{_libdir}/libinproctrace.so
 %endif
-%{_mandir}/man1/gdb.1*
-%ifarch %arm
-%{_mandir}/man1/run.1*
-%endif
-%{_mandir}/man1/gdbserver.1*
-%{_mandir}/man1/gstack.1*
+%{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
-%{_infodir}/gdbint.info*
-%{_infodir}/stabs.info*
-
-
-%changelog
-* Wed Jun 06 2012 Andrey Bondrov <abondrov@mandriva.org> 7.3.50.20110722-4
-+ Revision: 802906
-- Drop some legacy junk
-
-* Sat Mar 17 2012 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-3
-+ Revision: 785440
-- debug packages has now '-debuginfo' as suffix, rather than '-debug'
-- use pkgconfig() deps for buildrequires
-
-* Tue Nov 29 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-2
-+ Revision: 735290
-- enable P487
-
-* Tue Nov 29 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.3.50.20110722-1
-+ Revision: 735285
-- add gstack.1 man page
-- remove legacy rpm stuff
-- provide stub %%{_sysconfdir}/gdbinit (rhbz#651232)
-- sync version & patches with gdb-7.3.50.20110722-11 from Fedora
-
-  + Matthew Dawkins <mattydaw@mandriva.org>
-    - added arm support
-    - _gnu in arm is -gnueabi
-
-* Sun May 08 2011 Funda Wang <fwang@mandriva.org> 7.1-5
-+ Revision: 672383
-- disable werror
-
-  + Oden Eriksson <oeriksson@mandriva.com>
-    - mass rebuild
-
-* Sun Jan 09 2011 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.1-4mdv2011.0
-+ Revision: 630736
-- fix python 2.7 support (P1001)
-
-* Sat Dec 04 2010 Per Ãyvind Karlsen <peroyvind@mandriva.org> 7.1-3mdv2011.0
-+ Revision: 608927
-- add versioned rpm-devel build requires
-- port to rpm5 API (P1000)
-
-* Sun Oct 31 2010 Funda Wang <fwang@mandriva.org> 7.1-2mdv2011.0
-+ Revision: 590743
-- rebuild for py2.7
-
-* Fri Apr 16 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.1-1mdv2010.1
-+ Revision: 535538
-- Updated gdb to version 7.1
-- Sync Fedora patches with gdb-7.1-12.fc13
-- Update buildid-locate-mandriva patch for new gdb.
-
-* Fri Jan 15 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0.1-2mdv2010.1
-+ Revision: 491836
-- Make sure we always build with libexpat.
-
-* Wed Jan 06 2010 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0.1-1mdv2010.1
-+ Revision: 486873
-- Sync fedora patches with 7.0.1-19.fc12
-
-  + Emmanuel Andry <eandry@mandriva.org>
-    - New version 7.0.1
-    - drop p232 (merged upstream)
-    - BR libcloog-devel
-
-* Fri Dec 18 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 7.0-1mdv2010.1
-+ Revision: 479987
-- Rediff fix-sim-build, buildid-locate-mandriva.
-- Sync patches with Fedora gdb package (7.0-9.fc12).
-
-  + Christophe Fergeau <cfergeau@mandriva.com>
-    - upload gdb 7.0 tarball (still not building :-/)
-    - readd patches I didn't mean to remove just yet
-    - update to first 7.0 prerelease, still not working because of autoconf issues :(
-    - rediff patches against new gdb tarball
-      add gdb-6.6-buildid-locate-rpm.patch from fedora (they split gdb-6.6-buildid-locate.patch in 2 separate patches)
-      comment out 2 patches that haven't been rediffed yet
-    - fix patch comment to be in line with fedora .spec comment
-    - pick attach-signalled patch from fedora to replace ours
-    - drop no longer useful patch (after switch to gcc 4.4?)
-    - Patch179 has been dropped from RedHat too
-    - sync RedHat patches to latest version
-    - remove no longer used patches
-    - patch backporting upstream fixes is no longer necessary
-    - drop patches that are no longer in fedora package
-    - use 6.8.50 CVS snapshot instead of the old 6.8 release
-    - fix Patch176 (depended on an ia64 patch)
-    - Patch112 is needed by Patch141, readd it
-    - remove obsolete patches
-    - drop unused patches
-    - fix cvs snapshot handling
-    - delete dropped patches
-    - drop ppc, ia64 and sparc patches
-
-  + Olivier Blin <blino@mandriva.org>
-    - add mips support (from Arnaud Patard)
-    - fix a format error in sim-utils (from Arnaud Patard)
-
-* Wed Sep 02 2009 Christophe Fergeau <cfergeau@mandriva.com> 6.8-7mdv2010.0
-+ Revision: 424577
-- rebuild
-
-* Mon Mar 23 2009 Paulo Andrade <pcpa@mandriva.com.br> 6.8-6mdv2009.1
-+ Revision: 360759
-- Correct #37755. See https://bugzilla.redhat.com/show_bug.cgi?id=453688#c3
-  for more information. This basically allows 'valgrind --db-attach=yes' to
-  work again, as this feature is missing since 2008.0. This patch is not
-  fully correct as it depends on corrections in kernel code, but is enough
-  to get gdb to stop at the proper moment memory corruption happened, and
-  to allow checking contents of global and stack variables (of the current
-  function, stack frame information is lost).
-
-* Wed Jan 21 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-5mdv2009.1
-+ Revision: 332266
-- Really fix display of missing debug packages (#47170).
-
-* Wed Jan 21 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-4mdv2009.1
-+ Revision: 332195
-- Fix display of missing debug packages (#47170).
-
-* Tue Jan 20 2009 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-3mdv2009.1
-+ Revision: 332036
-- Reset _default_patch_fuzz to 2 until patches are rediffed.
-- Updated buildid-locate patch from Fedora (reported by Pixel).
-- Redid buildid-locate-mandriva patch.
-- Rediffed rpm5-compat patch.
-
-  + Per Ãyvind Karlsen <peroyvind@mandriva.org>
-    - add rpm5.org compatibility (P319)
-
-* Sun Aug 24 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-2mdv2009.0
-+ Revision: 275428
-- Provide again gdbserver (#41257). For some unknown reason it was being
-  removed on the spec, no explanation or changelog explaining this.
-
-  + GÃ¶tz Waschk <waschk@mandriva.org>
-    - fix license
-
-* Wed Jun 18 2008 Herton Ronaldo Krzesinski <herton@mandriva.com.br> 6.8-1mdv2009.0
-+ Revision: 224207
-- Add BuildRequires for librpm-devel
-- Mandriva doesn't have debuginfo-install etc., quick adapt for
-  buildid-locate patch from Fedora (we should stop to share/sync all
-  patches...)
-- Updated to version 6.8
-- Removed already applied patches:
-  gdb-6.6-makeinfoversion.patch
-  gdb-6.6-do-not-crash-on-line-info-with-no-file.patch
-- Sync fedora patches with their latest gdb package (gdb-6.8-10.fc10).
-
-* Tue Jun 17 2008 Thierry Vignaud <tv@mandriva.org> 6.6-6mdv2009.0
-+ Revision: 221044
-- rebuild
-
-* Mon Mar 31 2008 Pixel <pixel@mandriva.com> 6.6-5mdv2008.1
-+ Revision: 191243
-- fixes gdb crashing when using kdelibs-debug (#29755)
-  (without this patch, kcrash/drkonqi fails with a weird error message)
-
-  + Frederic Crozat <fcrozat@mandriva.com>
-    - Patch235 (CVS): fix rebuild with latest makeinfo
-
-  + Thierry Vignaud <tv@mandriva.org>
-    - rebuild
-    - kill re-definition of %%buildroot on Pixel's request
-
-  + Olivier Blin <blino@mandriva.org>
-    - restore BuildRoot
-
-* Mon Sep 10 2007 Adam Williamson <awilliamson@mandriva.org> 6.6-3mdv2008.0
-+ Revision: 84260
-- rediff patch234 (spaces vs. tabs...)
-- better version of patch234
-- add patch234 suggested by blino to fix a warning which breaks %%configure
-- don't package COPYING and COPYING.LIB
-- drop menu entries (#27065)
-- Fedora license policy, correct license
-- drop old (10.1) conditionals
-
-  + Oden Eriksson <oeriksson@mandriva.com>
-    - sync with gdb-6.6-1mdv2007.1.src.rpm
-
-
-* Sun Jan 28 2007 Per Ãyvind Karlsen <pkarlsen@mandriva.com> 6.6-1mdv2007.0
-+ Revision: 114460
-- new release: 6.6
-  sync with fedora
-  fix prereq
-- Import gdb
-
-* Tue Sep 19 2006 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-8mdv2007.0
-- Rebuild
-
-* Mon Jul 17 2006 Nicolas Lécureuil <neoclust@mandriva.org> 6.3-7mdv2007.0
-- XDG
-
-* Wed Oct 05 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-6mdk
-- ppc64 fixes
-
-* Mon Aug 01 2005 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.3-5mdk
-- add BuildRequires: bison
-
-* Wed Jul 27 2005 Gwenole Beauchesne <gbeauchesne@mandriva.com> 6.3-4mdk
-- merge with RH 6.3.0.0-1.49
-
-* Thu Jan 20 2005 Per Ãyvind Karlsen <peroyvind@linux-mandrake.com> 6.3-3mdk
-- rebuild for new readline
-- wipe out buildroot at the beginning of %%install
-
-* Sun Nov 14 2004 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.3-2mdk
-- add BuildRequires: flex
-
-* Wed Nov 10 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.3-1mdk
-- 6.3
-
-* Fri Aug 27 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.2-2mdk
-- Improved i386 prologue analyzer from 6.2-branch (2004/07/08)
-
-* Thu Aug 26 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.2-1mdk
-- 6.2
-
-* Sat Aug 14 2004 Laurent MONTEL <lmontel@mandrakesoft.com> 6.1.1-2mdk
-- Rebuild for new conversion table menu
-
-* Sat Jul 31 2004 Christiaan Welvaart <cjw@daneel.dyndns.org> 6.1.1-1mdk
-- package ppc-specific files
-- 6.1.1
-
-* Tue May 25 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 6.1-1mdk
-- 6.1
-

@@ -1,4 +1,6 @@
-sources:
+removed_sources:
   gdb-7.3.50.20110722.tar.bz2: 304e73c015a112dcb53e8417c4c35147d62733f1
+sources:
+  gdb-7.7.tar.bz2: eefda18270b2efc8d8051ed992d91ba4e0d7207f
   gdb-linaro-7.5-2012.12-1.tar.bz2: 0a15e18630ef86412af99bb43326d0449ceea7d5
   libstdc++-v3-python-r155978.tar.bz2: 0c8151ce702731e5ca59ee151f450b8300d94499

@@ -47,13 +47,13 @@ Content-Type: text/x-patch
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=f77-bounds.patch
 
-Index: gdb-7.5.0.20120926/gdb/f-lang.h
+Index: gdb-7.5.50.20130118/gdb/f-lang.h
 ===================================================================
---- gdb-7.5.0.20120926.orig/gdb/f-lang.h	2012-11-07 22:12:39.000000000 +0100
-+++ gdb-7.5.0.20120926/gdb/f-lang.h	2012-11-07 22:52:02.688632498 +0100
-@@ -66,9 +66,9 @@ enum f90_range_type
- extern char *real_main_name;	/* Name of main function.  */
- extern int real_main_c_value;	/* C_value field of main function.  */
+--- gdb-7.5.50.20130118.orig/gdb/f-lang.h	2013-01-18 23:39:40.209500968 +0100
++++ gdb-7.5.50.20130118/gdb/f-lang.h	2013-01-18 23:40:04.010531177 +0100
+@@ -65,9 +65,9 @@ struct common_block
+   struct symbol *contents[1];
+ };
  
 -extern int f77_get_upperbound (struct type *);
 +extern LONGEST f77_get_upperbound (struct type *);
@@ -63,11 +63,11 @@ Index: gdb-7.5.0.20120926/gdb/f-lang.h
  
  extern void f77_get_dynamic_array_length (struct type *);
  
-Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
+Index: gdb-7.5.50.20130118/gdb/f-typeprint.c
 ===================================================================
---- gdb-7.5.0.20120926.orig/gdb/f-typeprint.c	2012-11-07 22:00:41.000000000 +0100
-+++ gdb-7.5.0.20120926/gdb/f-typeprint.c	2012-11-07 22:52:02.689632497 +0100
-@@ -182,7 +182,7 @@ f_type_print_varspec_suffix (struct type
+--- gdb-7.5.50.20130118.orig/gdb/f-typeprint.c	2013-01-18 23:39:37.564497620 +0100
++++ gdb-7.5.50.20130118/gdb/f-typeprint.c	2013-01-18 23:39:40.210500970 +0100
+@@ -180,7 +180,7 @@ f_type_print_varspec_suffix (struct type
  			     int show, int passed_a_ptr, int demangled_args,
  			     int arrayprint_recurse_level)
  {
@@ -76,7 +76,7 @@ Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
  
    /* No static variables are permitted as an error call may occur during
       execution of this function.  */
-@@ -212,7 +212,7 @@ f_type_print_varspec_suffix (struct type
+@@ -210,7 +210,7 @@ f_type_print_varspec_suffix (struct type
  
        lower_bound = f77_get_lowerbound (type);
        if (lower_bound != 1)	/* Not the default.  */
@@ -85,7 +85,7 @@ Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
  
        /* Make sure that, if we have an assumed size array, we
           print out a warning and print the upperbound as '*'.  */
-@@ -222,7 +222,7 @@ f_type_print_varspec_suffix (struct type
+@@ -220,7 +220,7 @@ f_type_print_varspec_suffix (struct type
        else
  	{
  	  upper_bound = f77_get_upperbound (type);
@@ -94,7 +94,7 @@ Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
  	}
  
        if (TYPE_CODE (TYPE_TARGET_TYPE (type)) != TYPE_CODE_ARRAY)
-@@ -291,7 +291,7 @@ void
+@@ -288,7 +288,7 @@ void
  f_type_print_base (struct type *type, struct ui_file *stream, int show,
  		   int level)
  {
@@ -103,7 +103,7 @@ Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
    int index;
  
    QUIT;
-@@ -373,7 +373,7 @@ f_type_print_base (struct type *type, st
+@@ -370,7 +370,7 @@ f_type_print_base (struct type *type, st
        else
  	{
  	  upper_bound = f77_get_upperbound (type);
@@ -112,10 +112,10 @@ Index: gdb-7.5.0.20120926/gdb/f-typeprint.c
  	}
        break;
  
-Index: gdb-7.5.0.20120926/gdb/f-valprint.c
+Index: gdb-7.5.50.20130118/gdb/f-valprint.c
 ===================================================================
---- gdb-7.5.0.20120926.orig/gdb/f-valprint.c	2012-11-07 22:09:29.000000000 +0100
-+++ gdb-7.5.0.20120926/gdb/f-valprint.c	2012-11-07 22:52:21.888604907 +0100
+--- gdb-7.5.50.20130118.orig/gdb/f-valprint.c	2013-01-18 23:39:37.564497620 +0100
++++ gdb-7.5.50.20130118/gdb/f-valprint.c	2013-01-18 23:39:40.210500970 +0100
 @@ -57,7 +57,7 @@ LONGEST f77_array_offset_tbl[MAX_FORTRAN
  
  #define F77_DIM_BYTE_STRIDE(n) (f77_array_offset_tbl[n][0])

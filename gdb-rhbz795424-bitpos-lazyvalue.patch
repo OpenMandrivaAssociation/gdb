@@ -9,7 +9,7 @@
    val->contents = NULL;
    val->next = all_values;
 --- /dev/null	2012-10-18 11:08:13.202328239 +0200
-+++ gdb-7.5.0.20120926-m64-test/gdb/testsuite/gdb.base/longest-types.exp	2012-11-09 18:13:56.286587994 +0100
++++ gdb-7.5.0.20120926-m64-test/gdb/testsuite/gdb.base/longest-types-64bit.exp	2012-11-09 18:13:56.286587994 +0100
 @@ -0,0 +1,59 @@
 +# This testcase is part of GDB, the GNU debugger.
 +
@@ -71,7 +71,7 @@
 +
 +test "native"
 --- /dev/null	2012-10-18 11:08:13.202328239 +0200
-+++ ./gdb/testsuite/gdb.base/longest-types.c	2012-11-09 17:08:51.374406344 +0100
++++ ./gdb/testsuite/gdb.base/longest-types-64bit.c	2012-11-09 17:08:51.374406344 +0100
 @@ -0,0 +1,28 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
