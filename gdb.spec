@@ -926,6 +926,16 @@ ln -s gstack %{buildroot}%{_bindir}/pstack
 %{_mandir}/*/gcore.1*
 %{_mandir}/*/gdb-add-index.1*
 %{_bindir}/gstack
+%ifarch %arm
+%{_bindir}/run
+%endif
+ifarch %{mips} %{arm}
+%{_libdir}/lib*-*mandriva-linux-gnu*-sim.a
+%endif
+%{_mandir}/man1/gdb.1*
+%ifarch %arm
+%{_mandir}/man1/run.1*
+%endif
 %{_mandir}/*/gstack.1*
 %{_bindir}/gdb-add-index
 %{_bindir}/pstack
