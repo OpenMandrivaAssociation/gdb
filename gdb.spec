@@ -659,7 +659,7 @@ rm -rf readline/*
 mv -f readline-doc readline/doc
 
 %build
-
+CONFIGURE_TOP=$PWD
 # Identify the build directory with the version of gdb as well as the
 # architecture, to allow for mutliple versions to be installed and
 # built.
@@ -679,11 +679,7 @@ export CFLAGS="$RPM_OPT_FLAGS"
 CFLAGS="$CFLAGS -O0 -ggdb2"
 %endif
 
-../configure							\
-	--prefix=%{_prefix}					\
-	--libdir=%{_libdir}					\
-	--sysconfdir=%{_sysconfdir}				\
-	--mandir=%{_mandir}					\
+%configure2_5x	\
 	--infodir=%{_infodir}					\
 	--htmldir=%{gdb_docdir}					\
 	--pdfdir=%{gdb_docdir}					\
@@ -928,12 +924,7 @@ ln -s gstack %{buildroot}%{_bindir}/pstack
 %{_bindir}/gstack
 %ifarch %arm
 %{_bindir}/run
-%endif
-ifarch %{mips} %{arm}
 %{_libdir}/lib*-*mandriva-linux-gnu*-sim.a
-%endif
-%{_mandir}/man1/gdb.1*
-%ifarch %arm
 %{_mandir}/man1/run.1*
 %endif
 %{_mandir}/*/gstack.1*
