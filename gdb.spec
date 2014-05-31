@@ -5,6 +5,8 @@
 # --without python: No python support.
 # --with profile: gcc -fprofile-generate / -fprofile-use: Before better
 #                 workload gets run it decreases the general performance now.
+# --without rpm: Don't build rpm support (for aarch64 bootstrap)
+%bcond_with rpm
 
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
@@ -679,8 +681,7 @@ export CFLAGS="$RPM_OPT_FLAGS"
 CFLAGS="$CFLAGS -O0 -ggdb2"
 %endif
 
-%configure2_5x	\
-	--infodir=%{_infodir}					\
+CC=gcc CXX=g++ %configure	\
 	--htmldir=%{gdb_docdir}					\
 	--pdfdir=%{gdb_docdir}					\
 	--with-system-gdbinit=%{_sysconfdir}/gdbinit		\
@@ -700,13 +701,17 @@ $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 %else
 	--without-python					\
 %endif
+%if %{with rpm}
 	--with-rpm						\
+%else
+	--without-rpm						\
+%endif
 	--without-libunwind					\
 	--enable-64-bit-bfd					\
 %if 0%{?_with_debug:1}
 	--enable-static --disable-shared --enable-debug		\
 %endif
-	--enable-targets=s390-linux-gnu,powerpc-linux-gnu,arm-linux-gnu,aarch64-linux-gnu \
+	--enable-targets=s390-linux-gnu,powerpc-linux-gnu,arm-linux-gnueabi,aarch64-linux-gnu \
 	%{_target_platform}
 
 if [ -z "%{!?_with_profile:no}" ]
