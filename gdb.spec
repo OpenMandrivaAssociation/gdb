@@ -10,6 +10,7 @@
 
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
+%define _enable_libtoolize 1
 %define Werror_cflags %nil
 
 Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
