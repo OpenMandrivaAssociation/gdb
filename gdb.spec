@@ -10,7 +10,6 @@
 
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
-%define _enable_libtoolize 1
 %define Werror_cflags %nil
 
 Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
@@ -641,6 +640,15 @@ rm -f gdb/jv-exp.c gdb/m2-exp.c gdb/objc-exp.c gdb/p-exp.c gdb/go-exp.c
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
+
+sed -i -e 's,2.64,2.69,' config/override.m4
+libtoolize --force
+aclocal -I m4 -I . -I config
+cd bfd
+libtoolize --force
+aclocal -I . -I ../config
+autoconf
+cd ..
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{distro_version})
