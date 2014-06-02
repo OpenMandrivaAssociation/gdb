@@ -1,0 +1,20 @@
+--- gdb-7.7/gdb/aarch64-linux-nat.c.omv~	2014-06-02 13:26:24.000000000 +0000
++++ gdb-7.7/gdb/aarch64-linux-nat.c	2014-06-02 13:26:29.000000000 +0000
+@@ -32,6 +32,7 @@
+ #include "elf/common.h"
+ 
+ #include <sys/ptrace.h>
++#include <asm/ptrace.h> // for user_hwdebug_state
+ #include <sys/utsname.h>
+ 
+ #include "gregset.h"
+--- gdb-7.7/gdb/gdbserver/linux-aarch64-low.c.omv~	2014-06-02 13:25:41.000000000 +0000
++++ gdb-7.7/gdb/gdbserver/linux-aarch64-low.c	2014-06-02 13:26:00.000000000 +0000
+@@ -27,6 +27,7 @@
+ #include <sys/user.h>
+ #include <sys/ptrace.h>
+ #include <sys/uio.h>
++#include <asm/ptrace.h> // for user_hwdebug_state
+ 
+ #include "gdb_proc_service.h"
+ 

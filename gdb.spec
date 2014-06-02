@@ -11,6 +11,8 @@
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
 %define Werror_cflags %nil
+# Libtool die die die!
+%define __libtoolize /bin/true
 
 Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 Name: gdb%{?_withi_debug:-debug}
@@ -490,6 +492,7 @@ Patch851: gdb-gnat-dwarf-crash-2of3.patch
 Patch852: gdb-gnat-dwarf-crash-3of3.patch
 # RPM5 patch
 Patch1000: gdb-7.3.50.20110722-rpm5.patch
+Patch1001: gdb-7.7-aarch64-compile.patch
 
 # OMV/MGA have urpmi instead of yum:
 Patch10000: gdb-7.1-buildid-locate-mageia.patch
@@ -637,18 +640,10 @@ rm -f gdb/jv-exp.c gdb/m2-exp.c gdb/objc-exp.c gdb/p-exp.c gdb/go-exp.c
 %patch852 -p1
 
 %patch1000 -p1
+%patch1001 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
-
-sed -i -e 's,2.64,2.69,' config/override.m4
-libtoolize --force
-aclocal -I m4 -I . -I config
-cd bfd
-libtoolize --force
-aclocal -I . -I ../config
-autoconf
-cd ..
 
 cat > gdb/version.in << EOF
 %{version}-%{release} (%{distro_version})
