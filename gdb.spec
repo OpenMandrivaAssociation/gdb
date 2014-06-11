@@ -7,6 +7,7 @@
 #                 workload gets run it decreases the general performance now.
 # --without rpm: Don't build rpm support (for aarch64 bootstrap)
 %bcond_with rpm
+%bcond_with testsuite
 
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
@@ -14,23 +15,32 @@
 # Libtool die die die!
 %define __libtoolize /bin/true
 
+%define linaro 2014.06-1
+
 Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 Name: gdb%{?_withi_debug:-debug}
 
 #global snap       20140108
-Version:	7.7
+%define ver 7.7.1
 Release:	1
 License:	GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and BSD and Public Domain
 Group:		Development/Other
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
-# ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{version}.tar.bz2
-# ftp://sourceware.org/pub/gdb/snapshots/branch/gdb-%{version}.tar.bz2
-# ftp://sourceware.org/pub/gdb/releases/gdb-%{version}.tar.bz2
-Source0:	ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{version}.tar.bz2
+# ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{ver}.tar.bz2
+# ftp://sourceware.org/pub/gdb/snapshots/branch/gdb-%{ver}.tar.bz2
+# ftp://sourceware.org/pub/gdb/releases/gdb-%{ver}.tar.bz2
+%if "%{linaro}" == "%{nil}"
+Source0:	ftp://sourceware.org/pub/gdb/snapshots/current/gdb-%{ver}.tar.bz2
+Version:	%{ver}
+%define gdb_src gdb-%{ver}
+%else
+Source0:	http://cbuild.validation.linaro.org/snapshots/gdb-linaro-%{ver}-%{linaro}.tar.bz2
+Version:	%{ver}_%(echo %{linaro} |sed -e 's,-,_,g')
+%define gdb_src gdb-linaro-%{ver}-%{linaro}
+%endif
 URL:		http://gnu.org/software/gdb/
 
 # For our convenience
-%define gdb_src gdb-%{version}
 %define gdb_build build-%{_target_platform}
 %define gdb_docdir %{_docdir}/%{name}-doc
 
@@ -477,14 +487,8 @@ Patch843: gdb-enable-count-crash.patch
 # Fix testsuite "ERROR: no fileid for".
 Patch846: gdb-testsuite-nohostid.patch
 
-# Fix Python stack corruption.
-Patch847: gdb-python-stacksmash.patch
-
 # [rhel6] DTS backward Python compatibility API (BZ 1020004, Phil Muldoon).
 Patch848: gdb-dts-rhel6-python-compat.patch
-
-# Fix gdb-7.7 auto-load from /usr/share/gdb/auto-load/ regression.
-Patch849: gdb-auto-load-lost-path-7.7.patch
 
 # Fix crash of -readnow /usr/lib/debug/usr/bin/gnatbind.debug (BZ 1069211).
 Patch850: gdb-gnat-dwarf-crash-1of3.patch
@@ -492,7 +496,6 @@ Patch851: gdb-gnat-dwarf-crash-2of3.patch
 Patch852: gdb-gnat-dwarf-crash-3of3.patch
 # RPM5 patch
 Patch1000: gdb-7.3.50.20110722-rpm5.patch
-Patch1001: gdb-7.7-aarch64-compile.patch
 
 # OMV/MGA have urpmi instead of yum:
 Patch10000: gdb-7.1-buildid-locate-mageia.patch
@@ -511,6 +514,9 @@ BuildRequires:  pkgconfig
 BuildRequires:  readline-devel
 BuildRequires:  texinfo
 BuildRequires:	texlive
+%if %{with testsuite}
+BuildRequires:	dejagnu
+%endif
 
 
 %description
@@ -633,14 +639,11 @@ rm -f gdb/jv-exp.c gdb/m2-exp.c gdb/objc-exp.c gdb/p-exp.c gdb/go-exp.c
 %patch832 -p1
 %patch843 -p1
 %patch846 -p1
-%patch847 -p1
-%patch849 -p1
 %patch850 -p1
 %patch851 -p1
 %patch852 -p1
 
 %patch1000 -p1
-%patch1001 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
@@ -780,7 +783,7 @@ cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
 # Initially we're in the %{gdb_src} directory.
 cd %{gdb_build}
 
-%if 0%{!?_with_testsuite:1}
+%if %{without testsuite}
 echo ====================TESTSUITE DISABLED=========================
 %else
 echo ====================TESTING=========================
