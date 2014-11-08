@@ -8,6 +8,7 @@
 # --without rpm: Don't build rpm support (for aarch64 bootstrap)
 %bcond_with rpm
 %bcond_with testsuite
+%bcond_with python
 
 # Extract OpenMandriva Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
@@ -508,8 +509,10 @@ Buildrequires:  cloog-devel
 BuildRequires:  flex
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  expat-devel
+%if %{with python}
 BuildRequires:  pkgconfig(python)
 BuildRequires:  pkgconfig(python3)
+%endif
 BuildRequires:  pkgconfig(rpm) >= 5.3
 BuildRequires:  pkgconfig
 BuildRequires:  readline-devel
@@ -704,10 +707,10 @@ CC=gcc CXX=g++ %configure	\
 $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 	--without-libexpat-prefix				\
 	--disable-tui						\
-%if 0%{!?_without_python:1}
-	--with-python						\
-%else
+%if !%{with python}
 	--without-python					\
+%else
+	--with-python						\
 %endif
 %if %{with rpm}
 	--with-rpm						\
