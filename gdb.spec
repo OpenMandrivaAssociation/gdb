@@ -509,6 +509,7 @@ BuildRequires:  flex
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  expat-devel
 BuildRequires:  pkgconfig(python)
+BuildRequires:  pkgconfig(python3)
 BuildRequires:  pkgconfig(rpm) >= 5.3
 BuildRequires:  pkgconfig
 BuildRequires:  readline-devel
