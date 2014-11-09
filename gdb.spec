@@ -40,6 +40,7 @@ Version:	%{ver}_%(echo %{linaro} |sed -e 's,-,_,g')
 %define gdb_src gdb-linaro-%{ver}-%{linaro}
 %endif
 URL:		http://gnu.org/software/gdb/
+Source1:	gdb.rpmlinrc
 
 # For our convenience
 %define gdb_build build-%{_target_platform}
