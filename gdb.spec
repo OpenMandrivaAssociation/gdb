@@ -668,7 +668,7 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 
 Patch10000: gdb-7.12-buildid-locate-mageia.patch
 
-Patch10001: gdb-7.3.50.20110722-rpm5.patch
+Patch10001: gdb-8.0.1-rpm5.patch
 
 # http://svnweb.mageia.org/soft/rpm/debuginfo-install/trunk/debuginfo-install
 Source1000: debuginfo-install
