@@ -4,7 +4,6 @@
 
 # rpmbuild parameters:
 # --with testsuite: Run the testsuite (biarch if possible).  Default is without.
-# --with buildisa: Use %%{?_isa} for BuildRequires
 # --with asan: gcc -fsanitize=address
 # --without python: No python support.
 # --with profile: gcc -fprofile-generate / -fprofile-use: Before better
@@ -15,6 +14,7 @@
 %bcond_with rpm
 %bcond_with testsuite
 %bcond_with python
+%bcond_with babeltrace
 
 %{?scl:%scl_package gdb}
 %{!?scl:
@@ -51,7 +51,7 @@ URL: http://gnu.org/software/gdb/
 Conflicts: gdb-headless < 7.12-29
 
 Summary: A stub package for GNU source-level debugger
-Requires: gdb-headless%{?_isa} = %{version}-%{release}
+Requires: gdb-headless = %{version}-%{release}
 
 %description
 'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
@@ -75,11 +75,6 @@ Obsoletes: gdb64 < 5.3.91
 
 # eu-strip: -g recognizes .gdb_index as a debugging section. (#631997)
 Conflicts: elfutils < 0.149
-
-# https://fedoraproject.org/wiki/Packaging:Guidelines#BuildRequires_and_.25.7B_isa.7D
-%global buildisa %{?_with_buildisa:%{?_isa}}
-
-Recommends: gcc-plugins%{?_isa}
 
 # Require an implementation of /usr/bin/debuginfo-install
 Requires: pkg-command(debuginfo-install)
@@ -676,33 +671,34 @@ Source1000: debuginfo-install
 # RL_STATE_FEDORA_GDB would not be found for:
 # Patch642: gdb-readline62-ask-more-rh.patch
 # --with-system-readline
-BuildRequires: readline-devel%{buildisa} >= 6.2-4
-BuildRequires: ncurses-devel%{buildisa} texinfo gettext flex bison
-BuildRequires: expat-devel%{buildisa}
-BuildRequires: xz-devel%{buildisa}
+BuildRequires: readline-devel >= 6.2-4
+BuildRequires: ncurses-devel texinfo gettext flex bison
+BuildRequires: expat-devel
+BuildRequires: lzma-devel
 %ifnarch armv5tl
 BuildRequires: rust
 %endif
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
-BuildRequires: rpm-devel%{buildisa}
+BuildRequires: rpm-devel
 %global __python %{__python3}
-BuildRequires:   python3-devel%{buildisa}
-Requires:   python3%{buildisa}
+BuildRequires:   python3-devel
+Requires:   python3
 # gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
-BuildRequires:	 texinfo-tex
 BuildRequires:   texlive
-BuildRequires: libbabeltrace-devel%{buildisa}
-BuildRequires: guile-devel%{buildisa}
+%if %{with babeltrace}
+BuildRequires: libbabeltrace-devel
+%endif
+BuildRequires: guile-devel
 %global have_libipt 0
 %ifarch %{ix86} x86_64
-%global have_libipt 1
-BuildRequires: libipt-devel%{buildisa}
+#global have_libipt 1
+#BuildRequires: libipt-devel
 %endif
 BuildRequires: sharutils 
 BuildRequires: dejagnu
 # gcc-objc++ is not covered by the GDB testsuite.
 BuildRequires: gcc gcc-c++ gcc-gfortran gcc-objc
-BuildRequires: gcc-plugins
+BuildRequires: gcc-plugin-devel
 BuildRequires: fpc
  
 %description headless
@@ -1020,7 +1016,9 @@ CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 	--with-separate-debug-dir=/usr/lib/debug		\
  	--disable-sim						\
 	--disable-rpath						\
+%if %{with babeltrace}
 	--with-babeltrace					\
+%endif
 	--with-guile						\
 	--with-system-readline				\
 	--with-expat						\
