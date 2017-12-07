@@ -2,6 +2,8 @@
 # Extract Mageia Linux name and version
 %define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
 
+%define Werror_cflags %nil
+
 # rpmbuild parameters:
 # --with testsuite: Run the testsuite (biarch if possible).  Default is without.
 # --with asan: gcc -fsanitize=address
@@ -13,7 +15,7 @@
 
 %bcond_with rpm
 %bcond_with testsuite
-%bcond_with python
+%bcond_without python
 %bcond_with babeltrace
 
 %{?scl:%scl_package gdb}
@@ -675,11 +677,10 @@ BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
 BuildRequires: expat-devel
 BuildRequires: lzma-devel
-%ifnarch armv5tl
-BuildRequires: rust
-%endif
+%if %{with rpm}
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
 BuildRequires: rpm-devel
+%endif
 %global __python %{__python3}
 BuildRequires:   python3-devel
 Requires:   python3
@@ -697,9 +698,18 @@ BuildRequires: guile-devel
 BuildRequires: sharutils 
 BuildRequires: dejagnu
 # gcc-objc++ is not covered by the GDB testsuite.
-BuildRequires: gcc gcc-c++ gcc-gfortran gcc-objc
-BuildRequires: gcc-plugin-devel
+BuildRequires: gcc 
+BuildRequires: gcc-c++ 
+%if %{with testsuite}
+BuildRequires: gcc-gfortran 
+BuildRequires: gcc-objc
+BuildRequires: rust
 BuildRequires: fpc
+%ifnarch armv5tl
+BuildRequires: rust
+%endif
+%endif
+BuildRequires: gcc-plugin-devel
  
 %description headless
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
@@ -724,8 +734,6 @@ Summary: Documentation for GDB (the GNU source-level debugger)
 License: GFDL
 Group: Documentation
 BuildArch: noarch
-Requires(post):	 info-install
-Requires(preun): info-install
 Conflicts: gdb < 7.11-5.mga6
 
 %description doc
@@ -738,7 +746,7 @@ This package provides INFO, HTML and PDF user manual for GDB.
 %package -n urpmi-debuginfo-install
 Summary: debuginfo-install shim for urpmi
 License: CC0
-Group: System/Packaging
+Group: System/Configuration/Packaging
 # Conflict with older versions where debuginfo-install was bundled
 Conflicts: gdb < 7.12-13
 Conflicts: dnf-utils
@@ -1012,7 +1020,7 @@ CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 	--with-gdb-datadir=%{_datadir}/gdb			\
 	--enable-gdb-build-warnings=,-Wno-unused		\
 	--enable-build-with-cxx					\
-	--enable-werror						\
+	--disable-werror						\
 	--with-separate-debug-dir=/usr/lib/debug		\
  	--disable-sim						\
 	--disable-rpath						\
@@ -1267,7 +1275,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/backtrace.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 
 %files
-%license COPYING3 COPYING COPYING.LIB COPYING3.LIB
+%doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
 %doc README NEWS
 %{_bindir}/gdb
 %{_bindir}/gcore
