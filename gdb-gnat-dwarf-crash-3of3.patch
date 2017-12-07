@@ -34,11 +34,11 @@ gdb/
 
 	* dwarf2read.c (process_die): Change gdb_assert to complaint.
 
-diff --git a/gdb/dwarf2read.c b/gdb/dwarf2read.c
-index 3eaa0b1..71f5d34 100644
---- a/gdb/dwarf2read.c
-+++ b/gdb/dwarf2read.c
-@@ -8029,7 +8029,13 @@ process_die (struct die_info *die, struct dwarf2_cu *cu)
+Index: gdb-7.99.90.20170420/gdb/dwarf2read.c
+===================================================================
+--- gdb-7.99.90.20170420.orig/gdb/dwarf2read.c	2017-04-20 23:15:26.578897210 +0200
++++ gdb-7.99.90.20170420/gdb/dwarf2read.c	2017-04-20 23:15:57.805106371 +0200
+@@ -8426,7 +8426,13 @@
    struct cleanup *in_process;
  
    /* We should only be processing those not already in process.  */
@@ -47,12 +47,9 @@ index 3eaa0b1..71f5d34 100644
 +    {
 +      complaint (&symfile_complaints,
 +		 _("DIE at 0x%x attempted to be processed twice"),
-+		 die->offset.sect_off);
++		 to_underlying (die->sect_off));
 +      return;
 +    }
  
    die->in_process = 1;
    in_process = make_cleanup (reset_die_in_process,die);
-
---6TrnltStXW4iwmi0--
-

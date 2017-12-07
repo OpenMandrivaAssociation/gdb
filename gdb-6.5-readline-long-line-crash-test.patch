@@ -1,13 +1,11 @@
 https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=214196
 
 
-Index: ./gdb/testsuite/gdb.base/readline-overflow.exp
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/readline-overflow.exp
 ===================================================================
-RCS file: ./gdb/testsuite/gdb.base/readline-overflow.exp
-diff -N ./gdb/testsuite/gdb.base/readline-overflow.exp
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.base/readline-overflow.exp	13 Nov 2006 23:42:50 -0000
-@@ -0,0 +1,125 @@
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/readline-overflow.exp	2016-02-15 23:30:29.191677414 +0100
+@@ -0,0 +1,126 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +
 +# This program is free software; you can redistribute it and/or modify
@@ -110,7 +108,8 @@ diff -N ./gdb/testsuite/gdb.base/readline-overflow.exp
 +		gdb_clear_suppressed
 +	}
 +}
-+gdb_test "\r" \
++send_gdb "\r"
++gdb_test "" \
 +         "No executable file specified..*" \
 +         "All the characters transferred"
 +
@@ -133,4 +132,3 @@ diff -N ./gdb/testsuite/gdb.base/readline-overflow.exp
 +}
 +set timeout $oldtimeout1
 +
-+return 0

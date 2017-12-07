@@ -1,0 +1,166 @@
+commit 359b19bb24d048750aa5367ad56a33267300d1a8
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:28 2017 +0200
+
+    write_pieced_value: Transfer least significant bits into bit-field
+    
+    On big-endian targets, when targeting a bit-field, write_pieced_value
+    currently transfers the source value's *most* significant bits to the
+    target value, instead of its least significant bits.  This is fixed.
+    
+    In particular the fix adjusts the initial value of 'offset', which can now
+    potentially be nonzero.  Thus the variable 'type_len' is renamed to
+    'max_offset', to avoid confusion.  And for consistency, the affected logic
+    that was mirrored in read_pieced_value is changed there in the same way.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (write_pieced_value): When writing to a bit-field,
+            transfer the source value's least significant bits, instead of its
+            lowest-addressed ones.  Rename type_len to max_offset.
+            (read_pieced_value): Mirror above changes to write_pieced_value as
+            applicable.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,13 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (write_pieced_value): When writing to a bit-field,
++	transfer the source value's least significant bits, instead of its
++	lowest-addressed ones.  Rename type_len to max_offset.
++	(read_pieced_value): Mirror above changes to write_pieced_value as
++	applicable.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (write_pieced_value): In DWARF_VALUE_MEMORY,
+ 	truncate full bytes from dest_offset_bits before using it as an
+ 	offset into the buffer.
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1756,12 +1756,11 @@ static void
+ read_pieced_value (struct value *v)
+ {
+   int i;
+-  long offset = 0;
++  LONGEST offset = 0, max_offset;
+   ULONGEST bits_to_skip;
+   gdb_byte *contents;
+   struct piece_closure *c
+     = (struct piece_closure *) value_computed_closure (v);
+-  size_t type_len;
+   size_t buffer_size = 0;
+   std::vector<gdb_byte> buffer;
+   int bits_big_endian
+@@ -1778,12 +1777,12 @@ read_pieced_value (struct value *v)
+     {
+       bits_to_skip += (8 * value_offset (value_parent (v))
+ 		       + value_bitpos (v));
+-      type_len = value_bitsize (v);
++      max_offset = value_bitsize (v);
+     }
+   else
+-    type_len = 8 * TYPE_LENGTH (value_type (v));
++    max_offset = 8 * TYPE_LENGTH (value_type (v));
+ 
+-  for (i = 0; i < c->n_pieces && offset < type_len; i++)
++  for (i = 0; i < c->n_pieces && offset < max_offset; i++)
+     {
+       struct dwarf_expr_piece *p = &c->pieces[i];
+       size_t this_size, this_size_bits;
+@@ -1798,20 +1797,13 @@ read_pieced_value (struct value *v)
+ 	  bits_to_skip -= this_size_bits;
+ 	  continue;
+ 	}
+-      if (bits_to_skip > 0)
+-	{
+-	  dest_offset_bits = 0;
+-	  source_offset_bits = bits_to_skip;
+-	  this_size_bits -= bits_to_skip;
+-	  bits_to_skip = 0;
+-	}
+-      else
+-	{
+-	  dest_offset_bits = offset;
+-	  source_offset_bits = 0;
+-	}
+-      if (this_size_bits > type_len - offset)
+-	this_size_bits = type_len - offset;
++      source_offset_bits = bits_to_skip;
++      this_size_bits -= bits_to_skip;
++      bits_to_skip = 0;
++      dest_offset_bits = offset;
++
++      if (this_size_bits > max_offset - offset)
++	this_size_bits = max_offset - offset;
+ 
+       this_size = (this_size_bits + source_offset_bits % 8 + 7) / 8;
+       source_offset = source_offset_bits / 8;
+@@ -1932,12 +1924,11 @@ static void
+ write_pieced_value (struct value *to, struct value *from)
+ {
+   int i;
+-  long offset = 0;
+   ULONGEST bits_to_skip;
++  LONGEST offset = 0, max_offset;
+   const gdb_byte *contents;
+   struct piece_closure *c
+     = (struct piece_closure *) value_computed_closure (to);
+-  size_t type_len;
+   size_t buffer_size = 0;
+   std::vector<gdb_byte> buffer;
+   int bits_big_endian
+@@ -1949,12 +1940,20 @@ write_pieced_value (struct value *to, struct value *from)
+     {
+       bits_to_skip += (8 * value_offset (value_parent (to))
+ 		       + value_bitpos (to));
+-      type_len = value_bitsize (to);
+-    }
++      /* Use the least significant bits of FROM.  */
++      if (gdbarch_byte_order (get_type_arch (value_type (from)))
++	  == BFD_ENDIAN_BIG)
++	{
++	  max_offset = 8 * TYPE_LENGTH (value_type (from));
++	  offset = max_offset - value_bitsize (to);
++	}
++      else
++	max_offset = value_bitsize (to);
++   }
+   else
+-    type_len = 8 * TYPE_LENGTH (value_type (to));
++    max_offset = 8 * TYPE_LENGTH (value_type (to));
+ 
+-  for (i = 0; i < c->n_pieces && offset < type_len; i++)
++  for (i = 0; i < c->n_pieces && offset < max_offset; i++)
+     {
+       struct dwarf_expr_piece *p = &c->pieces[i];
+       size_t this_size_bits, this_size;
+@@ -1968,20 +1967,13 @@ write_pieced_value (struct value *to, struct value *from)
+ 	  bits_to_skip -= this_size_bits;
+ 	  continue;
+ 	}
+-      if (bits_to_skip > 0)
+-	{
+-	  dest_offset_bits = bits_to_skip;
+-	  source_offset_bits = 0;
+-	  this_size_bits -= bits_to_skip;
+-	  bits_to_skip = 0;
+-	}
+-      else
+-	{
+-	  dest_offset_bits = 0;
+-	  source_offset_bits = offset;
+-	}
+-      if (this_size_bits > type_len - offset)
+-	this_size_bits = type_len - offset;
++      dest_offset_bits = bits_to_skip;
++      this_size_bits -= bits_to_skip;
++      bits_to_skip = 0;
++      source_offset_bits = offset;
++
++      if (this_size_bits > max_offset - offset)
++	this_size_bits = max_offset - offset;
+ 
+       this_size = (this_size_bits + dest_offset_bits % 8 + 7) / 8;
+       source_offset = source_offset_bits / 8;

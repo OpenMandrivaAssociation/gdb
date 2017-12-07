@@ -1,0 +1,106 @@
+commit d5d1163eff2415a01895f1cff8bbee32b3f0ab66
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:26 2017 +0200
+
+    write_pieced_value: Fix size capping logic
+    
+    A field f in a structure composed of DWARF pieces may be located in
+    multiple pieces, where the first and last of those may contain bits from
+    other fields as well.  So when writing to f, the beginning of the first
+    and the end of the last of those pieces may have to be skipped.  But the
+    logic in write_pieced_value for handling one of those pieces is flawed
+    when the first and last piece are the same, i.e., f is contained in a
+    single piece:
+    
+      < - - - - - - - - - piece_size - - - - - - - - - ->
+      +-------------------------------------------------+
+      | skipped_bits |   f_bits   | / / / / / / / / / / |
+      +-------------------------------------------------+
+    
+    The current logic determines the size of the sub-piece to operate on by
+    limiting the piece size to the bit size of f and then subtracting the
+    skipped bits:
+    
+      min (piece_size, f_bits) - skipped_bits
+    
+    Instead of:
+    
+      min (piece_size - skipped_bits, f_bits)
+    
+    So the resulting sub-piece size is corrupted, leading to wrong handling of
+    this piece in write_pieced_value.
+    
+    Note that the same bug was already found in read_pieced_value and fixed
+    there (but not in write_pieced_value), see PR 15391.
+    
+    This patch swaps the calculations, bringing them into the same (correct)
+    order as in read_pieced_value.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (write_pieced_value): Fix order of calculations for
+            size capping.
+    
+    gdb/testsuite/ChangeLog:
+    
+            * gdb.dwarf2/var-pieces.exp: Add test case for modifying a
+            variable at nonzero offset.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,3 +1,8 @@
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
++	* dwarf2loc.c (write_pieced_value): Fix order of calculations for
++	size capping.
++
+ 2017-06-13  Yao Qi  <yao.qi@linaro.org>
+ 
+ 	* mips-linux-nat.c: Move include features/mips*-linux.c to
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1964,8 +1964,6 @@ write_pieced_value (struct value *to, struct value *from)
+ 	  bits_to_skip -= this_size_bits;
+ 	  continue;
+ 	}
+-      if (this_size_bits > type_len - offset)
+-	this_size_bits = type_len - offset;
+       if (bits_to_skip > 0)
+ 	{
+ 	  dest_offset_bits = bits_to_skip;
+@@ -1978,6 +1976,8 @@ write_pieced_value (struct value *to, struct value *from)
+ 	  dest_offset_bits = 0;
+ 	  source_offset_bits = offset;
+ 	}
++      if (this_size_bits > type_len - offset)
++	this_size_bits = type_len - offset;
+ 
+       this_size = (this_size_bits + source_offset_bits % 8 + 7) / 8;
+       source_offset = source_offset_bits / 8;
+### a/gdb/testsuite/ChangeLog
+### b/gdb/testsuite/ChangeLog
+## -1,5 +1,10 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* gdb.dwarf2/var-pieces.exp: Add test case for modifying a
++	variable at nonzero offset.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* gdb.dwarf2/var-access.c: New file.
+ 	* gdb.dwarf2/var-access.exp: New test.
+ 	* lib/gdb-utils.exp (string_to_regexp): Quote braces as well.
+--- a/gdb/testsuite/gdb.dwarf2/var-access.exp
++++ b/gdb/testsuite/gdb.dwarf2/var-access.exp
+@@ -178,6 +178,11 @@ gdb_test "print/d s1" " = \\{a = 63, b = 3, c = 0, d = 1\\}" \
+     "verify s1.a"
+ gdb_test "print/d a" " = \\{0, 1, 63, 3, 4, 5, 6, 7\\}" \
+     "verify s1.a through a"
++gdb_test_no_output "set var s1.b = 42"
++gdb_test "print/d s1" " = \\{a = 63, b = 42, c = 0, d = 1\\}" \
++    "verify s1.b"
++gdb_test "print/d a" " = \\{0, 1, 63, 42, 4, 5, 6, 7\\}" \
++    "verify s1.b through a"
+ 
+ # Byte-aligned register- and memory pieces.
+ gdb_test_no_output "set var \$[lindex $regname 0] = 81" \

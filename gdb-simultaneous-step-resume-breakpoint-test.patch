@@ -1,5 +1,7 @@
---- /dev/null	2009-09-25 12:44:54.497650251 +0200
-+++ ./gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.exp	2009-09-25 17:27:12.000000000 +0200
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.exp
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.exp	2016-02-15 23:38:23.366044101 +0100
 @@ -0,0 +1,65 @@
 +# Copyright (C) 2009 Free Software Foundation, Inc.
 +
@@ -21,7 +23,7 @@
 +
 +set testfile simultaneous-step-resume-breakpoint
 +set srcfile ${testfile}.c
-+set binfile ${objdir}/${subdir}/${testfile}
++set binfile [standard_output_file ${testfile}]
 +
 +if {[gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug}] != "" } {
 +    return -1
@@ -66,8 +68,10 @@
 +
 +gdb_test "continue" "sleep-after.*" "second continue"
 +gdb_test "continue" "final-exit.*" "third continue"
---- /dev/null	2009-09-25 12:44:54.497650251 +0200
-+++ ./gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.c	2009-09-25 17:29:42.000000000 +0200
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/simultaneous-step-resume-breakpoint.c	2016-02-15 23:38:18.257007826 +0100
 @@ -0,0 +1,79 @@
 +/* Copyright 2009 Free Software Foundation, Inc.
 +

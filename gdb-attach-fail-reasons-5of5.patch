@@ -37,35 +37,34 @@ gdb/gdbserver/
 	(linux_create_inferior, linux_tracefork_child): Call it instead of
 	direct ptrace.
 
-Index: gdb-7.6.90.20140127/gdb/common/linux-ptrace.c
+Index: gdb-7.12.50.20170226/gdb/nat/linux-ptrace.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/common/linux-ptrace.c	2014-02-06 17:40:32.530145960 +0100
-+++ gdb-7.6.90.20140127/gdb/common/linux-ptrace.c	2014-02-06 17:48:16.329644534 +0100
-@@ -32,6 +32,10 @@
- 
- #include <stdint.h>
+--- gdb-7.12.50.20170226.orig/gdb/nat/linux-ptrace.c	2017-02-26 21:27:14.780009449 +0100
++++ gdb-7.12.50.20170226/gdb/nat/linux-ptrace.c	2017-02-26 21:27:18.838038193 +0100
+@@ -27,6 +27,10 @@
+ #include <sys/procfs.h>
+ #endif
  
 +#ifdef HAVE_SELINUX_SELINUX_H
 +# include <selinux/selinux.h>
 +#endif /* HAVE_SELINUX_SELINUX_H */
 +
- /* Stores the currently supported ptrace options.  A value of
-    -1 means we did not check for features yet.  A value of 0 means
-    there are no supported features.  */
-@@ -56,6 +60,8 @@ linux_ptrace_attach_warnings (pid_t pid,
-     buffer_xml_printf (buffer, _("warning: process %d is a zombie "
- 				 "- the process has already terminated\n"),
+ /* Stores the ptrace options supported by the running kernel.
+    A value of -1 means we did not check for features yet.  A value
+    of 0 means there are no supported features.  */
+@@ -51,6 +55,8 @@
+     buffer_xml_printf (buffer, _("process %d is a zombie "
+ 				 "- the process has already terminated"),
  		       (int) pid);
 +
 +  linux_ptrace_create_warnings (buffer);
  }
  
- #if defined __i386__ || defined __x86_64__
-@@ -542,3 +548,19 @@ linux_ptrace_init_warnings (void)
- 
+ /* See linux-ptrace.h.  */
+@@ -594,6 +600,22 @@
    linux_ptrace_test_ret_to_nx ();
  }
-+
+ 
 +/* Print all possible reasons we could fail to create a traced process.  */
 +
 +void
@@ -81,23 +80,27 @@ Index: gdb-7.6.90.20140127/gdb/common/linux-ptrace.c
 +			 "(gdb) shell sudo setsebool deny_ptrace=0"));
 +#endif /* HAVE_LIBSELINUX */
 +}
-Index: gdb-7.6.90.20140127/gdb/common/linux-ptrace.h
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/common/linux-ptrace.h	2014-02-06 17:40:35.506149162 +0100
-+++ gdb-7.6.90.20140127/gdb/common/linux-ptrace.h	2014-02-06 17:48:00.601627995 +0100
-@@ -85,6 +85,7 @@ struct buffer;
++
+ /* Extract extended ptrace event from wait status.  */
  
- extern void linux_ptrace_attach_warnings (pid_t pid, struct buffer *buffer);
+ int
+Index: gdb-7.12.50.20170226/gdb/nat/linux-ptrace.h
+===================================================================
+--- gdb-7.12.50.20170226.orig/gdb/nat/linux-ptrace.h	2017-02-26 21:27:14.780009449 +0100
++++ gdb-7.12.50.20170226/gdb/nat/linux-ptrace.h	2017-02-26 21:27:18.838038193 +0100
+@@ -185,6 +185,7 @@
+ extern char *linux_ptrace_attach_fail_reason_string (ptid_t ptid, int err);
+ 
  extern void linux_ptrace_init_warnings (void);
 +extern void linux_ptrace_create_warnings (struct buffer *buffer);
- extern void linux_enable_event_reporting (pid_t pid);
- extern int linux_supports_tracefork (void);
- extern int linux_supports_traceclone (void);
-Index: gdb-7.6.90.20140127/gdb/configure.ac
+ extern void linux_check_ptrace_features (void);
+ extern void linux_enable_event_reporting (pid_t pid, int attached);
+ extern void linux_disable_event_reporting (pid_t pid);
+Index: gdb-7.12.50.20170226/gdb/configure.ac
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/configure.ac	2014-02-06 17:40:32.532145962 +0100
-+++ gdb-7.6.90.20140127/gdb/configure.ac	2014-02-06 17:40:35.507149163 +0100
-@@ -1975,6 +1975,10 @@ case $host_os in
+--- gdb-7.12.50.20170226.orig/gdb/configure.ac	2017-02-26 21:27:14.781009456 +0100
++++ gdb-7.12.50.20170226/gdb/configure.ac	2017-02-26 21:27:18.839038200 +0100
+@@ -2092,6 +2092,10 @@
  esac
  AC_DEFINE_UNQUOTED(GDBINIT,"$gdbinit",[The .gdbinit filename.])
  
@@ -108,11 +111,11 @@ Index: gdb-7.6.90.20140127/gdb/configure.ac
  dnl Handle optional features that can be enabled.
  
  # Support for --with-sysroot is a copy of GDB_AC_WITH_DIR,
-Index: gdb-7.6.90.20140127/gdb/gdbserver/configure.ac
+Index: gdb-7.12.50.20170226/gdb/gdbserver/configure.ac
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbserver/configure.ac	2014-02-06 17:40:32.532145962 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbserver/configure.ac	2014-02-06 17:40:35.507149163 +0100
-@@ -454,6 +454,10 @@ if $want_ipa ; then
+--- gdb-7.12.50.20170226.orig/gdb/gdbserver/configure.ac	2017-02-26 21:27:14.781009456 +0100
++++ gdb-7.12.50.20170226/gdb/gdbserver/configure.ac	2017-02-26 21:27:18.839038200 +0100
+@@ -469,6 +469,10 @@
     fi
  fi
  
@@ -123,11 +126,11 @@ Index: gdb-7.6.90.20140127/gdb/gdbserver/configure.ac
  AC_SUBST(GDBSERVER_DEPFILES)
  AC_SUBST(GDBSERVER_LIBS)
  AC_SUBST(srv_xmlbuiltin)
-Index: gdb-7.6.90.20140127/gdb/gdbserver/linux-low.c
+Index: gdb-7.12.50.20170226/gdb/gdbserver/linux-low.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbserver/linux-low.c	2014-02-06 17:40:32.534145964 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbserver/linux-low.c	2014-02-06 17:49:32.385726514 +0100
-@@ -543,6 +543,29 @@ add_lwp (ptid_t ptid)
+--- gdb-7.12.50.20170226.orig/gdb/gdbserver/linux-low.c	2017-02-26 21:27:14.783009470 +0100
++++ gdb-7.12.50.20170226/gdb/gdbserver/linux-low.c	2017-02-26 21:27:18.841038214 +0100
+@@ -946,6 +946,29 @@
    return lwp;
  }
  
@@ -157,65 +160,37 @@ Index: gdb-7.6.90.20140127/gdb/gdbserver/linux-low.c
  /* Start an inferior process and returns its pid.
     ALLARGS is a vector of program-name and args. */
  
-@@ -584,7 +607,7 @@ linux_create_inferior (char *program, ch
+@@ -969,7 +992,7 @@
    if (pid == 0)
      {
        close_most_fds ();
 -      ptrace (PTRACE_TRACEME, 0, (PTRACE_TYPE_ARG3) 0, (PTRACE_TYPE_ARG4) 0);
 +      linux_traceme (program);
  
- #ifndef __ANDROID__ /* Bionic doesn't use SIGRTMIN the way glibc does.  */
-       signal (__SIGRTMIN + 1, SIG_DFL);
-Index: gdb-7.6.90.20140127/gdb/inf-ptrace.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/inf-ptrace.c	2014-02-06 17:40:32.535145965 +0100
-+++ gdb-7.6.90.20140127/gdb/inf-ptrace.c	2014-02-06 17:40:35.510149167 +0100
-@@ -105,7 +105,15 @@ static void
- inf_ptrace_me (void)
- {
-   /* "Trace me, Dr. Memory!"  */
-+  errno = 0;
-   ptrace (PT_TRACE_ME, 0, (PTRACE_TYPE_ARG3)0, 0);
-+  if (errno != 0)
-+    {
-+      fprintf_unfiltered (gdb_stderr, _("Cannot create process: %s\n"),
-+			  safe_strerror (errno));
-+      gdb_flush (gdb_stderr);
-+      _exit (0177);
-+    }
- }
+       setpgid (0, 0);
  
- /* Start a new inferior Unix child process.  EXEC_FILE is the file to
-Index: gdb-7.6.90.20140127/gdb/linux-nat.c
+Index: gdb-7.12.50.20170226/gdb/linux-nat.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/linux-nat.c	2014-02-06 17:40:32.537145968 +0100
-+++ gdb-7.6.90.20140127/gdb/linux-nat.c	2014-02-06 17:40:35.511149168 +0100
-@@ -1283,6 +1283,7 @@ linux_nat_create_inferior (struct target
- #ifdef HAVE_PERSONALITY
-   int personality_orig = 0, personality_set = 0;
- #endif /* HAVE_PERSONALITY */
+--- gdb-7.12.50.20170226.orig/gdb/linux-nat.c	2017-02-26 21:27:14.785009484 +0100
++++ gdb-7.12.50.20170226/gdb/linux-nat.c	2017-02-26 21:27:18.842038221 +0100
+@@ -1110,6 +1110,7 @@
+ {
+   struct cleanup *restore_personality
+     = maybe_disable_address_space_randomization (disable_randomization);
 +  volatile struct gdb_exception ex;
  
    /* The fork_child mechanism is synchronous and calls target_wait, so
       we have to mask the async mode.  */
-@@ -1307,7 +1308,10 @@ linux_nat_create_inferior (struct target
+@@ -1117,7 +1118,28 @@
    /* Make sure we report all signals during startup.  */
-   linux_nat_pass_signals (0, NULL);
+   linux_nat_pass_signals (ops, 0, NULL);
  
 -  linux_ops->to_create_inferior (ops, exec_file, allargs, env, from_tty);
-+  TRY_CATCH (ex, RETURN_MASK_ERROR)
++  TRY
 +    {
 +      linux_ops->to_create_inferior (ops, exec_file, allargs, env, from_tty);
 +    }
- 
- #ifdef HAVE_PERSONALITY
-   if (personality_set)
-@@ -1319,6 +1323,24 @@ linux_nat_create_inferior (struct target
- 		 safe_strerror (errno));
-     }
- #endif /* HAVE_PERSONALITY */
-+
-+  if (ex.reason < 0)
++  CATCH (ex, RETURN_MASK_ERROR)
 +    {
 +      struct buffer buffer;
 +      char *message, *buffer_s;
@@ -232,14 +207,15 @@ Index: gdb-7.6.90.20140127/gdb/linux-nat.c
 +
 +      throw_error (ex.error, "%s%s", buffer_s, message);
 +    }
- }
++  END_CATCH
  
- static void
-Index: gdb-7.6.90.20140127/gdb/config.in
+   do_cleanups (restore_personality);
+ }
+Index: gdb-7.12.50.20170226/gdb/config.in
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/config.in	2014-02-06 17:40:32.538145969 +0100
-+++ gdb-7.6.90.20140127/gdb/config.in	2014-02-06 17:40:35.511149168 +0100
-@@ -213,6 +213,9 @@
+--- gdb-7.12.50.20170226.orig/gdb/config.in	2017-02-26 21:27:14.786009491 +0100
++++ gdb-7.12.50.20170226/gdb/config.in	2017-02-26 21:27:18.842038221 +0100
+@@ -270,6 +270,9 @@
  /* Define if librpm library is being used. */
  #undef HAVE_LIBRPM
  
@@ -249,9 +225,9 @@ Index: gdb-7.6.90.20140127/gdb/config.in
  /* Define to 1 if you have the <libunwind-ia64.h> header file. */
  #undef HAVE_LIBUNWIND_IA64_H
  
-@@ -345,6 +348,9 @@
- /* Define to 1 if you have the `sbrk' function. */
- #undef HAVE_SBRK
+@@ -402,6 +405,9 @@
+ /* Define to 1 if you have the `scm_new_smob' function. */
+ #undef HAVE_SCM_NEW_SMOB
  
 +/* Define to 1 if you have the <selinux/selinux.h> header file. */
 +#undef HAVE_SELINUX_SELINUX_H
@@ -259,11 +235,11 @@ Index: gdb-7.6.90.20140127/gdb/config.in
  /* Define to 1 if you have the `setlocale' function. */
  #undef HAVE_SETLOCALE
  
-Index: gdb-7.6.90.20140127/gdb/configure
+Index: gdb-7.12.50.20170226/gdb/configure
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/configure	2014-02-06 17:40:32.541145972 +0100
-+++ gdb-7.6.90.20140127/gdb/configure	2014-02-06 17:40:35.515149172 +0100
-@@ -12861,6 +12861,64 @@ cat >>confdefs.h <<_ACEOF
+--- gdb-7.12.50.20170226.orig/gdb/configure	2017-02-26 21:27:14.790009519 +0100
++++ gdb-7.12.50.20170226/gdb/configure	2017-02-26 21:27:18.846038249 +0100
+@@ -15492,6 +15492,64 @@
  _ACEOF
  
  
@@ -328,11 +304,11 @@ Index: gdb-7.6.90.20140127/gdb/configure
  
  # Support for --with-sysroot is a copy of GDB_AC_WITH_DIR,
  # except that the argument to --with-sysroot is optional.
-Index: gdb-7.6.90.20140127/gdb/gdbserver/config.in
+Index: gdb-7.12.50.20170226/gdb/gdbserver/config.in
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbserver/config.in	2014-02-06 17:40:32.542145973 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbserver/config.in	2014-02-06 17:54:06.923021799 +0100
-@@ -78,6 +78,9 @@
+--- gdb-7.12.50.20170226.orig/gdb/gdbserver/config.in	2017-02-26 21:27:14.791009527 +0100
++++ gdb-7.12.50.20170226/gdb/gdbserver/config.in	2017-02-26 21:27:18.846038249 +0100
+@@ -123,6 +123,9 @@
  /* Define to 1 if you have the `mcheck' library (-lmcheck). */
  #undef HAVE_LIBMCHECK
  
@@ -342,21 +318,21 @@ Index: gdb-7.6.90.20140127/gdb/gdbserver/config.in
  /* Define if the target supports branch tracing. */
  #undef HAVE_LINUX_BTRACE
  
-@@ -151,6 +154,9 @@
- /* Define to 1 if you have the `readlink' function. */
- #undef HAVE_READLINK
+@@ -199,6 +202,9 @@
+ /* Define to 1 if you have the `pwrite' function. */
+ #undef HAVE_PWRITE
  
 +/* Define to 1 if you have the <selinux/selinux.h> header file. */
 +#undef HAVE_SELINUX_SELINUX_H
 +
- /* Define to 1 if you have the <sgtty.h> header file. */
- #undef HAVE_SGTTY_H
+ /* Define to 1 if you have the `setns' function. */
+ #undef HAVE_SETNS
  
-Index: gdb-7.6.90.20140127/gdb/gdbserver/configure
+Index: gdb-7.12.50.20170226/gdb/gdbserver/configure
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbserver/configure	2014-02-06 17:40:32.543145974 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbserver/configure	2014-02-06 17:40:35.516149173 +0100
-@@ -6170,6 +6170,64 @@ if $want_ipa ; then
+--- gdb-7.12.50.20170226.orig/gdb/gdbserver/configure	2017-02-26 21:27:14.793009541 +0100
++++ gdb-7.12.50.20170226/gdb/gdbserver/configure	2017-02-26 21:27:18.848038263 +0100
+@@ -8429,6 +8429,64 @@
     fi
  fi
  

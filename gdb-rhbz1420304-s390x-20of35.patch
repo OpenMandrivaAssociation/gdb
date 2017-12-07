@@ -1,0 +1,74 @@
+commit 840989c113433c069f54872d7e051e1572202326
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:30 2017 +0200
+
+    read/write_pieced_value: Drop 'buffer_size' variable
+    
+    When the variable 'buffer_size' in read_pieced_value and
+    write_pieced_value was introduced, it was needed for tracking the buffer's
+    allocated size.  Now that the buffer's data type has been changed to a
+    std::vector, the variable is no longer necessary; so remove it.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (read_pieced_value): Remove buffer_size variable.
+            (write_pieced_value): Likewise.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,10 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (read_pieced_value): Remove buffer_size variable.
++	(write_pieced_value): Likewise.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (write_pieced_value): When writing to a bit-field,
+ 	transfer the source value's least significant bits, instead of its
+ 	lowest-addressed ones.  Rename type_len to max_offset.
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1761,7 +1761,6 @@ read_pieced_value (struct value *v)
+   gdb_byte *contents;
+   struct piece_closure *c
+     = (struct piece_closure *) value_computed_closure (v);
+-  size_t buffer_size = 0;
+   std::vector<gdb_byte> buffer;
+   int bits_big_endian
+     = gdbarch_bits_big_endian (get_type_arch (value_type (v)));
+@@ -1806,12 +1805,8 @@ read_pieced_value (struct value *v)
+ 	this_size_bits = max_offset - offset;
+ 
+       this_size = (this_size_bits + source_offset_bits % 8 + 7) / 8;
++      buffer.reserve (this_size);
+       source_offset = source_offset_bits / 8;
+-      if (buffer_size < this_size)
+-	{
+-	  buffer_size = this_size;
+-	  buffer.reserve (buffer_size);
+-	}
+       intermediate_buffer = buffer.data ();
+ 
+       /* Copy from the source to DEST_BUFFER.  */
+@@ -1929,7 +1924,6 @@ write_pieced_value (struct value *to, struct value *from)
+   const gdb_byte *contents;
+   struct piece_closure *c
+     = (struct piece_closure *) value_computed_closure (to);
+-  size_t buffer_size = 0;
+   std::vector<gdb_byte> buffer;
+   int bits_big_endian
+     = gdbarch_bits_big_endian (get_type_arch (value_type (to)));
+@@ -1988,11 +1982,7 @@ write_pieced_value (struct value *to, struct value *from)
+ 	}
+       else
+ 	{
+-	  if (buffer_size < this_size)
+-	    {
+-	      buffer_size = this_size;
+-	      buffer.reserve (buffer_size);
+-	    }
++	  buffer.reserve (this_size);
+ 	  source_buffer = buffer.data ();
+ 	  need_bitwise = 1;
+ 	}

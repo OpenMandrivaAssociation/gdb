@@ -1,8 +1,8 @@
-Index: gdb-7.6.50.20130731-cvs/gdb/breakpoint.c
+Index: gdb-7.99.90.20170420/gdb/breakpoint.c
 ===================================================================
---- gdb-7.6.50.20130731-cvs.orig/gdb/breakpoint.c	2013-08-02 16:29:16.065402116 +0200
-+++ gdb-7.6.50.20130731-cvs/gdb/breakpoint.c	2013-08-02 16:29:17.073403456 +0200
-@@ -15963,6 +15963,50 @@ initialize_breakpoint_ops (void)
+--- gdb-7.99.90.20170420.orig/gdb/breakpoint.c	2017-04-20 23:04:39.627960523 +0200
++++ gdb-7.99.90.20170420/gdb/breakpoint.c	2017-04-20 23:07:29.854919725 +0200
+@@ -16086,6 +16086,50 @@
  static struct cmd_list_element *enablebreaklist = NULL;
  
  void
@@ -34,7 +34,7 @@ Index: gdb-7.6.50.20130731-cvs/gdb/breakpoint.c
 +	      && relocated_address < obj_section_endaddr (osect))
 +	    {
 +	      if (bl->inserted)
-+		remove_breakpoint (bl, mark_uninserted);
++		remove_breakpoint (bl);
 +
 +	      bl->address += delta_offset;
 +	      bl->requested_address += delta_offset;
@@ -45,33 +45,33 @@ Index: gdb-7.6.50.20130731-cvs/gdb/breakpoint.c
 +    }
 +
 +  if (changed)
-+    qsort (bp_location, bp_location_count, sizeof (*bp_location),
-+	   bp_location_compare);
++    qsort (bp_locations, bp_locations_count, sizeof (*bp_locations),
++	   bp_locations_compare);
 +}
 +
 +void
  _initialize_breakpoint (void)
  {
    struct cmd_list_element *c;
-Index: gdb-7.6.50.20130731-cvs/gdb/breakpoint.h
+Index: gdb-7.99.90.20170420/gdb/breakpoint.h
 ===================================================================
---- gdb-7.6.50.20130731-cvs.orig/gdb/breakpoint.h	2013-08-02 16:29:17.074403457 +0200
-+++ gdb-7.6.50.20130731-cvs/gdb/breakpoint.h	2013-08-02 16:29:30.221420896 +0200
-@@ -1555,4 +1555,7 @@ extern void breakpoint_free_objfile (str
- 
- extern char *ep_parse_optional_if_clause (char **arg);
+--- gdb-7.99.90.20170420.orig/gdb/breakpoint.h	2017-04-20 23:04:39.627960523 +0200
++++ gdb-7.99.90.20170420/gdb/breakpoint.h	2017-04-20 23:04:48.331009563 +0200
+@@ -1646,4 +1646,7 @@
+    UIOUT iff debugging multiple threads.  */
+ extern void maybe_print_thread_hit_breakpoint (struct ui_out *uiout);
  
 +extern void breakpoints_relocate (struct objfile *objfile,
 +				  struct section_offsets *delta);
 +
  #endif /* !defined (BREAKPOINT_H) */
-Index: gdb-7.6.50.20130731-cvs/gdb/objfiles.c
+Index: gdb-7.99.90.20170420/gdb/objfiles.c
 ===================================================================
---- gdb-7.6.50.20130731-cvs.orig/gdb/objfiles.c	2013-08-02 16:29:16.068402120 +0200
-+++ gdb-7.6.50.20130731-cvs/gdb/objfiles.c	2013-08-02 16:29:17.075403458 +0200
-@@ -851,6 +851,11 @@ objfile_relocate1 (struct objfile *objfi
-     objfile->sf->sym_probe_fns->sym_relocate_probe (objfile,
- 						    new_offsets, delta);
+--- gdb-7.99.90.20170420.orig/gdb/objfiles.c	2017-04-20 23:04:39.627960523 +0200
++++ gdb-7.99.90.20170420/gdb/objfiles.c	2017-04-20 23:04:48.332009569 +0200
+@@ -909,6 +909,11 @@
+ 				obj_section_addr (s));
+     }
  
 +  /* Final call of breakpoint_re_set can keep breakpoint locations disabled if
 +     their addresses match.  */

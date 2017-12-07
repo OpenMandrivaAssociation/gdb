@@ -1,0 +1,189 @@
+commit e93523245b704bc126705620969b4736b00350c5
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:26 2017 +0200
+
+    PR gdb/21226: Take DWARF stack value pieces from LSB end
+    
+    When taking a DW_OP_piece or DW_OP_bit_piece from a DW_OP_stack_value, the
+    existing logic always takes the piece from the lowest-addressed end, which
+    is wrong on big-endian targets.  The DWARF standard states that the
+    "DW_OP_bit_piece operation describes a sequence of bits using the least
+    significant bits of that value", and this also matches the current logic
+    in GCC.  For instance, the GCC guality test case pr54970.c fails on s390x
+    because of this.
+    
+    This fix adjusts the piece accordingly on big-endian targets.  It is
+    assumed that:
+    
+    * DW_OP_piece shall take the piece from the LSB end as well;
+    
+    * pieces reaching outside the stack value bits are considered undefined,
+      and a zero value can be used instead.
+    
+    gdb/ChangeLog:
+    
+            PR gdb/21226
+            * dwarf2loc.c (read_pieced_value): Anchor stack value pieces at
+            the LSB end, independent of endianness.
+    
+    gdb/testsuite/ChangeLog:
+    
+            PR gdb/21226
+            * gdb.dwarf2/nonvar-access.exp: Add checks for verifying that
+            stack value pieces are taken from the LSB end.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	PR gdb/21226
++	* dwarf2loc.c (read_pieced_value): Anchor stack value pieces at
++	the LSB end, independent of endianness.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (write_pieced_value): Fix order of calculations for
+ 	size capping.
+ 
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1858,6 +1858,10 @@ read_pieced_value (struct value *v)
+ 		if (unavail)
+ 		  mark_value_bits_unavailable (v, offset, this_size_bits);
+ 	      }
++
++	    copy_bitwise (contents, dest_offset_bits,
++			  intermediate_buffer, source_offset_bits % 8,
++			  this_size_bits, bits_big_endian);
+ 	  }
+ 	  break;
+ 
+@@ -1866,26 +1870,30 @@ read_pieced_value (struct value *v)
+ 			     p->v.mem.in_stack_memory,
+ 			     p->v.mem.addr + source_offset,
+ 			     buffer.data (), this_size);
++	  copy_bitwise (contents, dest_offset_bits,
++			intermediate_buffer, source_offset_bits % 8,
++			this_size_bits, bits_big_endian);
+ 	  break;
+ 
+ 	case DWARF_VALUE_STACK:
+ 	  {
+-	    size_t n = this_size;
++	    struct objfile *objfile = dwarf2_per_cu_objfile (c->per_cu);
++	    struct gdbarch *objfile_gdbarch = get_objfile_arch (objfile);
++	    ULONGEST stack_value_size_bits
++	      = 8 * TYPE_LENGTH (value_type (p->v.value));
+ 
+-	    if (n > c->addr_size - source_offset)
+-	      n = (c->addr_size >= source_offset
+-		   ? c->addr_size - source_offset
+-		   : 0);
+-	    if (n == 0)
+-	      {
+-		/* Nothing.  */
+-	      }
+-	    else
+-	      {
+-		const gdb_byte *val_bytes = value_contents_all (p->v.value);
++	    /* Use zeroes if piece reaches beyond stack value.  */
++	    if (p->size > stack_value_size_bits)
++	      break;
+ 
+-		intermediate_buffer = val_bytes + source_offset;
+-	      }
++	    /* Piece is anchored at least significant bit end.  */
++	    if (gdbarch_byte_order (objfile_gdbarch) == BFD_ENDIAN_BIG)
++	      source_offset_bits += stack_value_size_bits - p->size;
++
++	    copy_bitwise (contents, dest_offset_bits,
++			  value_contents_all (p->v.value),
++			  source_offset_bits,
++			  this_size_bits, bits_big_endian);
+ 	  }
+ 	  break;
+ 
+@@ -1899,6 +1907,10 @@ read_pieced_value (struct value *v)
+ 		   : 0);
+ 	    if (n != 0)
+ 	      intermediate_buffer = p->v.literal.data + source_offset;
++
++	    copy_bitwise (contents, dest_offset_bits,
++			  intermediate_buffer, source_offset_bits % 8,
++			  this_size_bits, bits_big_endian);
+ 	  }
+ 	  break;
+ 
+@@ -1915,12 +1927,6 @@ read_pieced_value (struct value *v)
+ 	  internal_error (__FILE__, __LINE__, _("invalid location type"));
+ 	}
+ 
+-      if (p->location != DWARF_VALUE_OPTIMIZED_OUT
+-	  && p->location != DWARF_VALUE_IMPLICIT_POINTER)
+-	copy_bitwise (contents, dest_offset_bits,
+-		      intermediate_buffer, source_offset_bits % 8,
+-		      this_size_bits, bits_big_endian);
+-
+       offset += this_size_bits;
+     }
+ }
+### a/gdb/testsuite/ChangeLog
+### b/gdb/testsuite/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	PR gdb/21226
++	* gdb.dwarf2/nonvar-access.exp: Add checks for verifying that
++	stack value pieces are taken from the LSB end.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* gdb.dwarf2/var-pieces.exp: Add test case for modifying a
+ 	variable at nonzero offset.
+ 
+--- a/gdb/testsuite/gdb.dwarf2/nonvar-access.exp
++++ b/gdb/testsuite/gdb.dwarf2/nonvar-access.exp
+@@ -128,14 +128,26 @@ Dwarf::assemble $asm_file {
+ 		    {name def_t}
+ 		    {type :$struct_t_label}
+ 		    {location {
+-			const1u 0
++			const2s -184
+ 			stack_value
+ 			bit_piece 9 0
+-			const1s -1
++			const4u 1752286
+ 			stack_value
+ 			bit_piece 23 0
+ 		    } SPECIAL_expr}
+ 		}
++		# Composite location with some empty pieces.
++		DW_TAG_variable {
++		    {name part_def_a}
++		    {type :$array_a9_label}
++		    {location {
++			piece 3
++			const4u 0xf1927314
++			stack_value
++			piece 4
++			piece 2
++		    } SPECIAL_expr}
++		}
+ 		# Implicit location: immediate value.
+ 		DW_TAG_variable {
+ 		    {name def_implicit_s}
+@@ -221,9 +233,12 @@ gdb_test "print/x *implicit_b_ptr" " = $val"
+ 
+ # Byte-aligned fields, pieced together from DWARF stack values.
+ gdb_test "print def_s" " = \\{a = 0, b = -1\\}"
++switch $endian { big {set val 0x92} little {set val 0x73} }
++gdb_test "print/x part_def_a\[4\]" " = $val"
++gdb_test "print/x part_def_a\[8\]" " = <optimized out>"
+ 
+ # Non-byte-aligned fields, pieced together from DWARF stack values.
+-gdb_test "print def_t" " = \\{a = 0, b = -1\\}"
++gdb_test "print def_t" " = \\{a = -184, b = 1752286\\}"
+ 
+ # Simple variable without location.
+ gdb_test "print undef_int" " = <optimized out>"

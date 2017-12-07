@@ -1,6 +1,7 @@
-diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-lib.c gdb-6.5/gdb/testsuite/gdb.base/datalib-lib.c
---- gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-lib.c	1969-12-31 19:00:00.000000000 -0500
-+++ gdb-6.5/gdb/testsuite/gdb.base/datalib-lib.c	2008-05-29 13:51:50.000000000 -0400
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-lib.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-lib.c	2016-02-15 23:27:19.654331680 +0100
 @@ -0,0 +1,22 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -24,9 +25,10 @@ diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-lib.c gdb-6.5/gdb/tes
 +   bug-gdb@prep.ai.mit.edu  */
 +
 +int var;
-diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-main.c gdb-6.5/gdb/testsuite/gdb.base/datalib-main.c
---- gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-main.c	1969-12-31 19:00:00.000000000 -0500
-+++ gdb-6.5/gdb/testsuite/gdb.base/datalib-main.c	2008-05-29 13:51:39.000000000 -0400
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-main.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-main.c	2016-02-15 23:27:19.654331680 +0100
 @@ -0,0 +1,26 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -54,9 +56,10 @@ diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib-main.c gdb-6.5/gdb/te
 +{
 +  return 0;
 +}
-diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib.exp gdb-6.5/gdb/testsuite/gdb.base/datalib.exp
---- gdb-6.5-orig/gdb/testsuite/gdb.base/datalib.exp	1969-12-31 19:00:00.000000000 -0500
-+++ gdb-6.5/gdb/testsuite/gdb.base/datalib.exp	2008-05-29 14:58:33.000000000 -0400
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib.exp
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib.exp	2016-02-15 23:27:25.968376510 +0100
 @@ -0,0 +1,51 @@
 +# Copyright 2008 Free Software Foundation, Inc.
 +
@@ -77,8 +80,8 @@ diff -up -ruNp gdb-6.5-orig/gdb/testsuite/gdb.base/datalib.exp gdb-6.5/gdb/tests
 +set testfile datalib
 +set srcfilemain ${testfile}-main.c
 +set srcfilelib ${testfile}-lib.c
-+set libfile ${objdir}/${subdir}/${testfile}-lib.so
-+set binfile ${objdir}/${subdir}/${testfile}-main
++set libfile [standard_output_file ${testfile}-lib.so]
++set binfile [standard_output_file ${testfile}-main]
 +if  { [gdb_compile "${srcdir}/${subdir}/${srcfilelib}" "${libfile}" executable [list debug {additional_flags=-shared -nostdlib}]] != "" } {
 +    untested "Couldn't compile test program"
 +    return -1

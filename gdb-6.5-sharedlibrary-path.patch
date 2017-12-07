@@ -23,10 +23,10 @@ The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
 
 	Port to gdb-6.7.50.20080227.
 
-Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-main.c	2008-02-27 09:00:15.000000000 +0100
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-main.c	2016-02-16 10:16:12.629875073 +0100
 @@ -0,0 +1,25 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -53,10 +53,10 @@ Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
 +{
 +  return 0;
 +}
-Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c	2008-02-27 09:00:15.000000000 +0100
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c	2016-02-16 10:16:12.630875080 +0100
 @@ -0,0 +1,22 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -80,9 +80,11 @@ Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 +   bug-gdb@prep.ai.mit.edu  */
 +
 +__thread int var = 42;
---- /dev/null	2009-02-10 00:19:00.494289687 +0100
-+++ gdb-6.8.50.20090209-x/gdb/testsuite/gdb.threads/tls-sepdebug.exp	2009-02-10 00:49:38.000000000 +0100
-@@ -0,0 +1,86 @@
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug.exp
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug.exp	2016-02-16 10:16:31.241001010 +0100
+@@ -0,0 +1,87 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +
 +# This program is free software; you can redistribute it and/or modify
@@ -107,10 +109,10 @@ Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 +set srcmainfile   ${testfile}-main.c
 +set srcsharedfile ${testfile}-shared.c
 +
-+set binmainfile        ${objdir}/${subdir}/${testfile}-main
++set binmainfile        [standard_output_file ${testfile}-main]
 +set binsharedbase      ${testfile}-shared.so
-+set binsharedfile      ${objdir}/${subdir}/${binsharedbase}
-+set binshareddebugfile ${objdir}/${subdir}/${binsharedbase}.debug
++set binsharedfile      [standard_output_file ${binsharedbase}]
++set binshareddebugfile [standard_output_file ${binsharedbase}.debug]
 +
 +# Use explicit -soname as otherwise the full path to the library would get
 +# encoded into ${binmainfile} making LD_LIBRARY_PATH tests useless.
@@ -144,7 +146,8 @@ Index: gdb-6.7.50.20080227/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 +# \$PWD is easy - it is the absolute way
 +# ${subdir} would fail on "print var"
 +
-+foreach ld_library_path [list [pwd]/${subdir} ./${subdir}] name { absolute relative }  {
++set absdir [file dirname [standard_output_file ${binsharedbase}]]
++foreach ld_library_path [list $absdir [relative_filename [pwd] $absdir]] name { absolute relative }  {
 +
 +    gdb_exit
 +    gdb_start

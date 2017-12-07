@@ -1,0 +1,56 @@
+commit f65e204425b5b46a5927d9501c42f25d98a866ce
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:32 2017 +0200
+
+    write_pieced_value: Notify memory_changed observers
+    
+    So far write_pieced_value uses write_memory when writing memory pieces to
+    the target.  However, this is a case where GDB potentially overwrites a
+    watchpoint value.  In such a case write_memory_with_notification should be
+    used instead, so that memory_changed observers get notified.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (write_pieced_value): When writing the data for a
+            memory piece, use write_memory_with_notification instead of
+            write_memory.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (write_pieced_value): When writing the data for a
++	memory piece, use write_memory_with_notification instead of
++	write_memory.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* valops.c (read_value_memory): Change embedded_offset to
+ 	represent a bit offset instead of a byte offset.
+ 	* value.h (read_value_memory): Adjust comment.
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -2025,9 +2025,9 @@ write_pieced_value (struct value *to, struct value *from)
+ 		&& offset % 8 == 0)
+ 	      {
+ 		/* Everything is byte-aligned; no buffer needed.  */
+-		write_memory (start_addr,
+-			      contents + offset / 8,
+-			      this_size_bits / 8);
++		write_memory_with_notification (start_addr,
++						contents + offset / 8,
++						this_size_bits / 8);
+ 		break;
+ 	      }
+ 
+@@ -2054,7 +2054,8 @@ write_pieced_value (struct value *to, struct value *from)
+ 	    copy_bitwise (buffer.data (), bits_to_skip % 8,
+ 			  contents, offset,
+ 			  this_size_bits, bits_big_endian);
+-	    write_memory (start_addr, buffer.data (), this_size);
++	    write_memory_with_notification (start_addr, buffer.data (),
++					    this_size);
+ 	  }
+ 	  break;
+ 	default:

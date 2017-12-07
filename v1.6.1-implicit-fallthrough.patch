@@ -1,0 +1,23 @@
+gcc-7.1.1-1.fc27.x86_64
+/home/jkratoch/redhat/fedora/libipt/master/processor-trace-1.6.1/libipt/src/pt_block_decoder.c: In function ‘pt_blk_proceed_no_event_cached’:
+/home/jkratoch/redhat/fedora/libipt/master/processor-trace-1.6.1/libipt/src/pt_block_decoder.c:2282:6: error: this statement may fall through [-Werror=implicit-fallthrough=]
+   if (bce.isize) {
+      ^
+/home/jkratoch/redhat/fedora/libipt/master/processor-trace-1.6.1/libipt/src/pt_block_decoder.c:2328:2: note: here
+  case ptbq_decode: {
+  ^~~~
+
+diff --git a/libipt/src/pt_block_decoder.c b/libipt/src/pt_block_decoder.c
+index 21783a6..91d5bb3 100644
+--- a/libipt/src/pt_block_decoder.c
++++ b/libipt/src/pt_block_decoder.c
+@@ -2095,6 +2095,9 @@ static int pt_blk_proceed_no_event_cached(struct pt_block_decoder *decoder,
+ 		}
+ 
+ 		/* Fall through to ptbq_decode. */
++#if __GNUC__ >= 7
++		__attribute__ ((fallthrough));
++#endif
+ 
+ 	case ptbq_decode: {
+ 		struct pt_insn_ext iext;

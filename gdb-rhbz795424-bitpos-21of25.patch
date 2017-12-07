@@ -52,11 +52,11 @@ Content-Type: text/x-patch
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=bitpos-ensure-size_t.patch
 
-Index: gdb-7.6.90.20140127/gdb/alpha-tdep.c
+Index: gdb-8.0/gdb/alpha-tdep.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/alpha-tdep.c	2014-02-06 18:18:51.005616676 +0100
-+++ gdb-7.6.90.20140127/gdb/alpha-tdep.c	2014-02-06 18:18:53.671621349 +0100
-@@ -414,6 +414,13 @@ alpha_push_dummy_call (struct gdbarch *g
+--- gdb-8.0.orig/gdb/alpha-tdep.c	2017-08-19 20:07:45.469330496 +0200
++++ gdb-8.0/gdb/alpha-tdep.c	2017-08-19 20:07:50.670379152 +0200
+@@ -414,6 +414,13 @@
      accumulate_size = 0;
    else
      accumulate_size -= sizeof(arg_reg_buffer);
@@ -70,70 +70,49 @@ Index: gdb-7.6.90.20140127/gdb/alpha-tdep.c
    sp -= accumulate_size;
  
    /* Keep sp aligned to a multiple of 16 as the ABI requires.  */
-Index: gdb-7.6.90.20140127/gdb/cp-valprint.c
+Index: gdb-8.0/gdb/cp-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/cp-valprint.c	2014-02-06 18:18:51.006616677 +0100
-+++ gdb-7.6.90.20140127/gdb/cp-valprint.c	2014-02-06 18:18:53.671621349 +0100
-@@ -537,6 +537,8 @@ cp_print_value (struct type *type, struc
+--- gdb-8.0.orig/gdb/cp-valprint.c	2017-08-19 20:07:45.470330505 +0200
++++ gdb-8.0/gdb/cp-valprint.c	2017-08-19 20:07:50.670379152 +0200
+@@ -537,6 +537,8 @@
  		  gdb_byte *buf;
  		  struct cleanup *back_to;
  
 +		  ulongest_fits_host_or_error (TYPE_LENGTH (baseclass));
 +
- 		  buf = xmalloc (TYPE_LENGTH (baseclass));
+ 		  buf = (gdb_byte *) xmalloc (TYPE_LENGTH (baseclass));
  		  back_to = make_cleanup (xfree, buf);
  
-Index: gdb-7.6.90.20140127/gdb/dwarf2loc.c
+Index: gdb-8.0/gdb/findcmd.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/dwarf2loc.c	2014-02-06 18:18:51.007616678 +0100
-+++ gdb-7.6.90.20140127/gdb/dwarf2loc.c	2014-02-06 18:18:53.672621293 +0100
-@@ -1821,6 +1821,8 @@ read_pieced_value (struct value *v)
- 
-       this_size = (this_size_bits + source_offset_bits % 8 + 7) / 8;
-       source_offset = source_offset_bits / 8;
-+      ulongest_fits_host_or_error (this_size);
-+
-       if (buffer_size < this_size)
- 	{
- 	  buffer_size = this_size;
-@@ -2012,6 +2014,7 @@ write_pieced_value (struct value *to, st
- 	}
-       else
- 	{
-+	  ulongest_fits_host_or_error (this_size);
- 	  if (buffer_size < this_size)
- 	    {
- 	      buffer_size = this_size;
-Index: gdb-7.6.90.20140127/gdb/findcmd.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/findcmd.c	2014-02-06 18:18:51.008616679 +0100
-+++ gdb-7.6.90.20140127/gdb/findcmd.c	2014-02-06 18:18:53.673621239 +0100
-@@ -185,6 +185,7 @@ parse_find_args (char *args, ULONGEST *m
+--- gdb-8.0.orig/gdb/findcmd.c	2017-08-19 20:07:45.472330524 +0200
++++ gdb-8.0/gdb/findcmd.c	2017-08-19 20:07:50.672379171 +0200
+@@ -186,6 +186,7 @@
  	  size_t current_offset = pattern_buf_end - pattern_buf;
  
  	  pattern_buf_size = pattern_buf_size_need * 2;
 +	  ulongest_fits_host_or_error (pattern_buf_size);
- 	  pattern_buf = xrealloc (pattern_buf, pattern_buf_size);
+ 	  pattern_buf = (gdb_byte *) xrealloc (pattern_buf, pattern_buf_size);
  	  pattern_buf_end = pattern_buf + current_offset;
  	}
-Index: gdb-7.6.90.20140127/gdb/p-valprint.c
+Index: gdb-8.0/gdb/p-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/p-valprint.c	2014-02-06 18:18:51.008616679 +0100
-+++ gdb-7.6.90.20140127/gdb/p-valprint.c	2014-02-06 18:18:53.673621239 +0100
-@@ -798,6 +798,7 @@ pascal_object_print_value (struct type *
+--- gdb-8.0.orig/gdb/p-valprint.c	2017-08-19 20:07:45.472330524 +0200
++++ gdb-8.0/gdb/p-valprint.c	2017-08-19 20:07:50.673379180 +0200
+@@ -772,6 +772,7 @@
  	      gdb_byte *buf;
  	      struct cleanup *back_to;
  
 +	      ulongest_fits_host_or_error (TYPE_LENGTH (baseclass));
- 	      buf = xmalloc (TYPE_LENGTH (baseclass));
+ 	      buf = (gdb_byte *) xmalloc (TYPE_LENGTH (baseclass));
  	      back_to = make_cleanup (xfree, buf);
  
-Index: gdb-7.6.90.20140127/gdb/utils.c
+Index: gdb-8.0/gdb/utils.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/utils.c	2014-02-06 18:18:51.008616679 +0100
-+++ gdb-7.6.90.20140127/gdb/utils.c	2014-02-06 18:18:53.674621186 +0100
-@@ -3169,6 +3169,18 @@ host_address_to_string (const void *addr
-   return str;
+--- gdb-8.0.orig/gdb/utils.c	2017-08-19 20:07:45.473330533 +0200
++++ gdb-8.0/gdb/utils.c	2017-08-19 20:07:50.673379180 +0200
+@@ -2776,6 +2776,18 @@
+   return addr;
  }
  
 +/* Ensure that the input NUM is not larger than the maximum capacity of the
@@ -151,59 +130,52 @@ Index: gdb-7.6.90.20140127/gdb/utils.c
  char *
  gdb_realpath (const char *filename)
  {
-Index: gdb-7.6.90.20140127/gdb/valops.c
+Index: gdb-8.0/gdb/valops.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/valops.c	2014-02-06 18:18:51.009616680 +0100
-+++ gdb-7.6.90.20140127/gdb/valops.c	2014-02-06 18:18:53.675621135 +0100
-@@ -2184,6 +2184,7 @@ search_struct_method (const char *name,
+--- gdb-8.0.orig/gdb/valops.c	2017-08-19 20:07:45.474330542 +0200
++++ gdb-8.0/gdb/valops.c	2017-08-19 20:07:50.674379190 +0200
+@@ -2100,6 +2100,7 @@
  	      struct cleanup *back_to;
  	      CORE_ADDR address;
  
 +	      ulongest_fits_host_or_error (TYPE_LENGTH (baseclass));
- 	      tmp = xmalloc (TYPE_LENGTH (baseclass));
+ 	      tmp = (gdb_byte *) xmalloc (TYPE_LENGTH (baseclass));
  	      back_to = make_cleanup (xfree, tmp);
  	      address = value_address (*arg1p);
-Index: gdb-7.6.90.20140127/gdb/value.c
+Index: gdb-8.0/gdb/value.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/value.c	2014-02-06 18:18:51.010616681 +0100
-+++ gdb-7.6.90.20140127/gdb/value.c	2014-02-06 18:19:10.261637398 +0100
-@@ -822,6 +822,7 @@ allocate_value_lazy (struct type *type)
+--- gdb-8.0.orig/gdb/value.c	2017-08-19 20:07:45.476330561 +0200
++++ gdb-8.0/gdb/value.c	2017-08-19 20:07:50.675379199 +0200
+@@ -936,6 +936,7 @@
       description correctly.  */
    check_typedef (type);
  
 +  ulongest_fits_host_or_error (TYPE_LENGTH (type));
-   val = (struct value *) xzalloc (sizeof (struct value));
+   val = XCNEW (struct value);
    val->contents = NULL;
    val->next = all_values;
-@@ -853,6 +854,8 @@ allocate_value_lazy (struct type *type)
+@@ -1033,6 +1034,8 @@
  static void
  allocate_value_contents (struct value *val)
  {
 +  ulongest_fits_host_or_error (TYPE_LENGTH (val->enclosing_type));
 +
    if (!val->contents)
-     val->contents = (gdb_byte *) xzalloc (TYPE_LENGTH (val->enclosing_type));
- }
-@@ -2854,8 +2857,12 @@ void
- set_value_enclosing_type (struct value *val, struct type *new_encl_type)
- {
-   if (TYPE_LENGTH (new_encl_type) > TYPE_LENGTH (value_enclosing_type (val))) 
--    val->contents =
--      (gdb_byte *) xrealloc (val->contents, TYPE_LENGTH (new_encl_type));
-+    {
+     {
+       check_type_length_before_alloc (val->enclosing_type);
+@@ -3093,6 +3096,7 @@
+   if (TYPE_LENGTH (new_encl_type) > TYPE_LENGTH (value_enclosing_type (val)))
+     {
+       check_type_length_before_alloc (new_encl_type);
 +      ulongest_fits_host_or_error (TYPE_LENGTH (new_encl_type));
-+
-+      val->contents =
-+	(gdb_byte *) xrealloc (val->contents, TYPE_LENGTH (new_encl_type));
-+    }
- 
-   val->enclosing_type = new_encl_type;
- }
-Index: gdb-7.6.90.20140127/gdb/vax-tdep.c
+       val->contents
+ 	= (gdb_byte *) xrealloc (val->contents, TYPE_LENGTH (new_encl_type));
+     }
+Index: gdb-8.0/gdb/vax-tdep.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/vax-tdep.c	2014-02-06 18:18:51.370617068 +0100
-+++ gdb-7.6.90.20140127/gdb/vax-tdep.c	2014-02-06 18:18:53.676621086 +0100
-@@ -223,6 +223,7 @@ vax_return_value (struct gdbarch *gdbarc
+--- gdb-8.0.orig/gdb/vax-tdep.c	2017-08-19 20:07:45.476330561 +0200
++++ gdb-8.0/gdb/vax-tdep.c	2017-08-19 20:07:50.675379199 +0200
+@@ -219,6 +219,7 @@
  	  ULONGEST addr;
  
  	  regcache_raw_read_unsigned (regcache, VAX_R0_REGNUM, &addr);
@@ -211,11 +183,11 @@ Index: gdb-7.6.90.20140127/gdb/vax-tdep.c
  	  read_memory (addr, readbuf, len);
  	}
  
-Index: gdb-7.6.90.20140127/gdb/defs.h
+Index: gdb-8.0/gdb/defs.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/defs.h	2014-02-06 18:18:51.370617068 +0100
-+++ gdb-7.6.90.20140127/gdb/defs.h	2014-02-06 18:18:53.677621038 +0100
-@@ -768,4 +768,6 @@ enum block_enum
+--- gdb-8.0.orig/gdb/defs.h	2017-08-19 20:07:45.476330561 +0200
++++ gdb-8.0/gdb/defs.h	2017-08-19 20:07:50.676379208 +0200
+@@ -750,4 +750,6 @@
  
  #include "utils.h"
  

@@ -1,0 +1,40 @@
+commit cdaac320fd62bff75562aaa3e466494dc72dd175
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:27 2017 +0200
+
+    write_pieced_value: Fix copy/paste error in size calculation
+    
+    In write_pieced_value, the number of bytes containing a portion of the
+    bit-field in a given piece is calculated with the wrong starting offset;
+    thus the result may be off by one.  This bug was probably introduced when
+    copying this logic from read_pieced_value.  Fix it.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (write_pieced_value): Fix copy/paste error in the
+            calculation of this_size.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,10 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (write_pieced_value): Fix copy/paste error in the
++	calculation of this_size.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (read_pieced_value): Respect parent value's offset
+ 	when targeting a bit-field.
+ 	(write_pieced_value): Likewise.
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1983,7 +1983,7 @@ write_pieced_value (struct value *to, struct value *from)
+       if (this_size_bits > type_len - offset)
+ 	this_size_bits = type_len - offset;
+ 
+-      this_size = (this_size_bits + source_offset_bits % 8 + 7) / 8;
++      this_size = (this_size_bits + dest_offset_bits % 8 + 7) / 8;
+       source_offset = source_offset_bits / 8;
+       dest_offset = dest_offset_bits / 8;
+       if (dest_offset_bits % 8 == 0 && source_offset_bits % 8 == 0)

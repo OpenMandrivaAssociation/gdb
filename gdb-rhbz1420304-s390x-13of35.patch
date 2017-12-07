@@ -1,0 +1,72 @@
+commit 805acca042afed8e8431c92ab031167b03475676
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:26 2017 +0200
+
+    gdb/testsuite: Add "get_endianness" convenience proc
+    
+    The test suite contains multiple instances of determining the target's
+    endianness with GDB's "show endian" command.  This patch replaces these by
+    an invocation of a new convenience proc 'get_endianness'.
+    
+    gdb/testsuite/ChangeLog:
+    
+            * lib/gdb.exp (get_endianness): New proc.
+            * gdb.arch/aarch64-fp.exp: Use it.
+            * gdb.arch/altivec-regs.exp: Likewise.
+            * gdb.arch/e500-regs.exp: Likewise.
+            * gdb.arch/vsx-regs.exp: Likewise.
+            * gdb.base/dump.exp: Likewise.
+            * gdb.base/funcargs.exp: Likewise.
+            * gdb.base/gnu_vector.exp: Likewise.
+            * gdb.dwarf2/formdata16.exp: Likewise.
+            * gdb.dwarf2/implptrpiece.exp: Likewise.
+            * gdb.dwarf2/nonvar-access.exp: Likewise.
+            * gdb.python/py-inferior.exp: Likewise.
+            * gdb.trace/unavailable-dwarf-piece.exp: Likewise.
+
+### a/gdb/testsuite/ChangeLog
+### b/gdb/testsuite/ChangeLog
+## -1,5 +1,21 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* lib/gdb.exp (get_endianness): New proc.
++	* gdb.arch/aarch64-fp.exp: Use it.
++	* gdb.arch/altivec-regs.exp: Likewise.
++	* gdb.arch/e500-regs.exp: Likewise.
++	* gdb.arch/vsx-regs.exp: Likewise.
++	* gdb.base/dump.exp: Likewise.
++	* gdb.base/funcargs.exp: Likewise.
++	* gdb.base/gnu_vector.exp: Likewise.
++	* gdb.dwarf2/formdata16.exp: Likewise.
++	* gdb.dwarf2/implptrpiece.exp: Likewise.
++	* gdb.dwarf2/nonvar-access.exp: Likewise.
++	* gdb.python/py-inferior.exp: Likewise.
++	* gdb.trace/unavailable-dwarf-piece.exp: Likewise.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	PR gdb/21226
+ 	* gdb.dwarf2/nonvar-access.exp: Add checks for verifying that
+ 	stack value pieces are taken from the LSB end.
+--- a/gdb/testsuite/lib/gdb.exp
++++ b/gdb/testsuite/lib/gdb.exp
+@@ -5671,6 +5671,19 @@ proc set_remotetimeout { timeout } {
+     }
+ }
+ 
++# Get the target's current endianness and return it.
++proc get_endianness { } {
++    global gdb_prompt
++
++    gdb_test_multiple "show endian" "determine endianness" {
++	-re ".* (little|big) endian.*\r\n$gdb_prompt $" {
++	    # Pass silently.
++	    return $expect_out(1,string)
++	}
++    }
++    return "little"
++}
++
+ # ROOT and FULL are file names.  Returns the relative path from ROOT
+ # to FULL.  Note that FULL must be in a subdirectory of ROOT.
+ # For example, given ROOT = /usr/bin and FULL = /usr/bin/ls, this

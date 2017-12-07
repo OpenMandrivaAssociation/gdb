@@ -1,0 +1,76 @@
+commit 23f945bf8cebf348154aff43782de2e1977e9230
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:31 2017 +0200
+
+    Fix bit-/byte-offset mismatch in parameter to read_value_memory
+    
+    The function read_value_memory accepts a parameter embedded_offset and
+    expects it to represent the byte offset into the given value.  However,
+    the only invocation with a possibly non-zero embedded_offset happens in
+    read_pieced_value, where a bit offset is passed instead.
+    
+    Adjust the implementation of read_value_memory to meet the caller's
+    expectation.  This implicitly fixes the invocation in read_pieced_value.
+    
+    gdb/ChangeLog:
+    
+            * valops.c (read_value_memory): Change embedded_offset to
+            represent a bit offset instead of a byte offset.
+            * value.h (read_value_memory): Adjust comment.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* valops.c (read_value_memory): Change embedded_offset to
++	represent a bit offset instead of a byte offset.
++	* value.h (read_value_memory): Adjust comment.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (read_pieced_value): Remove unnecessary variables
+ 	dest_offset_bits and source_offset_bits.
+ 	(write_pieced_value): Likewise.
+--- a/gdb/valops.c
++++ b/gdb/valops.c
+@@ -958,7 +958,7 @@ value_at_lazy (struct type *type, CORE_ADDR addr)
+ }
+ 
+ void
+-read_value_memory (struct value *val, LONGEST embedded_offset,
++read_value_memory (struct value *val, LONGEST bit_offset,
+ 		   int stack, CORE_ADDR memaddr,
+ 		   gdb_byte *buffer, size_t length)
+ {
+@@ -984,8 +984,9 @@ read_value_memory (struct value *val, LONGEST embedded_offset,
+       if (status == TARGET_XFER_OK)
+ 	/* nothing */;
+       else if (status == TARGET_XFER_UNAVAILABLE)
+-	mark_value_bytes_unavailable (val, embedded_offset + xfered_total,
+-				      xfered_partial);
++	mark_value_bits_unavailable (val, (xfered_total * HOST_CHAR_BIT
++					   + bit_offset),
++				     xfered_partial * HOST_CHAR_BIT);
+       else if (status == TARGET_XFER_EOF)
+ 	memory_error (TARGET_XFER_E_IO, memaddr + xfered_total);
+       else
+--- a/gdb/value.h
++++ b/gdb/value.h
+@@ -581,12 +581,11 @@ extern int value_contents_eq (const struct value *val1, LONGEST offset1,
+ 
+ /* Read LENGTH addressable memory units starting at MEMADDR into BUFFER,
+    which is (or will be copied to) VAL's contents buffer offset by
+-   EMBEDDED_OFFSET (that is, to &VAL->contents[EMBEDDED_OFFSET]).
+-   Marks value contents ranges as unavailable if the corresponding
+-   memory is likewise unavailable.  STACK indicates whether the memory
+-   is known to be stack memory.  */
++   BIT_OFFSET bits.  Marks value contents ranges as unavailable if
++   the corresponding memory is likewise unavailable.  STACK indicates
++   whether the memory is known to be stack memory.  */
+ 
+-extern void read_value_memory (struct value *val, LONGEST embedded_offset,
++extern void read_value_memory (struct value *val, LONGEST bit_offset,
+ 			       int stack, CORE_ADDR memaddr,
+ 			       gdb_byte *buffer, size_t length);
+ 

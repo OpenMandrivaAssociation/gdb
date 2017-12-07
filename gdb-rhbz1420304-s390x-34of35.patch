@@ -1,0 +1,53 @@
+commit 79c12faeea57e61364b6a7a3e411b096edce989c
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Fri Jul 28 17:59:25 2017 +0200
+
+    S/390: Fix segfault when linking -shared -nostartfiles
+    
+    Regression-tested on s390x.
+    
+    bfd/ChangeLog:
+    
+    2017-07-28  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf32-s390.c (elf_s390_finish_dynamic_sections): Add NULL
+            pointer check for htab->elf.irelplt.
+            * elf64-s390.c (elf_s390_finish_dynamic_sections): Likewise.
+
+--- a/bfd/elf32-s390.c
++++ b/bfd/elf32-s390.c
+@@ -3941,7 +3941,9 @@ elf_s390_finish_dynamic_sections (bfd *output_bfd,
+ 	      break;
+ 
+ 	    case DT_PLTRELSZ:
+-	      dyn.d_un.d_val = htab->elf.srelplt->size + htab->elf.irelplt->size;
++	      dyn.d_un.d_val = htab->elf.srelplt->size;
++	      if (htab->elf.irelplt)
++		dyn.d_un.d_val += htab->elf.irelplt->size;
+ 	      break;
+ 	    }
+ 
+--- a/bfd/elf64-s390.c
++++ b/bfd/elf64-s390.c
+@@ -3745,7 +3745,9 @@ elf_s390_finish_dynamic_sections (bfd *output_bfd,
+ 	      break;
+ 
+ 	    case DT_PLTRELSZ:
+-	      dyn.d_un.d_val = htab->elf.srelplt->size + htab->elf.irelplt->size;
++	      dyn.d_un.d_val = htab->elf.srelplt->size;
++	      if (htab->elf.irelplt)
++		dyn.d_un.d_val += htab->elf.irelplt->size;
+ 	      break;
+ 
+ 	    case DT_RELASZ:
+@@ -3756,7 +3758,9 @@ elf_s390_finish_dynamic_sections (bfd *output_bfd,
+ 		 linker script arranges for .rela.plt to follow all
+ 		 other relocation sections, we don't have to worry
+ 		 about changing the DT_RELA entry.  */
+-	      dyn.d_un.d_val -= htab->elf.srelplt->size + htab->elf.irelplt->size;
++	      dyn.d_un.d_val -= htab->elf.srelplt->size;
++	      if (htab->elf.irelplt)
++		dyn.d_un.d_val -= htab->elf.irelplt->size;
+ 	      break;
+ 	    }
+ 

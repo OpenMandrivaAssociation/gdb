@@ -47,11 +47,11 @@ Content-Type: text/x-patch
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=f77-bounds.patch
 
-Index: gdb-7.5.50.20130118/gdb/f-lang.h
+Index: gdb-7.11.90.20160907/gdb/f-lang.h
 ===================================================================
---- gdb-7.5.50.20130118.orig/gdb/f-lang.h	2013-01-18 23:39:40.209500968 +0100
-+++ gdb-7.5.50.20130118/gdb/f-lang.h	2013-01-18 23:40:04.010531177 +0100
-@@ -65,9 +65,9 @@ struct common_block
+--- gdb-7.11.90.20160907.orig/gdb/f-lang.h	2016-09-07 21:48:33.308624019 +0200
++++ gdb-7.11.90.20160907/gdb/f-lang.h	2016-09-07 21:48:40.967692469 +0200
+@@ -49,9 +49,9 @@
    struct symbol *contents[1];
  };
  
@@ -63,38 +63,38 @@ Index: gdb-7.5.50.20130118/gdb/f-lang.h
  
  extern void f77_get_dynamic_array_length (struct type *);
  
-Index: gdb-7.5.50.20130118/gdb/f-typeprint.c
+Index: gdb-7.11.90.20160907/gdb/f-typeprint.c
 ===================================================================
---- gdb-7.5.50.20130118.orig/gdb/f-typeprint.c	2013-01-18 23:39:37.564497620 +0100
-+++ gdb-7.5.50.20130118/gdb/f-typeprint.c	2013-01-18 23:39:40.210500970 +0100
-@@ -180,7 +180,7 @@ f_type_print_varspec_suffix (struct type
+--- gdb-7.11.90.20160907.orig/gdb/f-typeprint.c	2016-09-07 21:48:33.309624028 +0200
++++ gdb-7.11.90.20160907/gdb/f-typeprint.c	2016-09-07 21:48:40.967692469 +0200
+@@ -147,7 +147,7 @@
  			     int show, int passed_a_ptr, int demangled_args,
- 			     int arrayprint_recurse_level)
+ 			     int arrayprint_recurse_level, int print_rank_only)
  {
 -  int upper_bound, lower_bound;
 +  LONGEST upper_bound, lower_bound;
  
    /* No static variables are permitted as an error call may occur during
       execution of this function.  */
-@@ -210,7 +210,7 @@ f_type_print_varspec_suffix (struct type
- 
-       lower_bound = f77_get_lowerbound (type);
-       if (lower_bound != 1)	/* Not the default.  */
--	fprintf_filtered (stream, "%d:", lower_bound);
-+	fprintf_filtered (stream, "%s:", plongest (lower_bound));
- 
-       /* Make sure that, if we have an assumed size array, we
-          print out a warning and print the upperbound as '*'.  */
-@@ -220,7 +220,7 @@ f_type_print_varspec_suffix (struct type
-       else
+@@ -194,7 +194,7 @@
  	{
- 	  upper_bound = f77_get_upperbound (type);
--	  fprintf_filtered (stream, "%d", upper_bound);
-+	  fprintf_filtered (stream, "%s", plongest (upper_bound));
+ 	  lower_bound = f77_get_lowerbound (type);
+ 	  if (lower_bound != 1)	/* Not the default.  */
+-	    fprintf_filtered (stream, "%d:", lower_bound);
++	    fprintf_filtered (stream, "%s:", plongest (lower_bound));
+ 
+ 	  /* Make sure that, if we have an assumed size array, we
+ 	       print out a warning and print the upperbound as '*'.  */
+@@ -204,7 +204,7 @@
+ 	  else
+ 	    {
+ 	      upper_bound = f77_get_upperbound (type);
+-	      fprintf_filtered (stream, "%d", upper_bound);
++	      fprintf_filtered (stream, "%s", plongest (upper_bound));
+ 	    }
  	}
  
-       if (TYPE_CODE (TYPE_TARGET_TYPE (type)) != TYPE_CODE_ARRAY)
-@@ -288,7 +288,7 @@ void
+@@ -276,7 +276,7 @@
  f_type_print_base (struct type *type, struct ui_file *stream, int show,
  		   int level)
  {
@@ -103,7 +103,7 @@ Index: gdb-7.5.50.20130118/gdb/f-typeprint.c
    int index;
  
    QUIT;
-@@ -370,7 +370,7 @@ f_type_print_base (struct type *type, st
+@@ -358,7 +358,7 @@
        else
  	{
  	  upper_bound = f77_get_upperbound (type);
@@ -112,20 +112,20 @@ Index: gdb-7.5.50.20130118/gdb/f-typeprint.c
  	}
        break;
  
-Index: gdb-7.5.50.20130118/gdb/f-valprint.c
+Index: gdb-7.11.90.20160907/gdb/f-valprint.c
 ===================================================================
---- gdb-7.5.50.20130118.orig/gdb/f-valprint.c	2013-01-18 23:39:37.564497620 +0100
-+++ gdb-7.5.50.20130118/gdb/f-valprint.c	2013-01-18 23:39:40.210500970 +0100
-@@ -57,7 +57,7 @@ LONGEST f77_array_offset_tbl[MAX_FORTRAN
- 
- #define F77_DIM_BYTE_STRIDE(n) (f77_array_offset_tbl[n][0])
+--- gdb-7.11.90.20160907.orig/gdb/f-valprint.c	2016-09-07 21:48:33.309624028 +0200
++++ gdb-7.11.90.20160907/gdb/f-valprint.c	2016-09-07 21:48:40.967692469 +0200
+@@ -43,7 +43,7 @@
+ /* Array which holds offsets to be applied to get a row's elements
+    for a given array.  Array also holds the size of each subarray.  */
  
 -int
 +LONGEST
  f77_get_lowerbound (struct type *type)
  {
-   f_object_address_data_valid_or_error (type);
-@@ -68,7 +68,7 @@ f77_get_lowerbound (struct type *type)
+   if (TYPE_ARRAY_LOWER_BOUND_IS_UNDEFINED (type))
+@@ -52,7 +52,7 @@
    return TYPE_ARRAY_LOWER_BOUND_VALUE (type);
  }
  
@@ -133,24 +133,4 @@ Index: gdb-7.5.50.20130118/gdb/f-valprint.c
 +LONGEST
  f77_get_upperbound (struct type *type)
  {
-   f_object_address_data_valid_or_error (type);
-@@ -92,8 +92,8 @@ f77_get_upperbound (struct type *type)
- static void
- f77_get_dynamic_length_of_aggregate (struct type *type)
- {
--  int upper_bound = -1;
--  int lower_bound = 1;
-+  LONGEST upper_bound = -1;
-+  LONGEST lower_bound = 1;
- 
-   /* Recursively go all the way down into a possibly multi-dimensional
-      F77 array and get the bounds.  For simple arrays, this is pretty
-@@ -128,7 +128,7 @@ f77_create_arrayprint_offset_tbl (struct
-   struct type *tmp_type;
-   LONGEST eltlen;
-   int ndimen = 1;
--  int upper, lower;
-+  LONGEST upper, lower;
- 
-   tmp_type = type;
- 
+   if (TYPE_ARRAY_UPPER_BOUND_IS_UNDEFINED (type))

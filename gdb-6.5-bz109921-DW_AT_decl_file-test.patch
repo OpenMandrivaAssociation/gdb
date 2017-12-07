@@ -16,8 +16,10 @@ http://sourceware.org/ml/gdb-patches/2007-01/msg00434.html
 	* gdb.dwarf2/dw2-included.exp, gdb.dwarf2/dw2-included.c,
 	gdb.dwarf2/dw2-included.h: New files.
 
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.dwarf2/dw2-included.c	2 Jan 2007 00:20:27 -0000
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.c	2016-02-16 09:52:29.861247534 +0100
 @@ -0,0 +1,26 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -45,8 +47,10 @@ http://sourceware.org/ml/gdb-patches/2007-01/msg00434.html
 +{
 +  return 0;
 +}
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.dwarf2/dw2-included.exp	2 Jan 2007 00:20:27 -0000
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.exp
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.exp	2016-02-16 09:52:36.481292330 +0100
 @@ -0,0 +1,47 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +
@@ -79,7 +83,7 @@ http://sourceware.org/ml/gdb-patches/2007-01/msg00434.html
 +
 +set testfile "dw2-included"
 +set srcfile ${testfile}.c
-+set binfile ${objdir}/${subdir}/${testfile}
++set binfile [standard_output_file ${testfile}]
 +
 +if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug}] != "" } {
 +    return -1
@@ -95,8 +99,10 @@ http://sourceware.org/ml/gdb-patches/2007-01/msg00434.html
 +gdb_test "ptype integer" "type = int\r"
 +# Path varies depending on the build location.
 +gdb_test "info variables integer" "\r\nFile \[^\r\n\]*/gdb.dwarf2/dw2-included.h:\r\nint integer;\r"
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.dwarf2/dw2-included.h	2 Jan 2007 00:20:27 -0000
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.dwarf2/dw2-included.h	2016-02-16 09:52:29.862247541 +0100
 @@ -0,0 +1,20 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +

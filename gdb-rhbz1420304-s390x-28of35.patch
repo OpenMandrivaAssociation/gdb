@@ -1,0 +1,60 @@
+commit 5524b5250e319f41933605420e9526fb74cfb9ae
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Wed Jun 14 14:24:03 2017 +0200
+
+    Fix register selection in var-access.exp
+    
+    The new test var-access.exp causes FAILs on i686.  This is because the
+    test chooses the wrong name for DWARF register number 1: It uses
+    "edx" (which corresponds to DWARF register number 2), but should have used
+    "ecx" instead.
+    
+    Also, the current logic in var-access.exp does not correctly distinguish
+    between a 64-bit and a 32-bit program on an x86-64 target.  It uses the
+    64-bit register names for both.
+    
+    These problems are fixed.  In order to address the latter, the convenience
+    macros is_*_target are exploited where appropriate.
+    
+    gdb/testsuite/ChangeLog:
+    
+            * gdb.dwarf2/var-access.exp: Use register name ecx instead of edx
+            on 32-bit x86 targets.  Exploit is_*_target macros where
+            appropriate.
+
+### a/gdb/testsuite/ChangeLog
+### b/gdb/testsuite/ChangeLog
+## -1,3 +1,9 @@
++2017-06-14  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
++	* gdb.dwarf2/var-access.exp: Use register name ecx instead of edx
++	on 32-bit x86 targets.  Exploit is_*_target macros where
++	appropriate.
++
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
+ 	* gdb.dwarf2/var-access.exp: Add test for non-byte-aligned
+--- a/gdb/testsuite/gdb.dwarf2/var-access.exp
++++ b/gdb/testsuite/gdb.dwarf2/var-access.exp
+@@ -28,16 +28,16 @@ if {![dwarf2_support]} {
+ 
+ set dwarf_regnum {0 1}
+ 
+-if { [istarget "aarch64*-*-*"] } {
++if { [is_aarch64_target] } {
+     set regname {x0 x1}
+-} elseif { [istarget "arm*-*-*"]
++} elseif { [is_aarch32_target]
+ 	   || [istarget "s390*-*-*" ]
+ 	   || [istarget "powerpc*-*-*"]
+ 	   || [istarget "rs6000*-*-aix*"] } {
+     set regname {r0 r1}
+-} elseif { [istarget "i?86-*-*"] } {
+-    set regname {eax edx}
+-} elseif { [istarget "x86_64-*-*"] } {
++} elseif { [is_x86_like_target] } {
++    set regname {eax ecx}
++} elseif { [is_amd64_regs_target] } {
+     set regname {rax rdx}
+ } else {
+     verbose "Skipping tests for accessing DWARF-described variables."

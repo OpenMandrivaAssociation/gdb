@@ -1,0 +1,197 @@
+commit b4cbbe8f7294070cc93a71ace78f134965ddad82
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Thu Jun 8 17:24:50 2017 +0200
+
+    S/390: Add support for pgste marker
+    
+    This patch adds a new S/390 specific segment type: PT_S390_PGSTE.  For
+    binaries marked with that segment the kernel will allocate 4k page
+    tables.  The only user so far will be qemu.
+    
+    ld/ChangeLog:
+    
+    2017-06-23  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * Makefile.in: Add s390.em as build dependency.
+            * emulparams/elf64_s390.sh (EXTRA_EM_FILE): Add s390.em.
+            * emultempl/s390.em: New file.
+            * gen-doc.texi: Add documentation for --s390-pgste option.
+            * ld.texinfo: Likewise.
+    
+    include/ChangeLog:
+    
+    2017-06-23  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf/s390.h (PT_S390_PGSTE): Define macro.
+    
+    binutils/ChangeLog:
+    
+    2017-06-23  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * readelf.c (get_s390_segment_type): Add support for the new
+            segment type PT_S390_PGSTE.
+            (get_segment_type): Call get_s390_segment_type.
+    
+    elfcpp/ChangeLog:
+    
+    2017-06-23  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elfcpp.h (enum PT): Add PT_S390_PGSTE to enum.
+    
+    bfd/ChangeLog:
+    
+    2017-06-23  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf-s390.h: New file.
+            * elf64-s390.c (struct elf_s390_link_hash_table): Add params
+            field.
+            (elf_s390_additional_program_headers): New function.
+            (elf_s390_modify_segment_map): New function.
+            (bfd_elf_s390_set_options): New function.
+            (elf_backend_additional_program_headers)
+            (elf_backend_modify_segment_map): Add macro definitions.
+
+--- /dev/null
++++ b/bfd/elf-s390.h
+@@ -0,0 +1,29 @@
++/* S/390-specific support for ELF.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++
++   This file is part of BFD, the Binary File Descriptor library.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
++   MA 02110-1301, USA.  */
++
++/* Used to pass info between ld and bfd.  */
++struct s390_elf_params
++{
++  /* Tell the kernel to allocate 4k page tables.  */
++  int pgste;
++};
++
++bfd_boolean bfd_elf_s390_set_options (struct bfd_link_info *info,
++				      struct s390_elf_params *params);
+--- a/bfd/elf64-s390.c
++++ b/bfd/elf64-s390.c
+@@ -25,6 +25,7 @@
+ #include "libbfd.h"
+ #include "elf-bfd.h"
+ #include "elf/s390.h"
++#include "elf-s390.h"
+ #include <stdarg.h>
+ 
+ /* In case we're on a 32-bit machine, construct a 64-bit "-1" value
+@@ -660,6 +661,9 @@ struct elf_s390_link_hash_table
+ 
+   /* Small local sym cache.  */
+   struct sym_cache sym_cache;
++
++  /* Options passed from the linker.  */
++  struct s390_elf_params *params;
+ };
+ 
+ /* Get the s390 ELF linker hash table from a link_info structure.  */
+@@ -3966,6 +3970,70 @@ elf64_s390_merge_private_bfd_data (bfd *ibfd, struct bfd_link_info *info)
+   return elf_s390_merge_obj_attributes (ibfd, info);
+ }
+ 
++/* We may add a PT_S390_PGSTE program header.  */
++
++static int
++elf_s390_additional_program_headers (bfd *abfd ATTRIBUTE_UNUSED,
++				     struct bfd_link_info *info)
++{
++  struct elf_s390_link_hash_table *htab;
++
++  htab = elf_s390_hash_table (info);
++  return htab->params->pgste;
++}
++
++
++/* Add the PT_S390_PGSTE program header.  */
++
++static bfd_boolean
++elf_s390_modify_segment_map (bfd *abfd ATTRIBUTE_UNUSED,
++			     struct bfd_link_info *info)
++{
++  struct elf_s390_link_hash_table *htab;
++  struct elf_segment_map *m, *pm = NULL;
++
++  htab = elf_s390_hash_table (info);
++  if (!htab->params->pgste)
++    return TRUE;
++
++  /* If there is already a PT_S390_PGSTE header, avoid adding
++     another.  */
++  m = elf_seg_map (abfd);
++  while (m && m->p_type != PT_S390_PGSTE)
++    {
++      pm = m;
++      m = m->next;
++    }
++
++  if (m)
++    return TRUE;
++
++  m = (struct elf_segment_map *)
++    bfd_zalloc (abfd, sizeof (struct elf_segment_map));
++  if (m == NULL)
++    return FALSE;
++  m->p_type = PT_S390_PGSTE;
++  m->count = 0;
++  m->next = NULL;
++  if (pm)
++    pm->next = m;
++
++  return TRUE;
++}
++
++bfd_boolean
++bfd_elf_s390_set_options (struct bfd_link_info *info,
++			  struct s390_elf_params *params)
++{
++  struct elf_s390_link_hash_table *htab;
++
++  htab = elf_s390_hash_table (info);
++  htab->params = params;
++
++  return TRUE;
++}
++
++
+ /* Why was the hash table entry size definition changed from
+    ARCH_SIZE/8 to 4? This breaks the 64 bit dynamic linker and
+    this is the only reason for the s390_elf64_size_info structure.  */
+@@ -4046,6 +4114,8 @@ const struct elf_size_info s390_elf64_size_info =
+ #define elf_backend_plt_sym_val		      elf_s390_plt_sym_val
+ #define elf_backend_add_symbol_hook           elf_s390_add_symbol_hook
+ #define elf_backend_sort_relocs_p             elf_s390_elf_sort_relocs_p
++#define elf_backend_additional_program_headers elf_s390_additional_program_headers
++#define elf_backend_modify_segment_map	      elf_s390_modify_segment_map
+ 
+ #define bfd_elf64_mkobject		elf_s390_mkobject
+ #define elf_backend_object_p		elf_s390_object_p
+--- a/include/elf/s390.h
++++ b/include/elf/s390.h
+@@ -37,6 +37,9 @@
+ 
+ #define EF_S390_HIGH_GPRS        0x00000001
+ 
++/* Request 4k page table size.  */
++#define PT_S390_PGSTE (PT_LOPROC + 0)
++
+ /* Relocation types.  */
+ 
+ START_RELOC_NUMBERS (elf_s390_reloc_type)

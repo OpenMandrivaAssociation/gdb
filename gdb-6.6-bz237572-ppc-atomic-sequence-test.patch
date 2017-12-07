@@ -209,7 +209,7 @@ Index: gdb-6.8.50.20081128/gdb/testsuite/gdb.threads/atomic-seq-threaded.exp
 +
 +set testfile atomic-seq-threaded
 +set srcfile ${testfile}.c
-+set binfile ${objdir}/${subdir}/${testfile}
++set binfile [standard_output_file ${testfile}]
 +
 +foreach opts {{} {compiler=gcc4} {FAIL}} {
 +    if {$opts eq "FAIL"} {

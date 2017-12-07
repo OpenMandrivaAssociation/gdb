@@ -1,24 +1,30 @@
 https://bugzilla.redhat.com/show_bug.cgi?id=1020004
 
-diff -dup -ruNp gdb-7.7-orig/gdb/data-directory/Makefile.in gdb-7.7/gdb/data-directory/Makefile.in
---- gdb-7.7-orig/gdb/data-directory/Makefile.in	2014-02-23 18:12:51.338866391 +0100
-+++ gdb-7.7/gdb/data-directory/Makefile.in	2014-02-23 18:14:31.187756983 +0100
-@@ -58,9 +58,12 @@ PYTHON_FILES = \
- 	gdb/frames.py \
- 	gdb/FrameIterator.py \
+Index: gdb-7.12.50.20170207/gdb/data-directory/Makefile.in
+===================================================================
+--- gdb-7.12.50.20170207.orig/gdb/data-directory/Makefile.in	2017-02-26 21:10:31.418894975 +0100
++++ gdb-7.12.50.20170207/gdb/data-directory/Makefile.in	2017-02-26 21:11:07.083147930 +0100
+@@ -71,6 +71,8 @@
+ 	gdb/__init__.py \
  	gdb/FrameDecorator.py \
+ 	gdb/FrameIterator.py \
 +	gdb/FrameWrapper.py \
 +	gdb/backtrace.py \
- 	gdb/types.py \
+ 	gdb/frames.py \
  	gdb/printing.py \
  	gdb/prompt.py \
+@@ -83,6 +85,7 @@
+ 	gdb/command/pahole.py \
+ 	gdb/command/xmethods.py \
+ 	gdb/command/explore.py \
 +	gdb/command/backtrace.py \
- 	gdb/command/bound_registers.py \
- 	gdb/command/__init__.py \
- 	gdb/command/ignore_errors.py \
-diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/FrameWrapper.py gdb-7.7/gdb/python/lib/gdb/FrameWrapper.py
---- gdb-7.7-orig/gdb/python/lib/gdb/FrameWrapper.py	1970-01-01 01:00:00.000000000 +0100
-+++ gdb-7.7/gdb/python/lib/gdb/FrameWrapper.py	2014-02-23 18:14:31.188756981 +0100
+ 	gdb/command/frame_filters.py \
+ 	gdb/command/pretty_printers.py \
+ 	gdb/command/prompt.py \
+Index: gdb-7.12.50.20170207/gdb/python/lib/gdb/FrameWrapper.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.12.50.20170207/gdb/python/lib/gdb/FrameWrapper.py	2017-02-26 21:10:31.419894983 +0100
 @@ -0,0 +1,122 @@
 +# Wrapper API for frames.
 +
@@ -56,7 +62,7 @@ diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/FrameWrapper.py gdb-7.7/gdb/pyth
 +            if val != None:
 +                val = str (val)
 +        # FIXME: would be nice to have a more precise exception here.
-+        except RuntimeError, text:
++        except RuntimeError as text:
 +            val = text
 +        if val == None:
 +            stream.write ("???")
@@ -142,9 +148,10 @@ diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/FrameWrapper.py gdb-7.7/gdb/pyth
 +
 +    def __getattr__ (self, name):
 +        return getattr (self.frame, name)
-diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/backtrace.py gdb-7.7/gdb/python/lib/gdb/backtrace.py
---- gdb-7.7-orig/gdb/python/lib/gdb/backtrace.py	1970-01-01 01:00:00.000000000 +0100
-+++ gdb-7.7/gdb/python/lib/gdb/backtrace.py	2014-02-23 18:14:31.188756981 +0100
+Index: gdb-7.12.50.20170207/gdb/python/lib/gdb/backtrace.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.12.50.20170207/gdb/python/lib/gdb/backtrace.py	2017-02-26 21:10:31.419894983 +0100
 @@ -0,0 +1,42 @@
 +# Filtering backtrace.
 +
@@ -188,9 +195,10 @@ diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/backtrace.py gdb-7.7/gdb/python/
 +        return iter
 +    return old_frame_filter (iter)
 +
-diff -dup -ruNp gdb-7.7-orig/gdb/python/lib/gdb/command/backtrace.py gdb-7.7/gdb/python/lib/gdb/command/backtrace.py
---- gdb-7.7-orig/gdb/python/lib/gdb/command/backtrace.py	1970-01-01 01:00:00.000000000 +0100
-+++ gdb-7.7/gdb/python/lib/gdb/command/backtrace.py	2014-02-23 18:14:31.188756981 +0100
+Index: gdb-7.12.50.20170207/gdb/python/lib/gdb/command/backtrace.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-7.12.50.20170207/gdb/python/lib/gdb/command/backtrace.py	2017-02-26 21:10:31.419894983 +0100
 @@ -0,0 +1,106 @@
 +# New backtrace command.
 +

@@ -1,8 +1,8 @@
-Index: gdb-7.4.50.20111219/gdb/testsuite/gdb.threads/staticthreads.exp
+Index: gdb-7.12.50.20170207/gdb/testsuite/gdb.threads/staticthreads.exp
 ===================================================================
---- gdb-7.4.50.20111219.orig/gdb/testsuite/gdb.threads/staticthreads.exp	2011-12-19 21:07:01.436475201 +0100
-+++ gdb-7.4.50.20111219/gdb/testsuite/gdb.threads/staticthreads.exp	2011-12-19 22:08:55.444514127 +0100
-@@ -45,6 +45,13 @@ gdb_test_no_output "set print sevenbit-s
+--- gdb-7.12.50.20170207.orig/gdb/testsuite/gdb.threads/staticthreads.exp	2017-02-26 17:24:48.392316045 +0100
++++ gdb-7.12.50.20170207/gdb/testsuite/gdb.threads/staticthreads.exp	2017-02-26 17:25:38.649677595 +0100
+@@ -41,6 +41,13 @@
  # See if the static multi-threaded program runs.
  
  runto_main
@@ -14,5 +14,5 @@ Index: gdb-7.4.50.20111219/gdb/testsuite/gdb.threads/staticthreads.exp
 +gdb_test "info threads" "^info threads\r\n\[ \t\]*Id\[ \t\]+Target Id\[ \t\]+Frame\[ \t\]*\r\n\[^\r\n\]* Thread \[^\r\n\]*" "info threads on start"
 +
  gdb_test "break sem_post"
- set test "Continue to main's call of sem_post"
+ set test "continue to main's call of sem_post"
  gdb_test_multiple "continue" "$test" {

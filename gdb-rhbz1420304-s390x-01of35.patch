@@ -1,0 +1,62 @@
+commit d7ab4911f8aa3e1cd06ece40f74d0b4a532d6a10
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Mon May 8 19:10:42 2017 +0200
+
+    S/390: Fix ifunc missing runtime reloc
+    
+    This fixes a problem with a missing R_390_64 reloc against .data for a
+    function pointer to an ifunc function.
+    
+    No regressions on s390x.
+    
+    Pushed to mainline.
+    
+    bfd/ChangeLog:
+    
+    2017-05-08  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf-s390-common.c: Don't check non_got_ref flag.
+            * elf32-s390.c (elf_s390_relocate_section): Likewise.
+            * elf64-s390.c (elf_s390_relocate_section): Likewise.
+
+--- a/bfd/elf-s390-common.c
++++ b/bfd/elf-s390-common.c
+@@ -161,9 +161,7 @@ keep:
+       h->type = STT_FUNC;
+     }
+ 
+-  /* We need dynamic relocation for STT_GNU_IFUNC symbol only when
+-     there is a non-GOT reference in a shared object.  */
+-  if (!bfd_link_pic (info) || !h->non_got_ref)
++  if (!bfd_link_pic (info))
+     *head = NULL;
+ 
+   /* Finally, allocate space.  */
+--- a/bfd/elf32-s390.c
++++ b/bfd/elf32-s390.c
+@@ -2774,7 +2774,7 @@ elf_s390_relocate_section (bfd *output_bfd,
+ 	      && s390_is_ifunc_symbol_p (h)
+ 	      && h->def_regular)
+ 	    {
+-	      if (!bfd_link_pic (info) || !h->non_got_ref)
++	      if (!bfd_link_pic (info))
+ 		{
+ 		  /* For a non-shared object STT_GNU_IFUNC symbol must
+ 		     go through PLT.  */
+--- a/bfd/elf64-s390.c
++++ b/bfd/elf64-s390.c
+@@ -2737,10 +2737,11 @@ elf_s390_relocate_section (bfd *output_bfd,
+ 	      && s390_is_ifunc_symbol_p (h)
+ 	      && h->def_regular)
+ 	    {
+-	      if (!bfd_link_pic (info) || !h->non_got_ref)
++	      if (!bfd_link_pic (info))
+ 		{
+-		  /* For a non-shared object STT_GNU_IFUNC symbol must
+-		     go through PLT.  */
++		  /* For a non-shared object the symbol will not
++		     change.  Hence we can write the address of the
++		     target IPLT slot now.  */
+ 		  relocation = (htab->elf.iplt->output_section->vma
+ 				+ htab->elf.iplt->output_offset
+ 				+ h ->plt.offset);

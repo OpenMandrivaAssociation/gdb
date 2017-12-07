@@ -1,0 +1,97 @@
+commit a09f2586017aeed82fa07c8bfea6c75859295bd9
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Mon May 29 12:34:56 2017 +0200
+
+    S/390: Improve error checking for optional operands
+    
+    So far we only had an instruction flag which made an arbitrary number
+    of operands optional.  This limits error checking capabilities for
+    instructions marked that way.  With this patch the optparm flag only
+    allows a single optional parameter and another one is added (optparm2)
+    allowing 2 optional arguments.  Hopefully we won't need more than that
+    in the future. So far there will be only a single use of optparm2.
+    
+    gas/ChangeLog:
+    
+    2017-05-30  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * config/tc-s390.c (md_gather_operands): Support new optparm2
+            instruction flag.
+    
+    include/ChangeLog:
+    
+    2017-05-30  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * opcode/s390.h: Add new instruction flags optparm2.
+    
+    opcodes/ChangeLog:
+    
+    2017-05-30  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * s390-dis.c (s390_print_insn_with_opcode): Support new optparm2
+            instruction flag.
+            * s390-mkopc.c (main): Recognize the new instruction flag when
+            parsing instruction list.
+
+--- a/include/opcode/s390.h
++++ b/include/opcode/s390.h
+@@ -48,10 +48,11 @@ enum s390_opcode_cpu_val
+ 
+ /* Instruction specific flags.  */
+ #define S390_INSTR_FLAG_OPTPARM 0x1
++#define S390_INSTR_FLAG_OPTPARM2 0x2
+ 
+-#define S390_INSTR_FLAG_HTM 0x2
+-#define S390_INSTR_FLAG_VX 0x4
+-#define S390_INSTR_FLAG_FACILITY_MASK 0x6
++#define S390_INSTR_FLAG_HTM 0x4
++#define S390_INSTR_FLAG_VX 0x8
++#define S390_INSTR_FLAG_FACILITY_MASK 0xc
+ 
+ /* The opcode table is an array of struct s390_opcode.  */
+ 
+--- a/opcodes/s390-dis.c
++++ b/opcodes/s390-dis.c
+@@ -206,11 +206,20 @@ s390_print_insn_with_opcode (bfd_vma memaddr,
+ 
+       /* For instructions with a last optional operand don't print it
+ 	 if zero.  */
+-      if ((opcode->flags & S390_INSTR_FLAG_OPTPARM)
++      if ((opcode->flags & (S390_INSTR_FLAG_OPTPARM | S390_INSTR_FLAG_OPTPARM2))
+ 	  && val.u == 0
+ 	  && opindex[1] == 0)
+ 	break;
+ 
++      if ((opcode->flags & S390_INSTR_FLAG_OPTPARM2)
++	  && val.u == 0 && opindex[1] != 0 && opindex[2] == 0)
++	{
++	  union operand_value next_op_val =
++	    s390_extract_operand (buffer, s390_operands + opindex[1]);
++	  if (next_op_val.u == 0)
++	    break;
++	}
++
+       if (flags & S390_OPERAND_GPR)
+ 	info->fprintf_func (info->stream, "%c%%r%u", separator, val.u);
+       else if (flags & S390_OPERAND_FPR)
+--- a/opcodes/s390-mkopc.c
++++ b/opcodes/s390-mkopc.c
+@@ -411,12 +411,16 @@ main (void)
+ 		&& (str[7] == 0 || str[7] == ',')) {
+ 	      flag_bits |= S390_INSTR_FLAG_OPTPARM;
+ 	      str += 7;
++	    } else if (strncmp (str, "optparm2", 8) == 0
++		       && (str[8] == 0 || str[8] == ',')) {
++	      flag_bits |= S390_INSTR_FLAG_OPTPARM2;
++	      str += 8;
+ 	    } else if (strncmp (str, "htm", 3) == 0
+-		&& (str[3] == 0 || str[3] == ',')) {
++		       && (str[3] == 0 || str[3] == ',')) {
+ 	      flag_bits |= S390_INSTR_FLAG_HTM;
+ 	      str += 3;
+ 	    } else if (strncmp (str, "vx", 2) == 0
+-		&& (str[2] == 0 || str[2] == ',')) {
++		       && (str[2] == 0 || str[2] == ',')) {
+ 	      flag_bits |= S390_INSTR_FLAG_VX;
+ 	      str += 2;
+ 	    } else {

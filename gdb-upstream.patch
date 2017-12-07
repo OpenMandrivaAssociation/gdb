@@ -1,66 +1,76 @@
-http://sourceware.org/ml/gdb-patches/2014-02/msg00179.html
-Subject: [obv] testsuite: Fix i386-sse-stack-align.exp regression since GDB_PARALLEL
+commit 16eb6b2db49e6cf2fdca56efd37689fcc170cd37
+Author: Leszek Swirski <leszeks@google.com>
+Date:   Mon Aug 7 16:40:38 2017 +0200
 
-
---u3/rZRmxL6MmkK24
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Tom,
-
-$ make check//unix/-m32 RUNTESTFLAGS="gdb.arch/i386-sse-stack-align.exp GDB_PARALLEL=1"
-[...]
-Running /home/jkratoch/redhat/gdb-clean/gdb/testsuite/gdb.arch/i386-sse-stack-align.exp ...
-ERROR: (/home/jkratoch/redhat/gdb-clean/gdb/testsuite.unix.-m32/outputs/gdb.arch/i386-sse-stack-align/i386-sse-stack-align) No such file or directory
-
-
-Checked in.
-
-
-Jan
-
---u3/rZRmxL6MmkK24
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline; filename=1
-
-commit 3c77faf33dc4c7bb693f05f44077ed687e9f8217
-Author: Jan Kratochvil <jan.kratochvil@redhat.com>
-Date:   Thu Feb 6 23:14:20 2014 +0100
-
-    Fix i386-sse-stack-align.exp regression since GDB_PARALLEL.
+    Fix dwarf2_string_attr for -gsplit-dwarf
     
-    gdb/testsuite/
-    2014-02-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+    The dwarf2_string_attr did not allow DW_FORM_GNU_str_index as a form for
+    string types. This manifested as null strings in the namespace_name
+    lookup (replaced with "(anonymous namespace)") when debugging
+    Fission-compiled code.
     
-    	Fix i386-sse-stack-align.exp regression since GDB_PARALLEL.
-    	* gdb.arch/i386-sse-stack-align.exp: Use standard_output_file.
+    gdb/ChangeLog:
+    
+            * dwarf2read.c (dwarf2_string_attr): Allow DW_FORM_GNU_strp_alt.
 
-diff --git a/gdb/testsuite/ChangeLog b/gdb/testsuite/ChangeLog
-index 8c846b8..13ccaf3 100644
-### a/gdb/testsuite/ChangeLog
-### b/gdb/testsuite/ChangeLog
-## -1,3 +1,8 @@
-+2014-02-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,3 +1,7 @@
++2017-08-07  Leszek Swirski  <leszeks@google.com>
 +
-+	Fix i386-sse-stack-align.exp regression since GDB_PARALLEL.
-+	* gdb.arch/i386-sse-stack-align.exp: Use standard_output_file.
++	* dwarf2read.c (dwarf2_string_attr): Allow DW_FORM_GNU_strp_alt.
 +
- 2014-02-06  Doug Evans  <xdje42@gmail.com>
+ 2017-08-07  Simon Marchi  <simon.marchi@ericsson.com>
  
- 	* gdb.python/py-breakpoint.exp (test_bkpt_eval_funcs): Update expected
-diff --git a/gdb/testsuite/gdb.arch/i386-sse-stack-align.exp b/gdb/testsuite/gdb.arch/i386-sse-stack-align.exp
-index b5a7e1e..462df1f 100644
---- a/gdb/testsuite/gdb.arch/i386-sse-stack-align.exp
-+++ b/gdb/testsuite/gdb.arch/i386-sse-stack-align.exp
-@@ -22,7 +22,7 @@ set testfile "i386-sse-stack-align"
- set srcfile ${testfile}.S
- set csrcfile ${testfile}.c
- set executable ${testfile}
--set binfile ${objdir}/${subdir}/${executable}
-+set binfile [standard_output_file ${executable}]
- set opts {}
+ 	* remote-sim.c (gdbsim_load): Remove char **argv local variable.
+--- a/gdb/dwarf2read.c
++++ b/gdb/dwarf2read.c
+@@ -17623,7 +17623,8 @@ dwarf2_string_attr (struct die_info *die, unsigned int name, struct dwarf2_cu *c
+   if (attr != NULL)
+     {
+       if (attr->form == DW_FORM_strp || attr->form == DW_FORM_line_strp
+-	  || attr->form == DW_FORM_string || attr->form == DW_FORM_GNU_strp_alt)
++	  || attr->form == DW_FORM_string || DW_FORM_GNU_str_index
++	  || attr->form == DW_FORM_GNU_strp_alt)
+ 	str = DW_STRING (attr);
+       else
+         complaint (&symfile_complaints,
+
+
+
+commit b33404388e5bbd8a1fddfde73cd4593ae2b557e8
+Author: H.J. Lu <hjl.tools@gmail.com>
+Date:   Wed Aug 9 05:01:55 2017 -0700
+
+    gdb: Fix build failure with GCC 7
+    
+    Fix:
+    
+    /export/gnu/import/git/sources/binutils-gdb/gdb/dwarf2read.c: In function ‘const char* dwarf2_string_attr(die_info*, unsigned int, dwarf2_cu*)’:
+    /export/gnu/import/git/sources/binutils-gdb/gdb/dwarf2read.c:17626:39: error: enum constant in boolean context [-Werror=int-in-bool-context]
+        || attr->form == DW_FORM_string || DW_FORM_GNU_str_index
+    
+            * dwarf2read.c (dwarf2_string_attr): Fix a typo.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,3 +1,7 @@
++2017-08-09  H.J. Lu  <hongjiu.lu@intel.com>
++
++	* dwarf2read.c (dwarf2_string_attr): Fix a typo.
++
+ 2017-08-09  Alex Lindsay  <alexlindsay239@gmail.com>
+ 	    Yao Qi  <yao.qi@linaro.org>
  
- if [info exists COMPILE] {
-
---u3/rZRmxL6MmkK24--
-
+--- a/gdb/dwarf2read.c
++++ b/gdb/dwarf2read.c
+@@ -17623,7 +17623,8 @@ dwarf2_string_attr (struct die_info *die, unsigned int name, struct dwarf2_cu *c
+   if (attr != NULL)
+     {
+       if (attr->form == DW_FORM_strp || attr->form == DW_FORM_line_strp
+-	  || attr->form == DW_FORM_string || DW_FORM_GNU_str_index
++	  || attr->form == DW_FORM_string
++	  || attr->form == DW_FORM_GNU_str_index
+ 	  || attr->form == DW_FORM_GNU_strp_alt)
+ 	str = DW_STRING (attr);
+       else

@@ -3,11 +3,11 @@
         * gdb.gdb/selftest.exp: Add matching on specific Red Hat only version
         string.
 
-Index: gdb-7.1.90.20100711/gdb/testsuite/gdb.gdb/selftest.exp
+Index: gdb-7.12.50.20170207/gdb/testsuite/gdb.gdb/selftest.exp
 ===================================================================
---- gdb-7.1.90.20100711.orig/gdb/testsuite/gdb.gdb/selftest.exp	2010-06-26 08:44:47.000000000 +0200
-+++ gdb-7.1.90.20100711/gdb/testsuite/gdb.gdb/selftest.exp	2010-07-12 09:59:42.000000000 +0200
-@@ -342,6 +342,9 @@ proc test_with_self { executable } {
+--- gdb-7.12.50.20170207.orig/gdb/testsuite/gdb.gdb/selftest.exp	2017-02-07 19:47:06.472874620 +0100
++++ gdb-7.12.50.20170207/gdb/testsuite/gdb.gdb/selftest.exp	2017-02-07 19:48:12.593380575 +0100
+@@ -53,6 +53,9 @@
  	-re ".\[0-9\]+ = +.+ +0x.*\[0-9.\]+.*$gdb_prompt $" {
  	    pass "printed version with cast"
  	}
@@ -16,4 +16,4 @@ Index: gdb-7.1.90.20100711/gdb/testsuite/gdb.gdb/selftest.exp
 +	}
      }
  
-     do_steps_and_nexts
+     # start the "xgdb" process

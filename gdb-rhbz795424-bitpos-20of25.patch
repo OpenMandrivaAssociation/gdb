@@ -463,11 +463,11 @@ Content-Type: text/x-patch
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=bitpos-main.patch
 
-Index: gdb-7.6.90.20140127/gdb/ada-lang.c
+Index: gdb-8.0/gdb/ada-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ada-lang.c	2014-02-06 18:07:54.341911093 +0100
-+++ gdb-7.6.90.20140127/gdb/ada-lang.c	2014-02-06 18:07:58.898915990 +0100
-@@ -80,7 +80,7 @@ static struct type *desc_bounds_type (st
+--- gdb-8.0.orig/gdb/ada-lang.c	2017-08-19 20:04:59.785780501 +0200
++++ gdb-8.0/gdb/ada-lang.c	2017-08-19 20:05:10.056876589 +0200
+@@ -76,7 +76,7 @@
  
  static struct value *desc_bounds (struct value *);
  
@@ -476,7 +476,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  static int fat_pntr_bounds_bitsize (struct type *);
  
-@@ -88,13 +88,13 @@ static struct type *desc_data_target_typ
+@@ -84,13 +84,13 @@
  
  static struct value *desc_data (struct value *);
  
@@ -492,7 +492,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  static int desc_bound_bitsize (struct type *, int, int);
  
-@@ -174,7 +174,7 @@ static struct type *static_unwrap_type (
+@@ -173,7 +173,7 @@
  
  static struct value *unwrap_value (struct value *);
  
@@ -501,7 +501,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  static struct type *decode_constrained_packed_array_type (struct type *);
  
-@@ -189,7 +189,8 @@ static int ada_is_unconstrained_packed_a
+@@ -188,7 +188,8 @@
  static struct value *value_subscript_packed (struct value *, int,
                                               struct value **);
  
@@ -511,12 +511,12 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  static struct value *coerce_unspec_val_to_type (struct value *,
                                                  struct type *);
-@@ -217,14 +218,14 @@ static struct value *value_val_atr (stru
+@@ -216,14 +217,14 @@
  static struct symbol *standard_lookup (const char *, const struct block *,
                                         domain_enum);
  
--static struct value *ada_search_struct_field (char *, struct value *, int,
-+static struct value *ada_search_struct_field (char *, struct value *, LONGEST,
+-static struct value *ada_search_struct_field (const char *, struct value *, int,
++static struct value *ada_search_struct_field (const char *, struct value *, LONGEST,
                                                struct type *);
  
 -static struct value *ada_value_primitive_field (struct value *, int, int,
@@ -526,20 +526,20 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
 -static int find_struct_field (const char *, struct type *, int,
 -                              struct type **, int *, int *, int *, int *);
 +static int find_struct_field (const char *, struct type *, LONGEST,
-+			      struct type **, LONGEST *, int *, int *, int *);
++                              struct type **, LONGEST *, int *, int *, int *);
  
  static struct value *ada_to_fixed_value_create (struct type *, CORE_ADDR,
                                                  struct value *);
-@@ -240,7 +241,7 @@ static void ada_language_arch_info (stru
- 
- static void check_size (const struct type *);
+@@ -237,7 +238,7 @@
+ static void ada_language_arch_info (struct gdbarch *,
+ 				    struct language_arch_info *);
  
 -static struct value *ada_index_struct_field (int, struct value *, int,
 +static struct value *ada_index_struct_field (LONGEST, struct value *, LONGEST,
  					     struct type *);
  
  static struct value *assign_aggregate (struct value *, struct value *, 
-@@ -587,7 +588,7 @@ coerce_unspec_val_to_type (struct value
+@@ -699,7 +700,7 @@
  }
  
  static const gdb_byte *
@@ -548,7 +548,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  {
    if (valaddr == NULL)
      return NULL;
-@@ -596,7 +597,7 @@ cond_offset_host (const gdb_byte *valadd
+@@ -708,7 +709,7 @@
  }
  
  static CORE_ADDR
@@ -557,7 +557,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  {
    if (address == 0)
      return 0;
-@@ -1602,7 +1603,7 @@ desc_bounds (struct value *arr)
+@@ -1755,7 +1756,7 @@
  /* If TYPE is the type of an array-descriptor (fat pointer),  the bit
     position of the field containing the address of the bounds data.  */
  
@@ -566,7 +566,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  fat_pntr_bounds_bitpos (struct type *type)
  {
    return TYPE_FIELD_BITPOS (desc_base_type (type), 1);
-@@ -1668,7 +1669,7 @@ desc_data (struct value *arr)
+@@ -1821,7 +1822,7 @@
  /* If TYPE is the type of an array-descriptor (fat pointer), the bit
     position of the field containing the address of the data.  */
  
@@ -575,7 +575,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  fat_pntr_data_bitpos (struct type *type)
  {
    return TYPE_FIELD_BITPOS (desc_base_type (type), 0);
-@@ -1703,7 +1704,7 @@ desc_one_bound (struct value *bounds, in
+@@ -1856,7 +1857,7 @@
     of the Ith lower bound stored in it, if WHICH is 0, and the Ith upper
     bound, if WHICH is 1.  The first bound is I=1.  */
  
@@ -584,7 +584,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  desc_bound_bitpos (struct type *type, int i, int which)
  {
    return TYPE_FIELD_BITPOS (desc_base_type (type), 2 * i + which - 2);
-@@ -1893,7 +1894,7 @@ ada_type_of_array (struct value *arr, in
+@@ -2046,7 +2047,7 @@
  	         zero, and does not need to be recomputed.  */
  	      if (lo < hi)
  		{
@@ -593,8 +593,8 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  		        (hi - lo + 1) * TYPE_FIELD_BITSIZE (elt_type, 0);
  
  		  TYPE_LENGTH (array_type) = (array_bitsize + 7) / 8;
-@@ -2045,7 +2046,7 @@ decode_packed_array_bitsize (struct type
-    in bits.  */
+@@ -2206,7 +2207,7 @@
+    the length is arbitrary.  */
  
  static struct type *
 -constrained_packed_array_type (struct type *type, long *elt_bits)
@@ -602,7 +602,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  {
    struct type *new_elt_type;
    struct type *new_type;
-@@ -2097,7 +2098,7 @@ decode_constrained_packed_array_type (st
+@@ -2260,7 +2261,7 @@
    char *name;
    const char *tail;
    struct type *shadow_type;
@@ -611,7 +611,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
    if (!raw_name)
      raw_name = ada_type_name (desc_base_type (type));
-@@ -2168,7 +2169,8 @@ decode_constrained_packed_array (struct
+@@ -2331,7 +2332,8 @@
   	 array with no wrapper.  In order to interpret the value through
   	 the (left-justified) packed array type we just built, we must
   	 first left-justify it.  */
@@ -621,7 +621,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        ULONGEST mod;
  
        mod = ada_modulus (value_type (arr)) - 1;
-@@ -2269,15 +2271,16 @@ has_negatives (struct type *type)
+@@ -2559,7 +2561,7 @@
  
  struct value *
  ada_value_primitive_packed_val (struct value *obj, const gdb_byte *valaddr,
@@ -630,21 +630,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
                                  struct type *type)
  {
    struct value *v;
--  int src,                      /* Index into the source area */
--    targ,                       /* Index into the target area */
--    srcBitsLeft,                /* Number of source bits left to move */
--    nsrc, ntarg,                /* Number of source and target bytes */
--    unusedLS,                   /* Number of bits in next significant
-+  int src;                      /* Index into the source area */
-+  LONGEST targ;                 /* Index into the target area */
-+  int srcBitsLeft,              /* Number of source bits left to move */
-+    nsrc;                       /* Number of source bytes */
-+  LONGEST ntarg;                /* Number of target bytes */
-+  int unusedLS,                 /* Number of bits in next significant
-                                    byte of source that are unused */
-     accumSize;                  /* Number of meaningful bits in accum */
-   unsigned char *bytes;         /* First byte containing data to unpack */
-@@ -2310,7 +2313,7 @@ ada_value_primitive_packed_val (struct v
+@@ -2630,7 +2632,7 @@
  
    if (obj != NULL)
      {
@@ -653,7 +639,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
        set_value_component_location (v, obj);
        set_value_bitpos (v, bit_offset + value_bitpos (obj));
-@@ -2426,7 +2429,7 @@ ada_value_primitive_packed_val (struct v
+@@ -2676,7 +2678,7 @@
     not overlap.  */
  static void
  move_bits (gdb_byte *target, int targ_offset, const gdb_byte *source,
@@ -662,25 +648,25 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  {
    unsigned int accum, mask;
    int accum_bits, chunk_size;
-@@ -2516,7 +2519,7 @@ ada_value_assign (struct value *toval, s
+@@ -2766,7 +2768,7 @@
      {
        int len = (value_bitpos (toval)
  		 + bits + HOST_CHAR_BIT - 1) / HOST_CHAR_BIT;
 -      int from_size;
 +      LONGEST from_size;
-       gdb_byte *buffer = alloca (len);
+       gdb_byte *buffer = (gdb_byte *) alloca (len);
        struct value *val;
        CORE_ADDR to_addr = value_address (toval);
-@@ -2561,7 +2564,7 @@ value_assign_to_component (struct value
+@@ -2817,7 +2819,7 @@
      (LONGEST)  (value_address (component) - value_address (container));
-   int bit_offset_in_container = 
+   int bit_offset_in_container =
      value_bitpos (component) - value_bitpos (container);
 -  int bits;
 +  LONGEST bits;
-   
+ 
    val = value_cast (value_type (component), val);
  
-@@ -4085,7 +4088,7 @@ ensure_lval (struct value *val)
+@@ -4468,7 +4470,7 @@
    if (VALUE_LVAL (val) == not_lval
        || VALUE_LVAL (val) == lval_internalvar)
      {
@@ -689,16 +675,16 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        const CORE_ADDR addr =
          value_as_long (value_allocate_space_in_inferior (len));
  
-@@ -4159,7 +4162,7 @@ static CORE_ADDR
+@@ -4552,7 +4554,7 @@
  value_pointer (struct value *value, struct type *type)
  {
    struct gdbarch *gdbarch = get_type_arch (type);
 -  unsigned len = TYPE_LENGTH (type);
 +  ULONGEST len = TYPE_LENGTH (type);
-   gdb_byte *buf = alloca (len);
+   gdb_byte *buf = (gdb_byte *) alloca (len);
    CORE_ADDR addr;
  
-@@ -6145,7 +6148,7 @@ value_tag_from_contents_and_address (str
+@@ -6752,7 +6754,7 @@
  				     const gdb_byte *valaddr,
                                       CORE_ADDR address)
  {
@@ -707,7 +693,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
    struct type *tag_type;
  
    if (find_struct_field ("_tag", type, 0, &tag_type, &tag_byte_offset,
-@@ -6610,7 +6613,7 @@ ada_in_variant (LONGEST val, struct type
+@@ -7233,7 +7235,7 @@
     only in that it can handle packed values of arbitrary type.  */
  
  static struct value *
@@ -716,7 +702,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
                             struct type *arg_type)
  {
    struct type *type;
-@@ -6622,7 +6625,7 @@ ada_value_primitive_field (struct value
+@@ -7245,7 +7247,7 @@
  
    if (TYPE_FIELD_BITSIZE (arg_type, fieldno) != 0)
      {
@@ -725,7 +711,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        int bit_size = TYPE_FIELD_BITSIZE (arg_type, fieldno);
  
        return ada_value_primitive_packed_val (arg1, value_contents (arg1),
-@@ -6649,9 +6652,9 @@ ada_value_primitive_field (struct value
+@@ -7272,9 +7274,9 @@
     Returns 1 if found, 0 otherwise.  */
  
  static int
@@ -737,7 +723,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  		   int *index_p)
  {
    int i;
-@@ -6669,8 +6672,8 @@ find_struct_field (const char *name, str
+@@ -7292,8 +7294,8 @@
  
    for (i = 0; i < TYPE_NFIELDS (type); i += 1)
      {
@@ -748,16 +734,16 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        const char *t_field_name = TYPE_FIELD_NAME (type, i);
  
        if (t_field_name == NULL)
-@@ -6740,7 +6743,7 @@ num_visible_fields (struct type *type)
+@@ -7363,7 +7365,7 @@
     Searches recursively through wrapper fields (e.g., '_parent').  */
  
  static struct value *
--ada_search_struct_field (char *name, struct value *arg, int offset,
-+ada_search_struct_field (char *name, struct value *arg, LONGEST offset,
+-ada_search_struct_field (const char *name, struct value *arg, int offset,
++ada_search_struct_field (const char *name, struct value *arg, LONGEST offset,
                           struct type *type)
  {
    int i;
-@@ -6773,7 +6776,7 @@ ada_search_struct_field (char *name, str
+@@ -7396,7 +7398,7 @@
            int j;
            struct type *field_type = ada_check_typedef (TYPE_FIELD_TYPE (type,
  									i));
@@ -766,7 +752,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
            for (j = 0; j < TYPE_NFIELDS (field_type); j += 1)
              {
-@@ -6791,8 +6794,8 @@ ada_search_struct_field (char *name, str
+@@ -7414,8 +7416,8 @@
    return NULL;
  }
  
@@ -777,7 +763,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  
  /* Return field #INDEX in ARG, where the index is that returned by
-@@ -6801,7 +6804,7 @@ static struct value *ada_index_struct_fi
+@@ -7424,7 +7426,7 @@
   * If found, return value, else return NULL.  */
  
  static struct value *
@@ -786,7 +772,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  			struct type *type)
  {
    return ada_index_struct_field_1 (&index, arg, offset, type);
-@@ -6813,7 +6816,7 @@ ada_index_struct_field (int index, struc
+@@ -7436,7 +7438,7 @@
   * *INDEX_P.  */
  
  static struct value *
@@ -795,7 +781,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  			  struct type *type)
  {
    int i;
-@@ -6903,7 +6906,8 @@ ada_value_struct_elt (struct value *arg,
+@@ -7526,7 +7528,8 @@
      v = ada_search_struct_field (name, arg, 0, t);
    else
      {
@@ -805,7 +791,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        struct type *field_type;
        CORE_ADDR address;
  
-@@ -7216,8 +7220,8 @@ ada_coerce_ref (struct value *val0)
+@@ -7832,8 +7835,8 @@
  /* Return OFF rounded upward if necessary to a multiple of
     ALIGNMENT (a power of 2).  */
  
@@ -816,7 +802,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  {
    return (off + alignment - 1) & ~(alignment - 1);
  }
-@@ -7596,10 +7600,9 @@ ada_template_to_fixed_record_type_1 (str
+@@ -8227,10 +8230,9 @@
    struct value *mark = value_mark ();
    struct value *dval;
    struct type *rtype;
@@ -829,7 +815,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
    int f;
  
    /* Compute the number of fields in this record type that are going
-@@ -7670,7 +7673,7 @@ ada_template_to_fixed_record_type_1 (str
+@@ -8308,7 +8310,7 @@
  	     that follow this one.  */
  	  if (ada_is_aligner_type (field_type))
  	    {
@@ -838,7 +824,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
  
  	      field_valaddr = cond_offset_host (field_valaddr, field_offset);
  	      field_address = cond_offset_target (field_address, field_offset);
-@@ -7799,11 +7802,11 @@ ada_template_to_fixed_record_type_1 (str
+@@ -8444,11 +8446,11 @@
    if (TYPE_LENGTH (type) <= 0)
      {
        if (TYPE_NAME (rtype))
@@ -854,7 +840,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
      }
    else
      {
-@@ -8140,7 +8143,8 @@ to_fixed_array_type (struct type *type0,
+@@ -8915,7 +8917,8 @@
  	 type was a regular (non-packed) array type.  As a result, the
  	 bitsize of the array elements needs to be set again, and the array
  	 length needs to be recomputed based on that bitsize.  */
@@ -864,20 +850,20 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.c
        int elt_bitsize = TYPE_FIELD_BITSIZE (type0, 0);
  
        TYPE_FIELD_BITSIZE (result, 0) = TYPE_FIELD_BITSIZE (type0, 0);
-Index: gdb-7.6.90.20140127/gdb/ada-lang.h
+Index: gdb-8.0/gdb/ada-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ada-lang.h	2014-02-06 18:07:54.342911094 +0100
-+++ gdb-7.6.90.20140127/gdb/ada-lang.h	2014-02-06 18:07:58.899915990 +0100
-@@ -180,7 +180,7 @@ extern void ada_print_type (struct type
+--- gdb-8.0.orig/gdb/ada-lang.h	2017-08-19 20:04:59.786780510 +0200
++++ gdb-8.0/gdb/ada-lang.h	2017-08-19 20:05:10.056876589 +0200
+@@ -168,7 +168,7 @@
  extern void ada_print_typedef (struct type *type, struct symbol *new_symbol,
  			       struct ui_file *stream);
  
--extern void ada_val_print (struct type *, const gdb_byte *, int, CORE_ADDR,
-+extern void ada_val_print (struct type *, const gdb_byte *, LONGEST, CORE_ADDR,
+-extern void ada_val_print (struct type *, int, CORE_ADDR,
++extern void ada_val_print (struct type *, LONGEST, CORE_ADDR,
  			   struct ui_file *, int,
- 			   const struct value *,
+ 			   struct value *,
  			   const struct value_print_options *);
-@@ -195,7 +195,7 @@ extern void ada_emit_char (int, struct t
+@@ -183,7 +183,7 @@
  extern void ada_printchar (int, struct type *, struct ui_file *);
  
  extern void ada_printstr (struct ui_file *, struct type *, const gdb_byte *,
@@ -886,7 +872,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.h
  			  const struct value_print_options *);
  
  struct value *ada_convert_actual (struct value *actual,
-@@ -268,7 +268,7 @@ extern int ada_is_constrained_packed_arr
+@@ -255,7 +255,7 @@
  
  extern struct value *ada_value_primitive_packed_val (struct value *,
  						     const gdb_byte *,
@@ -895,11 +881,11 @@ Index: gdb-7.6.90.20140127/gdb/ada-lang.h
                                                       struct type *);
  
  extern struct type *ada_coerce_to_simple_array_type (struct type *);
-Index: gdb-7.6.90.20140127/gdb/ada-typeprint.c
+Index: gdb-8.0/gdb/ada-typeprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ada-typeprint.c	2014-02-06 18:07:54.342911094 +0100
-+++ gdb-7.6.90.20140127/gdb/ada-typeprint.c	2014-02-06 18:07:58.899915990 +0100
-@@ -829,8 +829,8 @@ ada_print_type (struct type *type0, cons
+--- gdb-8.0.orig/gdb/ada-typeprint.c	2017-08-19 20:04:59.786780510 +0200
++++ gdb-8.0/gdb/ada-typeprint.c	2017-08-19 20:05:10.057876598 +0200
+@@ -891,8 +891,8 @@
  	    const char *name = ada_type_name (type);
  
  	    if (!ada_is_range_type_name (name))
@@ -910,7 +896,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-typeprint.c
  	    else
  	      {
  		fprintf_filtered (stream, "range ");
-@@ -851,7 +851,8 @@ ada_print_type (struct type *type0, cons
+@@ -913,7 +913,8 @@
  	  }
  	break;
        case TYPE_CODE_FLT:
@@ -920,34 +906,25 @@ Index: gdb-7.6.90.20140127/gdb/ada-typeprint.c
  	break;
        case TYPE_CODE_ENUM:
  	if (show < 0)
-Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
+Index: gdb-8.0/gdb/ada-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ada-valprint.c	2014-02-06 18:07:54.343911095 +0100
-+++ gdb-7.6.90.20140127/gdb/ada-valprint.c	2014-02-06 18:15:00.766368981 +0100
-@@ -35,11 +35,11 @@
+--- gdb-8.0.orig/gdb/ada-valprint.c	2017-08-19 20:04:59.787780520 +0200
++++ gdb-8.0/gdb/ada-valprint.c	2017-08-19 20:05:10.057876598 +0200
+@@ -33,11 +33,11 @@
  #include "objfiles.h"
  
  static int print_field_values (struct type *, const gdb_byte *,
 -			       int,
 +			       LONGEST,
  			       struct ui_file *, int,
- 			       const struct value *,
+ 			       struct value *,
  			       const struct value_print_options *,
 -			       int, struct type *, int,
 +			       int, struct type *, LONGEST,
  			       const struct language_defn *);
  
  
-@@ -131,7 +131,7 @@ val_print_packed_array_elements (struct
-   unsigned int things_printed = 0;
-   unsigned len;
-   struct type *elttype, *index_type;
--  unsigned eltlen;
-+  ULONGEST eltlen;
-   unsigned long bitsize = TYPE_FIELD_BITSIZE (type, 0);
-   struct value *mark = value_mark ();
-   LONGEST low = 0;
-@@ -280,7 +280,7 @@ ada_emit_char (int c, struct type *type,
+@@ -279,7 +279,7 @@
     of a character.  */
  
  static int
@@ -956,7 +933,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  	 enum bfd_endian byte_order)
  {
    if (type_len == 1)
-@@ -442,11 +442,11 @@ ada_print_scalar (struct type *type, LON
+@@ -439,11 +439,11 @@
  
  static void
  printstr (struct ui_file *stream, struct type *elttype, const gdb_byte *string,
@@ -970,7 +947,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
    unsigned int things_printed = 0;
    int in_quotes = 0;
    int need_comma = 0;
-@@ -461,9 +461,9 @@ printstr (struct ui_file *stream, struct
+@@ -458,9 +458,9 @@
      {
        /* Position of the character we are examining
           to see whether it is repeated.  */
@@ -982,7 +959,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  
        QUIT;
  
-@@ -494,7 +494,8 @@ printstr (struct ui_file *stream, struct
+@@ -491,7 +491,8 @@
  	  ada_emit_char (char_at (string, i, type_len, byte_order),
  			 elttype, stream, '\'', type_len);
  	  fputs_filtered ("'", stream);
@@ -992,7 +969,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  	  i = rep1 - 1;
  	  things_printed += options->repeat_count_threshold;
  	  need_comma = 1;
-@@ -522,7 +523,7 @@ printstr (struct ui_file *stream, struct
+@@ -519,7 +520,7 @@
  
  void
  ada_printstr (struct ui_file *stream, struct type *type,
@@ -1001,14 +978,14 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  	      const char *encoding, int force_ellipses,
  	      const struct value_print_options *options)
  {
-@@ -532,12 +533,12 @@ ada_printstr (struct ui_file *stream, st
+@@ -529,12 +530,12 @@
  
  static int
  print_variant_part (struct type *type, int field_num,
 -		    const gdb_byte *valaddr, int offset,
 +		    const gdb_byte *valaddr, LONGEST offset,
  		    struct ui_file *stream, int recurse,
- 		    const struct value *val,
+ 		    struct value *val,
  		    const struct value_print_options *options,
  		    int comma_needed,
 -		    struct type *outer_type, int outer_offset,
@@ -1016,13 +993,13 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  		    const struct language_defn *language)
  {
    struct type *var_type = TYPE_FIELD_TYPE (type, field_num);
-@@ -573,11 +574,11 @@ print_variant_part (struct type *type, i
+@@ -570,11 +571,11 @@
  
  static int
  print_field_values (struct type *type, const gdb_byte *valaddr,
 -		    int offset, struct ui_file *stream, int recurse,
 +		    LONGEST offset, struct ui_file *stream, int recurse,
- 		    const struct value *val,
+ 		    struct value *val,
  		    const struct value_print_options *options,
  		    int comma_needed,
 -		    struct type *outer_type, int outer_offset,
@@ -1030,16 +1007,16 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  		    const struct language_defn *language)
  {
    int i, len;
-@@ -644,7 +645,7 @@ print_field_values (struct type *type, c
- 	    }
+@@ -640,7 +641,7 @@
  	  else
  	    {
+ 	      struct value *v;
 -	      int bit_pos = TYPE_FIELD_BITPOS (type, i);
 +	      LONGEST bit_pos = TYPE_FIELD_BITPOS (type, i);
  	      int bit_size = TYPE_FIELD_BITSIZE (type, i);
  	      struct value_print_options opts;
  
-@@ -690,8 +691,8 @@ ada_val_print_string (struct type *type,
+@@ -685,8 +686,8 @@
  {
    enum bfd_endian byte_order = gdbarch_byte_order (get_type_arch (type));
    struct type *elttype = TYPE_TARGET_TYPE (type);
@@ -1050,7 +1027,7 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  
    /* We know that ELTTYPE cannot possibly be null, because we assume
       that we're called only when TYPE is a string-like type.
-@@ -710,7 +711,7 @@ ada_val_print_string (struct type *type,
+@@ -705,7 +706,7 @@
       elements up to it.  */
    if (options->stop_print_at_null)
      {
@@ -1059,29 +1036,29 @@ Index: gdb-7.6.90.20140127/gdb/ada-valprint.c
  
        /* Look for a NULL char.  */
        for (temp_len = 0;
-@@ -1069,7 +1070,7 @@ ada_val_print_ref (struct type *type, co
+@@ -1072,7 +1073,7 @@
  
  static void
- ada_val_print_1 (struct type *type, const gdb_byte *valaddr,
+ ada_val_print_1 (struct type *type,
 -		 int offset, CORE_ADDR address,
 +		 LONGEST offset, CORE_ADDR address,
  		 struct ui_file *stream, int recurse,
- 		 const struct value *original_value,
+ 		 struct value *original_value,
  		 const struct value_print_options *options,
-@@ -1150,7 +1151,7 @@ ada_val_print_1 (struct type *type, cons
+@@ -1156,7 +1157,7 @@
  
  void
- ada_val_print (struct type *type, const gdb_byte *valaddr,
+ ada_val_print (struct type *type,
 -	       int embedded_offset, CORE_ADDR address,
 +	       LONGEST embedded_offset, CORE_ADDR address,
  	       struct ui_file *stream, int recurse,
- 	       const struct value *val,
+ 	       struct value *val,
  	       const struct value_print_options *options)
-Index: gdb-7.6.90.20140127/gdb/annotate.c
+Index: gdb-8.0/gdb/annotate.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/annotate.c	2014-02-06 18:07:54.343911095 +0100
-+++ gdb-7.6.90.20140127/gdb/annotate.c	2014-02-06 18:07:58.900915992 +0100
-@@ -523,21 +523,21 @@ annotate_frame_end (void)
+--- gdb-8.0.orig/gdb/annotate.c	2017-08-19 20:04:59.787780520 +0200
++++ gdb-8.0/gdb/annotate.c	2017-08-19 20:05:10.057876598 +0200
+@@ -533,21 +533,21 @@
  }
  
  void
@@ -1107,11 +1084,11 @@ Index: gdb-7.6.90.20140127/gdb/annotate.c
  }
  
  void
-Index: gdb-7.6.90.20140127/gdb/annotate.h
+Index: gdb-8.0/gdb/annotate.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/annotate.h	2014-02-06 18:07:54.343911095 +0100
-+++ gdb-7.6.90.20140127/gdb/annotate.h	2014-02-06 18:07:58.901915993 +0100
-@@ -92,8 +92,8 @@ extern void annotate_frame_source_end (v
+--- gdb-8.0.orig/gdb/annotate.h	2017-08-19 20:04:59.788780529 +0200
++++ gdb-8.0/gdb/annotate.h	2017-08-19 20:05:10.058876607 +0200
+@@ -92,8 +92,8 @@
  extern void annotate_frame_where (void);
  extern void annotate_frame_end (void);
  
@@ -1122,24 +1099,24 @@ Index: gdb-7.6.90.20140127/gdb/annotate.h
  extern void annotate_elt_rep_end (void);
  extern void annotate_elt (void);
  extern void annotate_array_section_end (void);
-Index: gdb-7.6.90.20140127/gdb/arm-linux-nat.c
+Index: gdb-8.0/gdb/arm-linux-nat.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/arm-linux-nat.c	2014-02-06 18:07:54.343911095 +0100
-+++ gdb-7.6.90.20140127/gdb/arm-linux-nat.c	2014-02-06 18:07:58.901915993 +0100
-@@ -1073,7 +1073,7 @@ arm_linux_remove_hw_breakpoint (struct g
- /* Are we able to use a hardware watchpoint for the LEN bytes starting at 
+--- gdb-8.0.orig/gdb/arm-linux-nat.c	2017-08-19 20:04:59.788780529 +0200
++++ gdb-8.0/gdb/arm-linux-nat.c	2017-08-19 20:05:10.058876607 +0200
+@@ -1067,7 +1067,7 @@
     ADDR?  */
  static int
--arm_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+arm_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ arm_linux_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				       CORE_ADDR addr, int len)
++				       CORE_ADDR addr, LONGEST len)
  {
    const struct arm_linux_hwbp_cap *cap = arm_linux_get_hwbp_cap ();
    CORE_ADDR max_wp_length, aligned_addr;
-Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
+Index: gdb-8.0/gdb/ax-gdb.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ax-gdb.c	2014-02-06 18:07:54.344911096 +0100
-+++ gdb-7.6.90.20140127/gdb/ax-gdb.c	2014-02-06 18:07:58.902915994 +0100
-@@ -82,12 +82,12 @@ static void gen_traced_pop (struct gdbar
+--- gdb-8.0.orig/gdb/ax-gdb.c	2017-08-19 20:04:59.789780538 +0200
++++ gdb-8.0/gdb/ax-gdb.c	2017-08-19 20:05:10.059876617 +0200
+@@ -83,12 +83,12 @@
  static void gen_sign_extend (struct agent_expr *, struct type *);
  static void gen_extend (struct agent_expr *, struct type *);
  static void gen_fetch (struct agent_expr *, struct type *);
@@ -1154,7 +1131,7 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  static void gen_sym_offset (struct agent_expr *, struct symbol *);
  static void gen_var_ref (struct gdbarch *, struct agent_expr *ax,
  			 struct axs_value *value, struct symbol *var);
-@@ -135,15 +135,16 @@ static void gen_deref (struct agent_expr
+@@ -137,15 +137,15 @@
  static void gen_address_of (struct agent_expr *, struct axs_value *);
  static void gen_bitfield_ref (struct expression *exp, struct agent_expr *ax,
  			      struct axs_value *value,
@@ -1164,17 +1141,16 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  				 struct agent_expr *ax,
  				 struct axs_value *value,
 -				 int offset, int fieldno, struct type *type);
-+				 LONGEST offset, int fieldno,
-+				 struct type *type);
++				 LONGEST offset, int fieldno, struct type *type);
  static int gen_struct_ref_recursive (struct expression *exp,
  				     struct agent_expr *ax,
  				     struct axs_value *value,
--				     char *field, int offset,
-+				     char *field, LONGEST offset,
+-				     const char *field, int offset,
++				     const char *field, LONGEST offset,
  				     struct type *type);
  static void gen_struct_ref (struct expression *exp, struct agent_expr *ax,
  			    struct axs_value *value,
-@@ -538,7 +539,7 @@ gen_fetch (struct agent_expr *ax, struct
+@@ -541,7 +541,7 @@
     right shift it by -DISTANCE bits if DISTANCE < 0.  This generates
     unsigned (logical) right shifts.  */
  static void
@@ -1183,7 +1159,7 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  {
    if (distance > 0)
      {
-@@ -592,7 +593,7 @@ gen_frame_locals_address (struct gdbarch
+@@ -595,7 +595,7 @@
     programming in ML, it would be clearer why these are the same
     thing.  */
  static void
@@ -1192,7 +1168,7 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  {
    /* It would suffice to simply push the offset and add it, but this
       makes it easier to read positive and negative offsets in the
-@@ -1248,7 +1249,7 @@ gen_address_of (struct agent_expr *ax, s
+@@ -1251,7 +1251,7 @@
  static void
  gen_bitfield_ref (struct expression *exp, struct agent_expr *ax,
  		  struct axs_value *value, struct type *type,
@@ -1201,7 +1177,7 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  {
    /* Note that ops[i] fetches 8 << i bits.  */
    static enum agent_op ops[]
-@@ -1283,13 +1284,13 @@ gen_bitfield_ref (struct expression *exp
+@@ -1286,13 +1286,13 @@
  
    /* The first and one-after-last bits in the field, but rounded down
       and up to byte boundaries.  */
@@ -1220,7 +1196,7 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  
    /* The index in ops of the opcode we're considering.  */
    int op;
-@@ -1408,7 +1409,7 @@ gen_bitfield_ref (struct expression *exp
+@@ -1411,7 +1411,7 @@
  static void
  gen_primitive_field (struct expression *exp,
  		     struct agent_expr *ax, struct axs_value *value,
@@ -1229,20 +1205,20 @@ Index: gdb-7.6.90.20140127/gdb/ax-gdb.c
  {
    /* Is this a bitfield?  */
    if (TYPE_FIELD_PACKED (type, fieldno))
-@@ -1433,7 +1434,7 @@ gen_primitive_field (struct expression *
+@@ -1436,7 +1436,7 @@
  static int
  gen_struct_ref_recursive (struct expression *exp, struct agent_expr *ax,
  			  struct axs_value *value,
--			  char *field, int offset, struct type *type)
-+			  char *field, LONGEST offset, struct type *type)
+-			  const char *field, int offset, struct type *type)
++			  const char *field, LONGEST offset, struct type *type)
  {
    int i, rslt;
    int nbases = TYPE_N_BASECLASSES (type);
-Index: gdb-7.6.90.20140127/gdb/ax-general.c
+Index: gdb-8.0/gdb/ax-general.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ax-general.c	2014-02-06 18:07:54.345911097 +0100
-+++ gdb-7.6.90.20140127/gdb/ax-general.c	2014-02-06 18:07:58.902915994 +0100
-@@ -195,7 +195,7 @@ ax_zero_ext (struct agent_expr *x, int n
+--- gdb-8.0.orig/gdb/ax-general.c	2017-08-19 20:04:59.789780538 +0200
++++ gdb-8.0/gdb/ax-general.c	2017-08-19 20:05:10.059876617 +0200
+@@ -177,7 +177,7 @@
  
  /* Append a trace_quick instruction to EXPR, to record N bytes.  */
  void
@@ -1251,11 +1227,11 @@ Index: gdb-7.6.90.20140127/gdb/ax-general.c
  {
    /* N must fit in a byte.  */
    if (n < 0 || n > 255)
-Index: gdb-7.6.90.20140127/gdb/ax.h
+Index: gdb-8.0/gdb/ax.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ax.h	2014-02-06 18:07:54.345911097 +0100
-+++ gdb-7.6.90.20140127/gdb/ax.h	2014-02-06 18:07:58.902915994 +0100
-@@ -207,7 +207,7 @@ extern void ax_ext (struct agent_expr *E
+--- gdb-8.0.orig/gdb/ax.h	2017-08-19 20:04:59.789780538 +0200
++++ gdb-8.0/gdb/ax.h	2017-08-19 20:05:10.059876617 +0200
+@@ -205,7 +205,7 @@
  extern void ax_zero_ext (struct agent_expr *EXPR, int N);
  
  /* Append a trace_quick instruction to EXPR, to record N bytes.  */
@@ -1264,11 +1240,23 @@ Index: gdb-7.6.90.20140127/gdb/ax.h
  
  /* Append a goto op to EXPR.  OP is the actual op (must be aop_goto or
     aop_if_goto).  We assume we don't know the target offset yet,
-Index: gdb-7.6.90.20140127/gdb/breakpoint.c
+Index: gdb-8.0/gdb/breakpoint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/breakpoint.c	2014-02-06 18:07:54.348911100 +0100
-+++ gdb-7.6.90.20140127/gdb/breakpoint.c	2014-02-06 18:07:58.906915998 +0100
-@@ -6754,7 +6754,7 @@ breakpoint_address_match (struct address
+--- gdb-8.0.orig/gdb/breakpoint.c	2017-08-19 20:04:59.792780566 +0200
++++ gdb-8.0/gdb/breakpoint.c	2017-08-19 20:05:10.063876654 +0200
+@@ -2225,9 +2225,9 @@
+ 	{
+ 	  fprintf_unfiltered (gdb_stdlog,
+ 			      "infrun: stepping past non-steppable watchpoint. "
+-			      "skipping watchpoint at %s:%d\n",
++			      "skipping watchpoint at %s:%s\n",
+ 			      paddress (bl->gdbarch, bl->address),
+-			      bl->length);
++			      plongest (bl->length));
+ 	}
+       return 0;
+     }
+@@ -7151,7 +7151,7 @@
  
  static int
  breakpoint_address_match_range (struct address_space *aspace1, CORE_ADDR addr1,
@@ -1277,7 +1265,7 @@ Index: gdb-7.6.90.20140127/gdb/breakpoint.c
  				CORE_ADDR addr2)
  {
    return ((gdbarch_has_global_breakpoints (target_gdbarch ())
-@@ -11353,7 +11353,7 @@ can_use_hardware_watchpoint (struct valu
+@@ -11444,7 +11444,7 @@
  		      && TYPE_CODE (vtype) != TYPE_CODE_ARRAY))
  		{
  		  CORE_ADDR vaddr = value_address (v);
@@ -1286,11 +1274,11 @@ Index: gdb-7.6.90.20140127/gdb/breakpoint.c
  		  int num_regs;
  
  		  len = (target_exact_watchpoints
-Index: gdb-7.6.90.20140127/gdb/breakpoint.h
+Index: gdb-8.0/gdb/breakpoint.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/breakpoint.h	2014-02-06 18:07:54.348911100 +0100
-+++ gdb-7.6.90.20140127/gdb/breakpoint.h	2014-02-06 18:07:58.906915998 +0100
-@@ -242,7 +242,7 @@ struct bp_target_info
+--- gdb-8.0.orig/gdb/breakpoint.h	2017-08-19 20:04:59.793780576 +0200
++++ gdb-8.0/gdb/breakpoint.h	2017-08-19 20:05:10.063876654 +0200
+@@ -250,7 +250,7 @@
  
    /* If this is a ranged breakpoint, then this field contains the
       length of the range that will be watched for execution.  */
@@ -1299,7 +1287,7 @@ Index: gdb-7.6.90.20140127/gdb/breakpoint.h
  
    /* If the breakpoint lives in memory and reading that memory would
       give back the breakpoint, instead of the original contents, then
-@@ -411,7 +411,7 @@ struct bp_location
+@@ -422,7 +422,7 @@
    /* For hardware watchpoints, the size of the memory region being
       watched.  For hardware ranged breakpoints, the size of the
       breakpoint range.  */
@@ -1308,11 +1296,11 @@ Index: gdb-7.6.90.20140127/gdb/breakpoint.h
  
    /* Type of hardware watchpoint.  */
    enum target_hw_bp_type watchpoint_type;
-Index: gdb-7.6.90.20140127/gdb/c-lang.c
+Index: gdb-8.0/gdb/c-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/c-lang.c	2014-02-06 18:07:54.349911101 +0100
-+++ gdb-7.6.90.20140127/gdb/c-lang.c	2014-02-06 18:07:58.907915999 +0100
-@@ -190,7 +190,7 @@ c_printchar (int c, struct type *type, s
+--- gdb-8.0.orig/gdb/c-lang.c	2017-08-19 20:04:59.793780576 +0200
++++ gdb-8.0/gdb/c-lang.c	2017-08-19 20:05:10.064876663 +0200
+@@ -186,7 +186,7 @@
  
  void
  c_printstr (struct ui_file *stream, struct type *type, 
@@ -1321,7 +1309,7 @@ Index: gdb-7.6.90.20140127/gdb/c-lang.c
  	    const char *user_encoding, int force_ellipses,
  	    const struct value_print_options *options)
  {
-@@ -679,7 +679,7 @@ evaluate_subexp_c (struct type *expect_t
+@@ -672,7 +672,7 @@
  	  }
  	else
  	  {
@@ -1330,7 +1318,7 @@ Index: gdb-7.6.90.20140127/gdb/c-lang.c
  
  	    /* Write the terminating character.  */
  	    for (i = 0; i < TYPE_LENGTH (type); ++i)
-@@ -688,7 +688,7 @@ evaluate_subexp_c (struct type *expect_t
+@@ -681,7 +681,7 @@
  	    if (satisfy_expected)
  	      {
  		LONGEST low_bound, high_bound;
@@ -1339,20 +1327,20 @@ Index: gdb-7.6.90.20140127/gdb/c-lang.c
  
  		if (get_discrete_bounds (TYPE_INDEX_TYPE (expect_type),
  					 &low_bound, &high_bound) < 0)
-Index: gdb-7.6.90.20140127/gdb/c-lang.h
+Index: gdb-8.0/gdb/c-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/c-lang.h	2014-02-06 18:07:54.349911101 +0100
-+++ gdb-7.6.90.20140127/gdb/c-lang.h	2014-02-06 18:07:58.907915999 +0100
-@@ -73,7 +73,7 @@ extern void c_print_typedef (struct type
+--- gdb-8.0.orig/gdb/c-lang.h	2017-08-19 20:04:59.793780576 +0200
++++ gdb-8.0/gdb/c-lang.h	2017-08-19 20:05:10.064876663 +0200
+@@ -77,7 +77,7 @@
  			     struct ui_file *);
  
- extern void c_val_print (struct type *, const gdb_byte *,
+ extern void c_val_print (struct type *,
 -			 int, CORE_ADDR,
 +			 LONGEST, CORE_ADDR,
  			 struct ui_file *, int,
- 			 const struct value *,
+ 			 struct value *,
  			 const struct value_print_options *);
-@@ -93,7 +93,7 @@ extern void c_printchar (int, struct typ
+@@ -97,7 +97,7 @@
  extern void c_printstr (struct ui_file * stream,
  			struct type *elttype,
  			const gdb_byte *string,
@@ -1361,90 +1349,68 @@ Index: gdb-7.6.90.20140127/gdb/c-lang.h
  			const char *user_encoding,
  			int force_ellipses,
  			const struct value_print_options *options);
-@@ -119,14 +119,14 @@ extern void cp_print_class_member (const
- 				   struct ui_file *, char *);
- 
- extern void cp_print_value_fields (struct type *, struct type *,
--				   const gdb_byte *, int, CORE_ADDR,
-+				   const gdb_byte *, LONGEST, CORE_ADDR,
- 				   struct ui_file *, int,
- 				   const struct value *,
- 				   const struct value_print_options *,
- 				   struct type **, int);
- 
- extern void cp_print_value_fields_rtti (struct type *,
--					const gdb_byte *, int, CORE_ADDR,
-+					const gdb_byte *, LONGEST, CORE_ADDR,
- 					struct ui_file *, int,
- 					const struct value *,
- 					const struct value_print_options *,
-Index: gdb-7.6.90.20140127/gdb/c-valprint.c
+Index: gdb-8.0/gdb/c-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/c-valprint.c	2014-02-06 18:07:54.349911101 +0100
-+++ gdb-7.6.90.20140127/gdb/c-valprint.c	2014-02-06 18:07:58.907915999 +0100
-@@ -132,7 +132,7 @@ static const struct generic_val_print_de
+--- gdb-8.0.orig/gdb/c-valprint.c	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/c-valprint.c	2017-08-19 20:05:10.064876663 +0200
+@@ -244,7 +244,7 @@
+   if (TYPE_LENGTH (type) > 0 && TYPE_LENGTH (unresolved_elttype) > 0)
+     {
+       LONGEST low_bound, high_bound;
+-      int eltlen, len;
++      LONGEST eltlen, len;
+       struct gdbarch *gdbarch = get_type_arch (type);
+       enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+       unsigned int i = 0;	/* Number of characters printed.  */
+@@ -318,8 +318,8 @@
+ 	  if (cp_is_vtbl_ptr_type (elttype))
+ 	    {
+ 	      i = 1;
+-	      fprintf_filtered (stream, _("%d vtable entries"),
+-				len - 1);
++	      fprintf_filtered (stream, _("%s vtable entries"),
++				plongest (len - 1));
+ 	    }
+ 	  else
+ 	    {
+@@ -396,7 +396,7 @@
+ 	 -fvtable_thunks.  (Otherwise, look under
+ 	 TYPE_CODE_PTR.)  */
+       struct gdbarch *gdbarch = get_type_arch (type);
+-      int offset = (embedded_offset
++      LONGEST offset = (embedded_offset
+ 		    + TYPE_FIELD_BITPOS (type,
+ 					 VTBL_FNADDR_OFFSET) / 8);
+       struct type *field_type = TYPE_FIELD_TYPE (type, VTBL_FNADDR_OFFSET);
+@@ -495,7 +495,7 @@
  
  void
- c_val_print (struct type *type, const gdb_byte *valaddr,
+ c_val_print (struct type *type,
 -	     int embedded_offset, CORE_ADDR address,
 +	     LONGEST embedded_offset, CORE_ADDR address,
  	     struct ui_file *stream, int recurse,
- 	     const struct value *original_value,
+ 	     struct value *original_value,
  	     const struct value_print_options *options)
-@@ -143,7 +143,7 @@ c_val_print (struct type *type, const gd
-   unsigned len;
-   struct type *elttype, *unresolved_elttype;
-   struct type *unresolved_type = type;
--  unsigned eltlen;
-+  ULONGEST eltlen;
-   CORE_ADDR addr;
- 
-   CHECK_TYPEDEF (type);
-@@ -379,9 +379,9 @@ c_val_print (struct type *type, const gd
- 	  /* Print vtable entry - we only get here if NOT using
- 	     -fvtable_thunks.  (Otherwise, look under
- 	     TYPE_CODE_PTR.)  */
--	  int offset = (embedded_offset
--			+ TYPE_FIELD_BITPOS (type,
--					     VTBL_FNADDR_OFFSET) / 8);
-+	  LONGEST offset = (embedded_offset
-+			    + TYPE_FIELD_BITPOS (type,
-+						 VTBL_FNADDR_OFFSET) / 8);
- 	  struct type *field_type = TYPE_FIELD_TYPE (type,
- 						     VTBL_FNADDR_OFFSET);
- 	  CORE_ADDR addr
-@@ -460,7 +460,8 @@ c_value_print (struct value *val, struct
- 	       const struct value_print_options *options)
- {
-   struct type *type, *real_type, *val_type;
--  int full, top, using_enc;
-+  int full, using_enc;
-+  LONGEST top;
-   struct value_print_options opts = *options;
- 
-   opts.deref_ref = 1;
-Index: gdb-7.6.90.20140127/gdb/cp-abi.c
+Index: gdb-8.0/gdb/cp-abi.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/cp-abi.c	2014-02-06 18:07:54.350911103 +0100
-+++ gdb-7.6.90.20140127/gdb/cp-abi.c	2014-02-06 18:07:58.908916001 +0100
-@@ -68,13 +68,13 @@ is_operator_name (const char *name)
+--- gdb-8.0.orig/gdb/cp-abi.c	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/cp-abi.c	2017-08-19 20:05:10.065876673 +0200
+@@ -64,12 +64,12 @@
    return (*current_cp_abi.is_operator_name) (name);
  }
  
 -int
 +LONGEST
  baseclass_offset (struct type *type, int index, const gdb_byte *valaddr,
--		  int embedded_offset, CORE_ADDR address,
-+		  LONGEST embedded_offset, CORE_ADDR address,
+ 		  LONGEST embedded_offset, CORE_ADDR address,
  		  const struct value *val)
  {
-   volatile struct gdb_exception ex;
 -  int res = 0;
 +  LONGEST res = 0;
  
    gdb_assert (current_cp_abi.baseclass_offset != NULL);
  
-@@ -98,7 +98,7 @@ baseclass_offset (struct type *type, int
+@@ -96,7 +96,7 @@
  struct value *
  value_virtual_fn_field (struct value **arg1p,
  			struct fn_field *f, int j,
@@ -1453,20 +1419,11 @@ Index: gdb-7.6.90.20140127/gdb/cp-abi.c
  {
    if ((current_cp_abi.virtual_fn_field) == NULL)
      return NULL;
-@@ -108,7 +108,7 @@ value_virtual_fn_field (struct value **a
- 
- struct type *
- value_rtti_type (struct value *v, int *full,
--		 int *top, int *using_enc)
-+		 LONGEST *top, int *using_enc)
- {
-   struct type *ret = NULL;
-   volatile struct gdb_exception e;
-Index: gdb-7.6.90.20140127/gdb/cp-abi.h
+Index: gdb-8.0/gdb/cp-abi.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/cp-abi.h	2014-02-06 18:07:54.350911103 +0100
-+++ gdb-7.6.90.20140127/gdb/cp-abi.h	2014-02-06 18:07:58.908916001 +0100
-@@ -108,7 +108,7 @@ extern struct value *value_virtual_fn_fi
+--- gdb-8.0.orig/gdb/cp-abi.h	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/cp-abi.h	2017-08-19 20:05:10.065876673 +0200
+@@ -108,7 +108,7 @@
  					     struct fn_field *f,
  					     int j,
  					     struct type *type,
@@ -1475,22 +1432,13 @@ Index: gdb-7.6.90.20140127/gdb/cp-abi.h
  
  
  /* Try to find the run-time type of VALUE, using C++ run-time type
-@@ -135,7 +135,7 @@ extern struct value *value_virtual_fn_fi
-    FULL, TOP, and USING_ENC can each be zero, in which case we don't
-    provide the corresponding piece of information.  */
- extern struct type *value_rtti_type (struct value *value,
--                                     int *full, int *top,
-+                                     int *full, LONGEST *top,
- 				     int *using_enc);
- 
- /* Compute the offset of the baseclass which is the INDEXth baseclass
-@@ -144,11 +144,11 @@ extern struct type *value_rtti_type (str
+@@ -144,11 +144,11 @@
     contents of VAL.  The result is the offset of the baseclass value
     relative to (the address of)(ARG) + OFFSET.  */
  
 -extern int baseclass_offset (struct type *type,
 -			     int index, const gdb_byte *valaddr,
--			     int embedded_offset,
+-			     LONGEST embedded_offset,
 -			     CORE_ADDR address,
 -			     const struct value *val);
 +extern LONGEST baseclass_offset (struct type *type,
@@ -1501,48 +1449,28 @@ Index: gdb-7.6.90.20140127/gdb/cp-abi.h
  
  /* Describe the target of a pointer to method.  CONTENTS is the byte
     pattern representing the pointer to method.  TYPE is the pointer to
-@@ -227,12 +227,13 @@ struct cp_abi_ops
+@@ -226,12 +226,12 @@
    struct value *(*virtual_fn_field) (struct value **arg1p,
  				     struct fn_field * f,
  				     int j, struct type * type,
 -				     int offset);
 +				     LONGEST offset);
    struct type *(*rtti_type) (struct value *v, int *full,
--			     int *top, int *using_enc);
+ 			     LONGEST *top, int *using_enc);
 -  int (*baseclass_offset) (struct type *type, int index,
--			   const bfd_byte *valaddr, int embedded_offset,
+-			   const bfd_byte *valaddr, LONGEST embedded_offset,
 -			   CORE_ADDR address, const struct value *val);
-+			     LONGEST *top, int *using_enc);
 +  LONGEST (*baseclass_offset) (struct type *type, int index,
-+			       const bfd_byte *valaddr,
-+			       LONGEST embedded_offset, CORE_ADDR address,
-+			       const struct value *val);
++			       const bfd_byte *valaddr, LONGEST embedded_offset,
++			       CORE_ADDR address, const struct value *val);
    void (*print_method_ptr) (const gdb_byte *contents,
  			    struct type *type,
  			    struct ui_file *stream);
-Index: gdb-7.6.90.20140127/gdb/cp-valprint.c
+Index: gdb-8.0/gdb/cp-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/cp-valprint.c	2014-02-06 18:07:54.350911103 +0100
-+++ gdb-7.6.90.20140127/gdb/cp-valprint.c	2014-02-06 18:07:58.908916001 +0100
-@@ -82,7 +82,7 @@ static void cp_print_static_field (struc
- 				   const struct value_print_options *);
- 
- static void cp_print_value (struct type *, struct type *,
--			    const gdb_byte *, int,
-+			    const gdb_byte *, LONGEST,
- 			    CORE_ADDR, struct ui_file *,
- 			    int, const struct value *,
- 			    const struct value_print_options *,
-@@ -156,7 +156,7 @@ cp_is_vtbl_member (struct type *type)
- 
- void
- cp_print_value_fields (struct type *type, struct type *real_type,
--		       const gdb_byte *valaddr, int offset,
-+		       const gdb_byte *valaddr, LONGEST offset,
- 		       CORE_ADDR address, struct ui_file *stream,
- 		       int recurse, const struct value *val,
- 		       const struct value_print_options *options,
-@@ -339,7 +339,7 @@ cp_print_value_fields (struct type *type
+--- gdb-8.0.orig/gdb/cp-valprint.c	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/cp-valprint.c	2017-08-19 20:05:10.065876673 +0200
+@@ -336,7 +336,7 @@
  		}
  	      else if (i == vptr_fieldno && type == vptr_basetype)
  		{
@@ -1551,211 +1479,55 @@ Index: gdb-7.6.90.20140127/gdb/cp-valprint.c
  		  struct type *i_type = TYPE_FIELD_TYPE (type, i);
  
  		  if (valprint_check_validity (stream, i_type, i_offset, val))
-@@ -422,7 +422,7 @@ cp_print_value_fields (struct type *type
- 
- void
- cp_print_value_fields_rtti (struct type *type,
--			    const gdb_byte *valaddr, int offset,
-+			    const gdb_byte *valaddr, LONGEST offset,
- 			    CORE_ADDR address,
- 			    struct ui_file *stream, int recurse,
- 			    const struct value *val,
-@@ -438,7 +438,8 @@ cp_print_value_fields_rtti (struct type
- 			TARGET_CHAR_BIT * TYPE_LENGTH (type)))
-     {
-       struct value *value;
--      int full, top, using_enc;
-+      int full, using_enc;
-+      LONGEST top;
- 
-       /* Ugh, we have to convert back to a value here.  */
-       value = value_from_contents_and_address (type, valaddr + offset,
-@@ -462,7 +463,7 @@ cp_print_value_fields_rtti (struct type
- 
- static void
- cp_print_value (struct type *type, struct type *real_type,
--		const gdb_byte *valaddr, int offset,
-+		const gdb_byte *valaddr, LONGEST offset,
- 		CORE_ADDR address, struct ui_file *stream,
- 		int recurse, const struct value *val,
- 		const struct value_print_options *options,
-@@ -472,7 +473,7 @@ cp_print_value (struct type *type, struc
-     = (struct type **) obstack_next_free (&dont_print_vb_obstack);
-   struct obstack tmp_obstack = dont_print_vb_obstack;
-   int i, n_baseclasses = TYPE_N_BASECLASSES (type);
--  int thisoffset;
-+  LONGEST thisoffset;
-   struct type *thistype;
- 
-   if (dont_print_vb == 0)
-@@ -486,7 +487,7 @@ cp_print_value (struct type *type, struc
- 
-   for (i = 0; i < n_baseclasses; i++)
-     {
--      int boffset = 0;
-+      LONGEST boffset = 0;
-       int skip;
-       struct type *baseclass = check_typedef (TYPE_BASECLASS (type, i));
-       const char *basename = TYPE_NAME (baseclass);
-Index: gdb-7.6.90.20140127/gdb/d-lang.h
+Index: gdb-8.0/gdb/d-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/d-lang.h	2014-02-06 18:07:54.351911104 +0100
-+++ gdb-7.6.90.20140127/gdb/d-lang.h	2014-02-06 18:07:58.908916001 +0100
-@@ -25,7 +25,7 @@
- extern char *d_demangle (const char *mangled, int options);
+--- gdb-8.0.orig/gdb/d-lang.h	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/d-lang.h	2017-08-19 20:05:10.065876673 +0200
+@@ -81,7 +81,7 @@
+ /* Defined in d-valprint.c  */
  
- extern void d_val_print (struct type *type, const gdb_byte *valaddr,
+ extern void d_val_print (struct type *type,
 -			 int embedded_offset, CORE_ADDR address,
 +			 LONGEST embedded_offset, CORE_ADDR address,
  			 struct ui_file *stream, int recurse,
- 			 const struct value *val,
+ 			 struct value *val,
  			 const struct value_print_options *options);
-Index: gdb-7.6.90.20140127/gdb/d-valprint.c
+Index: gdb-8.0/gdb/d-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/d-valprint.c	2014-02-06 18:07:54.351911104 +0100
-+++ gdb-7.6.90.20140127/gdb/d-valprint.c	2014-02-06 18:07:58.909916001 +0100
-@@ -29,7 +29,7 @@
- 
- static int
- dynamic_array_type (struct type *type, const gdb_byte *valaddr,
--		    int embedded_offset, CORE_ADDR address,
-+		    LONGEST embedded_offset, CORE_ADDR address,
- 		    struct ui_file *stream, int recurse,
- 		    const struct value *val,
- 		    const struct value_print_options *options)
-@@ -71,9 +71,9 @@ dynamic_array_type (struct type *type, c
+--- gdb-8.0.orig/gdb/d-valprint.c	2017-08-19 20:04:59.794780585 +0200
++++ gdb-8.0/gdb/d-valprint.c	2017-08-19 20:05:10.065876673 +0200
+@@ -73,7 +73,7 @@
  
  /* Implements the la_val_print routine for language D.  */
  void
--d_val_print (struct type *type, const gdb_byte *valaddr, int embedded_offset,
--             CORE_ADDR address, struct ui_file *stream, int recurse,
--	     const struct value *val,
-+d_val_print (struct type *type, const gdb_byte *valaddr,
-+	     LONGEST embedded_offset, CORE_ADDR address,
-+	     struct ui_file *stream, int recurse, const struct value *val,
+-d_val_print (struct type *type, int embedded_offset,
++d_val_print (struct type *type, LONGEST embedded_offset,
+              CORE_ADDR address, struct ui_file *stream, int recurse,
+ 	     struct value *val,
               const struct value_print_options *options)
- {
-   int ret;
-Index: gdb-7.6.90.20140127/gdb/doublest.c
+Index: gdb-8.0/gdb/dwarf2loc.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/doublest.c	2014-02-06 18:07:54.351911104 +0100
-+++ gdb-7.6.90.20140127/gdb/doublest.c	2014-02-06 18:07:58.909916001 +0100
-@@ -767,7 +767,7 @@ floatformat_from_doublest (const struct
-    but not passed on by GDB.  This should be fixed.  */
- 
- static const struct floatformat *
--floatformat_from_length (struct gdbarch *gdbarch, int len)
-+floatformat_from_length (struct gdbarch *gdbarch, LONGEST len)
- {
-   const struct floatformat *format;
- 
-@@ -795,8 +795,8 @@ floatformat_from_length (struct gdbarch
-   else
-     format = NULL;
-   if (format == NULL)
--    error (_("Unrecognized %d-bit floating-point type."),
--	   len * TARGET_CHAR_BIT);
-+    error (_("Unrecognized %s-bit floating-point type."),
-+	   plongest (len * TARGET_CHAR_BIT));
-   return format;
- }
- 
-Index: gdb-7.6.90.20140127/gdb/dwarf2loc.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/dwarf2loc.c	2014-02-06 18:07:54.352911105 +0100
-+++ gdb-7.6.90.20140127/gdb/dwarf2loc.c	2014-02-06 18:07:58.910916003 +0100
-@@ -1709,19 +1709,19 @@ insert_bits (unsigned int datum,
-    BITS_BIG_ENDIAN is taken directly from gdbarch.  */
- 
- static void
--copy_bitwise (gdb_byte *dest, unsigned int dest_offset_bits,
--	      const gdb_byte *source, unsigned int source_offset_bits,
--	      unsigned int bit_count,
-+copy_bitwise (gdb_byte *dest, ULONGEST dest_offset_bits,
-+	      const gdb_byte *source, ULONGEST source_offset,
-+	      ULONGEST bit_count,
- 	      int bits_big_endian)
- {
--  unsigned int dest_avail;
-+  unsigned int dest_avail, source_offset_bits;
-   int datum;
- 
-   /* Reduce everything to byte-size pieces.  */
-   dest += dest_offset_bits / 8;
-   dest_offset_bits %= 8;
--  source += source_offset_bits / 8;
--  source_offset_bits %= 8;
-+  source += source_offset / 8;
-+  source_offset_bits = source_offset % 8;
- 
-   dest_avail = 8 - dest_offset_bits % 8;
- 
-@@ -1759,13 +1759,13 @@ static void
- read_pieced_value (struct value *v)
- {
-   int i;
--  long offset = 0;
-+  LONGEST offset = 0;
-   ULONGEST bits_to_skip;
-   gdb_byte *contents;
-   struct piece_closure *c
-     = (struct piece_closure *) value_computed_closure (v);
-   struct frame_info *frame = frame_find_by_id (VALUE_FRAME_ID (v));
--  size_t type_len;
-+  ULONGEST type_len;
-   size_t buffer_size = 0;
-   gdb_byte *buffer = NULL;
-   struct cleanup *cleanup;
-@@ -1792,8 +1792,8 @@ read_pieced_value (struct value *v)
-   for (i = 0; i < c->n_pieces && offset < type_len; i++)
-     {
-       struct dwarf_expr_piece *p = &c->pieces[i];
--      size_t this_size, this_size_bits;
--      long dest_offset_bits, source_offset_bits, source_offset;
-+      ULONGEST this_size, this_size_bits;
-+      LONGEST dest_offset_bits, source_offset_bits, source_offset;
-       const gdb_byte *intermediate_buffer;
- 
-       /* Compute size, source, and destination offsets for copying, in
-@@ -1942,13 +1942,13 @@ static void
- write_pieced_value (struct value *to, struct value *from)
- {
-   int i;
--  long offset = 0;
-+  LONGEST offset = 0;
-   ULONGEST bits_to_skip;
-   const gdb_byte *contents;
-   struct piece_closure *c
-     = (struct piece_closure *) value_computed_closure (to);
-   struct frame_info *frame = frame_find_by_id (VALUE_FRAME_ID (to));
--  size_t type_len;
-+  ULONGEST type_len;
-   size_t buffer_size = 0;
-   gdb_byte *buffer = NULL;
-   struct cleanup *cleanup;
-@@ -1976,8 +1976,8 @@ write_pieced_value (struct value *to, st
-   for (i = 0; i < c->n_pieces && offset < type_len; i++)
+--- gdb-8.0.orig/gdb/dwarf2loc.c	2017-08-19 20:04:59.796780604 +0200
++++ gdb-8.0/gdb/dwarf2loc.c	2017-08-19 20:07:00.692911605 +0200
+@@ -1826,7 +1826,7 @@
+   for (; i < c->n_pieces && offset < max_offset; i++)
      {
        struct dwarf_expr_piece *p = &c->pieces[i];
 -      size_t this_size_bits, this_size;
--      long dest_offset_bits, source_offset_bits, dest_offset, source_offset;
 +      ULONGEST this_size_bits, this_size;
-+      LONGEST dest_offset_bits, source_offset_bits, dest_offset, source_offset;
-       int need_bitwise;
-       const gdb_byte *source_buffer;
  
-@@ -2107,8 +2107,8 @@ write_pieced_value (struct value *to, st
-    implicit pointer.  */
+       this_size_bits = p->size - bits_to_skip;
+       if (this_size_bits > max_offset - offset)
+@@ -2073,7 +2073,7 @@
  
  static int
--check_pieced_value_bits (const struct value *value, int bit_offset,
--			 int bit_length,
-+check_pieced_value_bits (const struct value *value, LONGEST bit_offset,
-+			 LONGEST bit_length,
- 			 enum dwarf_value_location check_for)
+ check_pieced_synthetic_pointer (const struct value *value, LONGEST bit_offset,
+-				int bit_length)
++				LONGEST bit_length)
  {
    struct piece_closure *c
-@@ -2124,7 +2124,7 @@ check_pieced_value_bits (const struct va
+     = (struct piece_closure *) value_computed_closure (value);
+@@ -2086,7 +2086,7 @@
    for (i = 0; i < c->n_pieces && bit_length > 0; i++)
      {
        struct dwarf_expr_piece *p = &c->pieces[i];
@@ -1764,42 +1536,18 @@ Index: gdb-7.6.90.20140127/gdb/dwarf2loc.c
  
        if (bit_offset > 0)
  	{
-@@ -2162,8 +2162,8 @@ check_pieced_value_bits (const struct va
- }
- 
- static int
--check_pieced_value_validity (const struct value *value, int bit_offset,
--			     int bit_length)
-+check_pieced_value_validity (const struct value *value, LONGEST bit_offset,
-+			     LONGEST bit_length)
- {
-   return check_pieced_value_bits (value, bit_offset, bit_length,
- 				  DWARF_VALUE_MEMORY);
-@@ -2181,8 +2181,8 @@ check_pieced_value_invalid (const struct
-    a synthetic pointer.  */
- 
- static int
--check_pieced_synthetic_pointer (const struct value *value, int bit_offset,
--				int bit_length)
-+check_pieced_synthetic_pointer (const struct value *value, LONGEST bit_offset,
-+				LONGEST bit_length)
- {
-   return check_pieced_value_bits (value, bit_offset, bit_length,
- 				  DWARF_VALUE_IMPLICIT_POINTER);
-@@ -2207,9 +2207,10 @@ indirect_pieced_value (struct value *val
+@@ -2194,8 +2194,8 @@
    struct type *type;
    struct frame_info *frame;
    struct dwarf2_locexpr_baton baton;
--  int i, bit_offset, bit_length;
+-  int i, bit_length;
+-  LONGEST bit_offset;
 +  int i;
-+  LONGEST bit_length;
++  LONGEST bit_length, bit_offset;
    struct dwarf_expr_piece *piece = NULL;
--  LONGEST byte_offset;
-+  LONGEST byte_offset, bit_offset;
- 
-   type = check_typedef (value_type (value));
-   if (TYPE_CODE (type) != TYPE_CODE_PTR)
-@@ -2223,7 +2224,7 @@ indirect_pieced_value (struct value *val
+   LONGEST byte_offset;
+   enum bfd_endian byte_order;
+@@ -2212,7 +2212,7 @@
    for (i = 0; i < c->n_pieces && bit_length > 0; i++)
      {
        struct dwarf_expr_piece *p = &c->pieces[i];
@@ -1808,20 +1556,24 @@ Index: gdb-7.6.90.20140127/gdb/dwarf2loc.c
  
        if (bit_offset > 0)
  	{
-@@ -2491,7 +2492,7 @@ dwarf2_evaluate_loc_desc_full (struct ty
- 	    struct value *value = dwarf_expr_fetch (ctx, 0);
- 	    gdb_byte *contents;
- 	    const gdb_byte *val_bytes;
+@@ -2503,9 +2503,9 @@
+ 	case DWARF_VALUE_STACK:
+ 	  {
+ 	    struct value *value = ctx.fetch (0);
 -	    size_t n = TYPE_LENGTH (value_type (value));
+-	    size_t len = TYPE_LENGTH (subobj_type);
+-	    size_t max = TYPE_LENGTH (type);
 +	    ULONGEST n = TYPE_LENGTH (value_type (value));
++	    ULONGEST len = TYPE_LENGTH (subobj_type);
++	    ULONGEST max = TYPE_LENGTH (type);
+ 	    struct gdbarch *objfile_gdbarch = get_objfile_arch (objfile);
+ 	    struct cleanup *cleanup;
  
- 	    if (byte_offset + TYPE_LENGTH (type) > n)
- 	      invalid_synthetic_pointer ();
-Index: gdb-7.6.90.20140127/gdb/dwarf2read.c
+Index: gdb-8.0/gdb/dwarf2read.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/dwarf2read.c	2014-02-06 18:07:54.356911109 +0100
-+++ gdb-7.6.90.20140127/gdb/dwarf2read.c	2014-02-06 18:07:58.913916006 +0100
-@@ -1893,12 +1893,12 @@ dwarf2_complex_location_expr_complaint (
+--- gdb-8.0.orig/gdb/dwarf2read.c	2017-08-19 20:04:59.800780641 +0200
++++ gdb-8.0/gdb/dwarf2read.c	2017-08-19 20:05:10.072876738 +0200
+@@ -2064,12 +2064,12 @@
  }
  
  static void
@@ -1838,7 +1590,7 @@ Index: gdb-7.6.90.20140127/gdb/dwarf2read.c
  }
  
  static void
-@@ -12190,8 +12190,8 @@ dwarf2_add_field (struct field_info *fip
+@@ -12863,8 +12863,8 @@
  	         object, and then subtract off the number of bits of
  	         the field itself.  The result is the bit offset of
  	         the LSB of the field.  */
@@ -1849,11 +1601,11 @@ Index: gdb-7.6.90.20140127/gdb/dwarf2read.c
  
  	      attr = dwarf2_attr (die, DW_AT_byte_size, cu);
  	      if (attr)
-Index: gdb-7.6.90.20140127/gdb/eval.c
+Index: gdb-8.0/gdb/eval.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/eval.c	2014-02-06 18:07:54.358911111 +0100
-+++ gdb-7.6.90.20140127/gdb/eval.c	2014-02-06 18:07:58.914916007 +0100
-@@ -298,7 +298,8 @@ evaluate_struct_tuple (struct value *str
+--- gdb-8.0.orig/gdb/eval.c	2017-08-19 20:04:59.801780651 +0200
++++ gdb-8.0/gdb/eval.c	2017-08-19 20:05:10.073876748 +0200
+@@ -297,7 +297,8 @@
    while (--nargs >= 0)
      {
        struct value *val = NULL;
@@ -1863,7 +1615,7 @@ Index: gdb-7.6.90.20140127/gdb/eval.c
        bfd_byte *addr;
  
        fieldno++;
-@@ -360,7 +361,7 @@ init_array_element (struct value *array,
+@@ -358,7 +359,7 @@
  		    enum noside noside, LONGEST low_bound, LONGEST high_bound)
  {
    LONGEST index;
@@ -1872,7 +1624,7 @@ Index: gdb-7.6.90.20140127/gdb/eval.c
  
    if (exp->elts[*pos].opcode == BINOP_COMMA)
      {
-@@ -718,11 +719,11 @@ binop_promote (const struct language_def
+@@ -802,11 +803,11 @@
      /* FIXME: Also mixed integral/booleans, with result an integer.  */
      {
        const struct builtin_type *builtin = builtin_type (gdbarch);
@@ -1887,7 +1639,7 @@ Index: gdb-7.6.90.20140127/gdb/eval.c
        int unsigned_operation;
  
        /* Determine type length and signedness after promotion for
-@@ -905,7 +906,7 @@ evaluate_subexp_standard (struct type *e
+@@ -988,7 +989,7 @@
    struct value **argvec;
    int code;
    int ix;
@@ -1896,7 +1648,7 @@ Index: gdb-7.6.90.20140127/gdb/eval.c
    struct type **arg_types;
    int save_pos1;
    struct symbol *function = NULL;
-@@ -1085,7 +1086,7 @@ evaluate_subexp_standard (struct type *e
+@@ -1167,7 +1168,7 @@
  	  struct type *range_type = TYPE_INDEX_TYPE (type);
  	  struct type *element_type = TYPE_TARGET_TYPE (type);
  	  struct value *array = allocate_value (expect_type);
@@ -1905,21 +1657,11 @@ Index: gdb-7.6.90.20140127/gdb/eval.c
  	  LONGEST low_bound, high_bound, index;
  
  	  if (get_discrete_bounds (range_type, &low_bound, &high_bound) < 0)
-@@ -2080,7 +2081,8 @@ evaluate_subexp_standard (struct type *e
-       {
-         struct type *type = value_type (arg1);
-         struct type *real_type;
--        int full, top, using_enc;
-+        int full, using_enc;
-+	LONGEST top;
- 	struct value_print_options opts;
- 
- 	get_user_print_options (&opts);
-Index: gdb-7.6.90.20140127/gdb/f-lang.c
+Index: gdb-8.0/gdb/f-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/f-lang.c	2014-02-06 18:07:54.358911111 +0100
-+++ gdb-7.6.90.20140127/gdb/f-lang.c	2014-02-06 18:07:58.914916007 +0100
-@@ -104,7 +104,7 @@ f_printchar (int c, struct type *type, s
+--- gdb-8.0.orig/gdb/f-lang.c	2017-08-19 20:04:59.801780651 +0200
++++ gdb-8.0/gdb/f-lang.c	2017-08-19 20:05:10.073876748 +0200
+@@ -103,7 +103,7 @@
  
  static void
  f_printstr (struct ui_file *stream, struct type *type, const gdb_byte *string,
@@ -1928,25 +1670,25 @@ Index: gdb-7.6.90.20140127/gdb/f-lang.c
  	    const struct value_print_options *options)
  {
    const char *type_encoding = f_get_encoding (type);
-Index: gdb-7.6.90.20140127/gdb/f-lang.h
+Index: gdb-8.0/gdb/f-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/f-lang.h	2014-02-06 18:07:54.358911111 +0100
-+++ gdb-7.6.90.20140127/gdb/f-lang.h	2014-02-06 18:07:58.914916007 +0100
-@@ -33,7 +33,7 @@ extern const char *f_object_address_data
-   (struct type *type, struct ui_file *stream);
- extern void f_object_address_data_valid_or_error (struct type *type);
+--- gdb-8.0.orig/gdb/f-lang.h	2017-08-19 20:04:59.802780660 +0200
++++ gdb-8.0/gdb/f-lang.h	2017-08-19 20:05:10.073876748 +0200
+@@ -30,7 +30,7 @@
+ extern void f_print_type (struct type *, const char *, struct ui_file *, int,
+ 			  int, const struct type_print_options *);
  
--extern void f_val_print (struct type *, const gdb_byte *, int, CORE_ADDR,
-+extern void f_val_print (struct type *, const gdb_byte *, LONGEST, CORE_ADDR,
+-extern void f_val_print (struct type *, int, CORE_ADDR,
++extern void f_val_print (struct type *, LONGEST, CORE_ADDR,
  			 struct ui_file *, int,
- 			 const struct value *,
+ 			 struct value *,
  			 const struct value_print_options *);
-Index: gdb-7.6.90.20140127/gdb/f-valprint.c
+Index: gdb-8.0/gdb/f-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/f-valprint.c	2014-02-06 18:07:54.359911112 +0100
-+++ gdb-7.6.90.20140127/gdb/f-valprint.c	2014-02-06 18:07:58.915916008 +0100
-@@ -43,7 +43,7 @@ static void f77_create_arrayprint_offset
- 					      struct ui_file *);
+--- gdb-8.0.orig/gdb/f-valprint.c	2017-08-19 20:04:59.802780660 +0200
++++ gdb-8.0/gdb/f-valprint.c	2017-08-19 20:05:10.073876748 +0200
+@@ -38,7 +38,7 @@
+ static void info_common_command (char *, int);
  static void f77_get_dynamic_length_of_aggregate (struct type *);
  
 -int f77_array_offset_tbl[MAX_FORTRAN_DIMS + 1][2];
@@ -1954,16 +1696,18 @@ Index: gdb-7.6.90.20140127/gdb/f-valprint.c
  
  /* Array which holds offsets to be applied to get a row's elements
     for a given array.  Array also holds the size of each subarray.  */
-@@ -126,7 +126,7 @@ static void
- f77_create_arrayprint_offset_tbl (struct type *type, struct ui_file *stream)
+@@ -73,8 +73,8 @@
+ static void
+ f77_get_dynamic_length_of_aggregate (struct type *type)
  {
-   struct type *tmp_type;
--  int eltlen;
-+  LONGEST eltlen;
-   int ndimen = 1;
-   int upper, lower;
+-  int upper_bound = -1;
+-  int lower_bound = 1;
++  LONGEST upper_bound = -1;
++  LONGEST lower_bound = 1;
  
-@@ -171,13 +171,13 @@ f77_create_arrayprint_offset_tbl (struct
+   /* Recursively go all the way down into a possibly multi-dimensional
+      F77 array and get the bounds.  For simple arrays, this is pretty
+@@ -106,7 +106,7 @@
  static void
  f77_print_array_1 (int nss, int ndimensions, struct type *type,
  		   const gdb_byte *valaddr,
@@ -1972,14 +1716,16 @@ Index: gdb-7.6.90.20140127/gdb/f-valprint.c
  		   struct ui_file *stream, int recurse,
  		   const struct value *val,
  		   const struct value_print_options *options,
- 		   int *elts)
- {
+@@ -115,7 +115,7 @@
+   struct type *range_type = TYPE_INDEX_TYPE (check_typedef (type));
+   CORE_ADDR addr = address + embedded_offset;
+   LONGEST lowerbound, upperbound;
 -  int i;
 +  LONGEST i;
  
-   if (nss != ndimensions)
-     {
-@@ -220,7 +220,7 @@ f77_print_array_1 (int nss, int ndimensi
+   get_discrete_bounds (range_type, &lowerbound, &upperbound);
+ 
+@@ -177,7 +177,7 @@
  
  static void
  f77_print_array (struct type *type, const gdb_byte *valaddr,
@@ -1988,68 +1734,51 @@ Index: gdb-7.6.90.20140127/gdb/f-valprint.c
  		 CORE_ADDR address, struct ui_file *stream,
  		 int recurse,
  		 const struct value *val,
-@@ -263,8 +263,9 @@ static const struct generic_val_print_de
+@@ -216,7 +216,7 @@
     function; they are identical.  */
  
  void
--f_val_print (struct type *type, const gdb_byte *valaddr, int embedded_offset,
--	     CORE_ADDR address, struct ui_file *stream, int recurse,
-+f_val_print (struct type *type, const gdb_byte *valaddr,
-+	     LONGEST embedded_offset, CORE_ADDR address,
-+	     struct ui_file *stream, int recurse,
- 	     const struct value *original_value,
+-f_val_print (struct type *type, int embedded_offset,
++f_val_print (struct type *type, LONGEST embedded_offset,
+ 	     CORE_ADDR address, struct ui_file *stream, int recurse,
+ 	     struct value *original_value,
  	     const struct value_print_options *options)
- {
-@@ -389,7 +390,7 @@ f_val_print (struct type *type, const gd
-       fprintf_filtered (stream, "( ");
-       for (index = 0; index < TYPE_NFIELDS (type); index++)
-         {
--          int offset = TYPE_FIELD_BITPOS (type, index) / 8;
-+	  LONGEST offset = TYPE_FIELD_BITPOS (type, index) / 8;
- 
-           val_print (TYPE_FIELD_TYPE (type, index), valaddr,
- 		     embedded_offset + offset,
-Index: gdb-7.6.90.20140127/gdb/findvar.c
+Index: gdb-8.0/gdb/findvar.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/findvar.c	2014-02-06 18:07:54.359911112 +0100
-+++ gdb-7.6.90.20140127/gdb/findvar.c	2014-02-06 18:07:58.915916008 +0100
-@@ -623,7 +623,7 @@ default_value_from_register (struct type
- 			     struct frame_info *frame)
+--- gdb-8.0.orig/gdb/findvar.c	2017-08-19 20:04:59.802780660 +0200
++++ gdb-8.0/gdb/findvar.c	2017-08-19 20:05:10.074876757 +0200
+@@ -817,7 +817,7 @@
+ default_value_from_register (struct gdbarch *gdbarch, struct type *type,
+                              int regnum, struct frame_id frame_id)
  {
-   struct gdbarch *gdbarch = get_frame_arch (frame);
 -  int len = TYPE_LENGTH (type);
 +  LONGEST len = TYPE_LENGTH (type);
    struct value *value = allocate_value (type);
+   struct frame_info *frame;
  
-   VALUE_LVAL (value) = lval_register;
-@@ -656,10 +656,10 @@ void
- read_frame_register_value (struct value *value, struct frame_info *frame)
- {
-   struct gdbarch *gdbarch = get_frame_arch (frame);
--  int offset = 0;
--  int reg_offset = value_offset (value);
-+  LONGEST offset = 0;
-+  LONGEST reg_offset = value_offset (value);
+@@ -861,7 +861,7 @@
+   LONGEST offset = 0;
+   LONGEST reg_offset = value_offset (value);
    int regnum = VALUE_REGNUM (value);
--  int len = TYPE_LENGTH (check_typedef (value_type (value)));
-+  LONGEST len = TYPE_LENGTH (check_typedef (value_type (value)));
+-  int len = type_length_units (check_typedef (value_type (value)));
++  LONGEST len = type_length_units (check_typedef (value_type (value)));
  
    gdb_assert (VALUE_LVAL (value) == lval_register);
  
-@@ -674,7 +674,7 @@ read_frame_register_value (struct value
+@@ -876,7 +876,7 @@
    while (len > 0)
      {
        struct value *regval = get_frame_register_value (frame, regnum);
--      int reg_len = TYPE_LENGTH (value_type (regval)) - reg_offset;
-+      LONGEST reg_len = TYPE_LENGTH (value_type (regval)) - reg_offset;
+-      int reg_len = type_length_units (value_type (regval)) - reg_offset;
++      LONGEST reg_len = type_length_units (value_type (regval)) - reg_offset;
  
-       if (value_optimized_out (regval))
- 	{
-Index: gdb-7.6.90.20140127/gdb/frame.c
+       /* If the register length is larger than the number of bytes
+          remaining to copy, then only copy the appropriate bytes.  */
+Index: gdb-8.0/gdb/frame.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/frame.c	2014-02-06 18:07:54.360911113 +0100
-+++ gdb-7.6.90.20140127/gdb/frame.c	2014-02-06 18:07:58.915916008 +0100
-@@ -1247,7 +1247,7 @@ deprecated_frame_register_read (struct f
+--- gdb-8.0.orig/gdb/frame.c	2017-08-19 20:04:59.803780669 +0200
++++ gdb-8.0/gdb/frame.c	2017-08-19 20:05:10.074876757 +0200
+@@ -1375,7 +1375,7 @@
  
  int
  get_frame_register_bytes (struct frame_info *frame, int regnum,
@@ -2058,7 +1787,7 @@ Index: gdb-7.6.90.20140127/gdb/frame.c
  			  int *optimizedp, int *unavailablep)
  {
    struct gdbarch *gdbarch = get_frame_arch (frame);
-@@ -1276,7 +1276,7 @@ get_frame_register_bytes (struct frame_i
+@@ -1404,7 +1404,7 @@
      }
    if (len > maxsize)
      error (_("Bad debug information detected: "
@@ -2067,11 +1796,11 @@ Index: gdb-7.6.90.20140127/gdb/frame.c
  
    /* Copy the data.  */
    while (len > 0)
-Index: gdb-7.6.90.20140127/gdb/frame.h
+Index: gdb-8.0/gdb/frame.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/frame.h	2014-02-06 18:07:54.360911113 +0100
-+++ gdb-7.6.90.20140127/gdb/frame.h	2014-02-06 18:07:58.916916009 +0100
-@@ -556,7 +556,7 @@ extern void put_frame_register (struct f
+--- gdb-8.0.orig/gdb/frame.h	2017-08-19 20:04:59.803780669 +0200
++++ gdb-8.0/gdb/frame.h	2017-08-19 20:05:10.074876757 +0200
+@@ -600,7 +600,7 @@
     contents are optimized out or unavailable, set *OPTIMIZEDP,
     *UNAVAILABLEP accordingly.  */
  extern int get_frame_register_bytes (struct frame_info *frame, int regnum,
@@ -2080,20 +1809,20 @@ Index: gdb-7.6.90.20140127/gdb/frame.h
  				     gdb_byte *myaddr,
  				     int *optimizedp, int *unavailablep);
  
-Index: gdb-7.6.90.20140127/gdb/gdbtypes.c
+Index: gdb-8.0/gdb/gdbtypes.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbtypes.c	2014-02-06 18:07:54.361911114 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbtypes.c	2014-02-06 18:07:58.916916009 +0100
-@@ -2108,7 +2108,7 @@ allocate_gnat_aux_type (struct type *typ
+--- gdb-8.0.orig/gdb/gdbtypes.c	2017-08-19 20:04:59.804780679 +0200
++++ gdb-8.0/gdb/gdbtypes.c	2017-08-19 20:05:10.075876766 +0200
+@@ -2807,7 +2807,7 @@
     least as long as OBJFILE.  */
  
  struct type *
--init_type (enum type_code code, int length, int flags,
-+init_type (enum type_code code, LONGEST length, int flags,
- 	   const char *name, struct objfile *objfile)
+-init_type (struct objfile *objfile, enum type_code code, int length,
++init_type (struct objfile *objfile, enum type_code code, LONGEST length,
+ 	   const char *name)
  {
    struct type *type;
-@@ -2339,8 +2339,8 @@ is_public_ancestor (struct type *base, s
+@@ -3116,8 +3116,8 @@
  
  static int
  is_unique_ancestor_worker (struct type *base, struct type *dclass,
@@ -2104,7 +1833,7 @@ Index: gdb-7.6.90.20140127/gdb/gdbtypes.c
  			   CORE_ADDR address, struct value *val)
  {
    int i, count = 0;
-@@ -2351,7 +2351,7 @@ is_unique_ancestor_worker (struct type *
+@@ -3128,7 +3128,7 @@
    for (i = 0; i < TYPE_N_BASECLASSES (dclass) && count < 2; ++i)
      {
        struct type *iter;
@@ -2113,7 +1842,7 @@ Index: gdb-7.6.90.20140127/gdb/gdbtypes.c
  
        iter = check_typedef (TYPE_BASECLASS (dclass, i));
  
-@@ -2392,7 +2392,7 @@ is_unique_ancestor_worker (struct type *
+@@ -3169,7 +3169,7 @@
  int
  is_unique_ancestor (struct type *base, struct value *val)
  {
@@ -2122,7 +1851,7 @@ Index: gdb-7.6.90.20140127/gdb/gdbtypes.c
  
    return is_unique_ancestor_worker (base, value_type (val), &offset,
  				    value_contents_for_printing (val),
-@@ -3530,7 +3530,7 @@ recursive_dump_type (struct type *type,
+@@ -4415,7 +4415,7 @@
        break;
      }
    puts_filtered ("\n");
@@ -2131,68 +1860,51 @@ Index: gdb-7.6.90.20140127/gdb/gdbtypes.c
    if (TYPE_OBJFILE_OWNED (type))
      {
        printfi_filtered (spaces, "objfile ");
-@@ -3654,8 +3654,8 @@ recursive_dump_type (struct type *type,
- 			  idx, plongest (TYPE_FIELD_ENUMVAL (type, idx)));
-       else
- 	printfi_filtered (spaces + 2,
--			  "[%d] bitpos %d bitsize %d type ",
--			  idx, TYPE_FIELD_BITPOS (type, idx),
-+			  "[%d] bitpos %s bitsize %d type ",
-+			  idx, plongest (TYPE_FIELD_BITPOS (type, idx)),
- 			  TYPE_FIELD_BITSIZE (type, idx));
-       gdb_print_host_address (TYPE_FIELD_TYPE (type, idx), gdb_stdout);
-       printf_filtered (" name '%s' (",
-@@ -4169,7 +4169,7 @@ copy_type (const struct type *type)
+@@ -4875,7 +4875,7 @@
  
  struct type *
  arch_type (struct gdbarch *gdbarch,
--	   enum type_code code, int length, char *name)
-+	   enum type_code code, LONGEST length, char *name)
+-	   enum type_code code, int length, const char *name)
++	   enum type_code code, LONGEST length, const char *name)
  {
    struct type *type;
  
-Index: gdb-7.6.90.20140127/gdb/gdbtypes.h
+Index: gdb-8.0/gdb/gdbtypes.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gdbtypes.h	2014-02-06 18:07:54.362911115 +0100
-+++ gdb-7.6.90.20140127/gdb/gdbtypes.h	2014-02-06 18:11:46.431160650 +0100
-@@ -606,7 +606,7 @@ struct main_type
- 	   gdbarch_bits_big_endian=0 targets, it is the bit offset to
- 	   the LSB.  */
+--- gdb-8.0.orig/gdb/gdbtypes.h	2017-08-19 20:04:59.805780688 +0200
++++ gdb-8.0/gdb/gdbtypes.h	2017-08-19 20:05:10.076876776 +0200
+@@ -787,7 +787,7 @@
+      type_length_units function should be used in order to get the length
+      expressed in target addressable memory units.  */
  
--	int bitpos;
-+	LONGEST bitpos;
- 
- 	/* Enum value.  */
- 	LONGEST enumval;
-@@ -798,7 +798,7 @@ struct type
-      HOST_CHAR_BIT.  However, this would still fail to address
-      machines based on a ternary or decimal representation.  */
-   
--  unsigned length;
+-  unsigned int length;
 +  ULONGEST length;
  
-   /* Core type, shared by a group of qualified types.  */
-   struct main_type *main_type;
-@@ -1546,11 +1546,12 @@ extern struct gdbarch *get_type_arch (co
- extern struct type *get_target_type (struct type *type);
+   /* * Core type, shared by a group of qualified types.  */
  
- /* Helper function to construct objfile-owned types.  */
--extern struct type *init_type (enum type_code, int, int, const char *,
-+extern struct type *init_type (enum type_code, LONGEST, int, const char *,
- 			       struct objfile *);
+@@ -1665,7 +1665,7 @@
+ 
+ /* * Helper function to construct objfile-owned types.  */
+ 
+-extern struct type *init_type (struct objfile *, enum type_code, int,
++extern struct type *init_type (struct objfile *, enum type_code, LONGEST,
+ 			       const char *);
+ extern struct type *init_integer_type (struct objfile *, int, int,
+ 				       const char *);
+@@ -1682,7 +1682,7 @@
+ 				       struct type *);
  
  /* Helper functions to construct architecture-owned types.  */
--extern struct type *arch_type (struct gdbarch *, enum type_code, int, char *);
+-extern struct type *arch_type (struct gdbarch *, enum type_code, int,
 +extern struct type *arch_type (struct gdbarch *, enum type_code, LONGEST,
-+			       char *);
- extern struct type *arch_integer_type (struct gdbarch *, int, int, char *);
- extern struct type *arch_character_type (struct gdbarch *, int, int, char *);
- extern struct type *arch_boolean_type (struct gdbarch *, int, int, char *);
-Index: gdb-7.6.90.20140127/gdb/gnu-v2-abi.c
+ 			       const char *);
+ extern struct type *arch_integer_type (struct gdbarch *, int, int,
+ 				       const char *);
+Index: gdb-8.0/gdb/gnu-v2-abi.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gnu-v2-abi.c	2014-02-06 18:07:54.362911115 +0100
-+++ gdb-7.6.90.20140127/gdb/gnu-v2-abi.c	2014-02-06 18:07:58.917916010 +0100
-@@ -85,7 +85,7 @@ gnuv2_is_operator_name (const char *name
+--- gdb-8.0.orig/gdb/gnu-v2-abi.c	2017-08-19 20:04:59.805780688 +0200
++++ gdb-8.0/gdb/gnu-v2-abi.c	2017-08-19 20:05:10.076876776 +0200
+@@ -82,7 +82,7 @@
     TYPE is the type in which F is located.  */
  static struct value *
  gnuv2_virtual_fn_field (struct value **arg1p, struct fn_field * f, int j,
@@ -2201,40 +1913,26 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v2-abi.c
  {
    struct value *arg1 = *arg1p;
    struct type *type1 = check_typedef (value_type (arg1));
-@@ -186,7 +186,8 @@ gnuv2_virtual_fn_field (struct value **a
- 
- 
- static struct type *
--gnuv2_value_rtti_type (struct value *v, int *full, int *top, int *using_enc)
-+gnuv2_value_rtti_type (struct value *v, int *full, LONGEST *top,
-+		       int *using_enc)
- {
-   struct type *known_type;
-   struct type *rtti_type;
-@@ -341,9 +342,9 @@ vb_match (struct type *type, int index,
+@@ -338,7 +338,7 @@
     target).  The result is the offset of the baseclass value relative
     to (the address of)(ARG) + OFFSET.  */
  
 -static int
 +static LONGEST
  gnuv2_baseclass_offset (struct type *type, int index,
--			const bfd_byte *valaddr, int embedded_offset,
-+			const bfd_byte *valaddr, LONGEST embedded_offset,
+ 			const bfd_byte *valaddr, LONGEST embedded_offset,
  			CORE_ADDR address, const struct value *val)
- {
-   struct type *basetype = TYPE_BASECLASS (type, index);
-@@ -361,8 +362,8 @@ gnuv2_baseclass_offset (struct type *typ
+@@ -358,8 +358,7 @@
  	  if (vb_match (type, i, basetype))
  	    {
  	      struct type *field_type;
--	      int field_offset;
+-	      LONGEST field_offset;
 -	      int field_length;
-+	      LONGEST field_offset;
-+	      LONGEST field_length;
++	      LONGEST field_offset, field_length;
  	      CORE_ADDR addr;
  
  	      field_type = check_typedef (TYPE_FIELD_TYPE (type, i));
-@@ -386,7 +387,7 @@ gnuv2_baseclass_offset (struct type *typ
+@@ -383,7 +382,7 @@
  	  /* Don't go through baseclass_offset, as that wraps
  	     exceptions, thus, inner exceptions would be wrapped more
  	     than once.  */
@@ -2243,11 +1941,11 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v2-abi.c
  	    gnuv2_baseclass_offset (type, i, valaddr,
  				    embedded_offset, address, val);
  
-Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
+Index: gdb-8.0/gdb/gnu-v3-abi.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/gnu-v3-abi.c	2014-02-06 18:07:54.363911116 +0100
-+++ gdb-7.6.90.20140127/gdb/gnu-v3-abi.c	2014-02-06 18:07:58.918916011 +0100
-@@ -112,7 +112,7 @@ build_gdb_vtable_type (struct gdbarch *a
+--- gdb-8.0.orig/gdb/gnu-v3-abi.c	2017-08-19 20:04:59.806780698 +0200
++++ gdb-8.0/gdb/gnu-v3-abi.c	2017-08-19 20:05:10.077876785 +0200
+@@ -109,7 +109,7 @@
  {
    struct type *t;
    struct field *field_list, *field;
@@ -2256,7 +1954,7 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
  
    struct type *void_ptr_type
      = builtin_type (arch)->builtin_data_ptr;
-@@ -188,7 +188,7 @@ vtable_ptrdiff_type (struct gdbarch *gdb
+@@ -185,7 +185,7 @@
  /* Return the offset from the start of the imaginary `struct
     gdb_gnu_v3_abi_vtable' object to the vtable's "address point"
     (i.e., where objects' virtual table pointers point).  */
@@ -2264,17 +1962,8 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
 +static LONGEST
  vtable_address_point_offset (struct gdbarch *gdbarch)
  {
-   struct type *vtable_type = gdbarch_data (gdbarch, vtable_type_gdbarch_data);
-@@ -279,7 +279,7 @@ gnuv3_get_vtable (struct gdbarch *gdbarc
- 
- static struct type *
- gnuv3_rtti_type (struct value *value,
--                 int *full_p, int *top_p, int *using_enc_p)
-+                 int *full_p, LONGEST *top_p, int *using_enc_p)
- {
-   struct gdbarch *gdbarch;
-   struct type *values_type = check_typedef (value_type (value));
-@@ -404,7 +404,7 @@ gnuv3_get_virtual_fn (struct gdbarch *gd
+   struct type *vtable_type
+@@ -408,7 +408,7 @@
  static struct value *
  gnuv3_virtual_fn_field (struct value **value_p,
                          struct fn_field *f, int j,
@@ -2283,18 +1972,16 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
  {
    struct type *values_type = check_typedef (value_type (*value_p));
    struct gdbarch *gdbarch;
-@@ -434,16 +434,16 @@ gnuv3_virtual_fn_field (struct value **v
+@@ -438,7 +438,7 @@
  
     -1 is returned on error.  */
  
 -static int
 +static LONGEST
  gnuv3_baseclass_offset (struct type *type, int index,
--			const bfd_byte *valaddr, int embedded_offset,
-+			const bfd_byte *valaddr, LONGEST embedded_offset,
+ 			const bfd_byte *valaddr, LONGEST embedded_offset,
  			CORE_ADDR address, const struct value *val)
- {
-   struct gdbarch *gdbarch;
+@@ -447,7 +447,7 @@
    struct type *ptr_type;
    struct value *vtable;
    struct value *vbase_array;
@@ -2303,7 +1990,7 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
  
    /* Determine architecture.  */
    gdbarch = get_type_arch (type);
-@@ -467,7 +467,7 @@ gnuv3_baseclass_offset (struct type *typ
+@@ -470,7 +470,7 @@
    cur_base_offset = cur_base_offset + vtable_address_point_offset (gdbarch);
    if ((- cur_base_offset) % TYPE_LENGTH (ptr_type) != 0)
      error (_("Misaligned vbase offset."));
@@ -2312,7 +1999,7 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
  
    vtable = gnuv3_get_vtable (gdbarch, type, address + embedded_offset);
    gdb_assert (vtable != NULL);
-@@ -511,7 +511,7 @@ gnuv3_find_method_in (struct type *domai
+@@ -514,7 +514,7 @@
       we're out of luck.  */
    for (i = 0; i < TYPE_N_BASECLASSES (domain); i++)
      {
@@ -2321,155 +2008,37 @@ Index: gdb-7.6.90.20140127/gdb/gnu-v3-abi.c
        struct type *basetype;
  
        if (BASETYPE_VIA_VIRTUAL (domain, i))
-Index: gdb-7.6.90.20140127/gdb/go-lang.h
+Index: gdb-8.0/gdb/go-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/go-lang.h	2014-02-06 18:07:54.363911116 +0100
-+++ gdb-7.6.90.20140127/gdb/go-lang.h	2014-02-06 18:07:58.918916011 +0100
-@@ -83,7 +83,7 @@ extern void go_print_type (struct type *
+--- gdb-8.0.orig/gdb/go-lang.h	2017-08-19 20:04:59.806780698 +0200
++++ gdb-8.0/gdb/go-lang.h	2017-08-19 20:05:10.077876785 +0200
+@@ -85,7 +85,7 @@
  /* Defined in go-valprint.c.  */
  
- extern void go_val_print (struct type *type, const gdb_byte *valaddr,
+ extern void go_val_print (struct type *type,
 -			  int embedded_offset, CORE_ADDR address,
 +			  LONGEST embedded_offset, CORE_ADDR address,
  			  struct ui_file *stream, int recurse,
- 			  const struct value *val,
+ 			  struct value *val,
  			  const struct value_print_options *options);
-Index: gdb-7.6.90.20140127/gdb/go-valprint.c
+Index: gdb-8.0/gdb/go-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/go-valprint.c	2014-02-06 18:07:54.363911116 +0100
-+++ gdb-7.6.90.20140127/gdb/go-valprint.c	2014-02-06 18:07:58.918916011 +0100
-@@ -37,7 +37,7 @@
- 
- static void
- print_go_string (struct type *type, const gdb_byte *valaddr,
--		 int embedded_offset, CORE_ADDR address,
-+		 LONGEST embedded_offset, CORE_ADDR address,
- 		 struct ui_file *stream, int recurse,
- 		 const struct value *val,
- 		 const struct value_print_options *options)
-@@ -86,9 +86,9 @@ print_go_string (struct type *type, cons
+--- gdb-8.0.orig/gdb/go-valprint.c	2017-08-19 20:04:59.806780698 +0200
++++ gdb-8.0/gdb/go-valprint.c	2017-08-19 20:05:10.077876785 +0200
+@@ -86,7 +86,7 @@
  /* Implements the la_val_print routine for language Go.  */
  
  void
--go_val_print (struct type *type, const gdb_byte *valaddr, int embedded_offset,
--	      CORE_ADDR address, struct ui_file *stream, int recurse,
--	      const struct value *val,
-+go_val_print (struct type *type, const gdb_byte *valaddr,
-+	      LONGEST embedded_offset, CORE_ADDR address,
-+	      struct ui_file *stream, int recurse, const struct value *val,
+-go_val_print (struct type *type, int embedded_offset,
++go_val_print (struct type *type, LONGEST embedded_offset,
+ 	      CORE_ADDR address, struct ui_file *stream, int recurse,
+ 	      struct value *val,
  	      const struct value_print_options *options)
- {
-   CHECK_TYPEDEF (type);
-Index: gdb-7.6.90.20140127/gdb/i386-nat.c
+Index: gdb-8.0/gdb/language.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/i386-nat.c	2014-02-06 18:07:54.363911116 +0100
-+++ gdb-7.6.90.20140127/gdb/i386-nat.c	2014-02-06 18:07:58.918916011 +0100
-@@ -290,7 +290,7 @@ static int i386_remove_aligned_watchpoin
-    valid value, bombs through internal_error.  */
- static int i386_handle_nonaligned_watchpoint (struct i386_debug_reg_state *state,
- 					      i386_wp_op_t what,
--					      CORE_ADDR addr, int len,
-+					      CORE_ADDR addr, LONGEST len,
- 					      enum target_hw_bp_type type);
- 
- /* Implementation.  */
-@@ -501,8 +501,8 @@ i386_remove_aligned_watchpoint (struct i
- 
- static int
- i386_handle_nonaligned_watchpoint (struct i386_debug_reg_state *state,
--				   i386_wp_op_t what, CORE_ADDR addr, int len,
--				   enum target_hw_bp_type type)
-+				   i386_wp_op_t what, CORE_ADDR addr,
-+				   LONGEST len, enum target_hw_bp_type type)
- {
-   int retval = 0;
-   int max_wp_len = TARGET_HAS_DR_LEN_8 ? 8 : 4;
-@@ -662,7 +662,7 @@ i386_remove_watchpoint (CORE_ADDR addr,
-    address ADDR and whose length is LEN bytes.  */
- 
- static int
--i386_region_ok_for_watchpoint (CORE_ADDR addr, int len)
-+i386_region_ok_for_watchpoint (CORE_ADDR addr, LONGEST len)
- {
-   struct i386_debug_reg_state *state
-     = i386_debug_reg_state (ptid_get_pid (inferior_ptid));
-Index: gdb-7.6.90.20140127/gdb/inf-ttrace.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/inf-ttrace.c	2014-02-06 18:07:54.364911117 +0100
-+++ gdb-7.6.90.20140127/gdb/inf-ttrace.c	2014-02-06 18:07:58.918916011 +0100
-@@ -365,7 +365,7 @@ inf_ttrace_can_use_hw_breakpoint (int ty
- }
- 
- static int
--inf_ttrace_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+inf_ttrace_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
- {
-   return 1;
- }
-Index: gdb-7.6.90.20140127/gdb/jv-lang.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/jv-lang.c	2014-02-06 18:07:54.364911117 +0100
-+++ gdb-7.6.90.20140127/gdb/jv-lang.c	2014-02-06 18:07:58.919916012 +0100
-@@ -436,7 +436,7 @@ java_link_class_type (struct gdbarch *gd
-   for (i = TYPE_N_BASECLASSES (type); i < nfields; i++)
-     {
-       int accflags;
--      int boffset;
-+      LONGEST boffset;
- 
-       if (fields == NULL)
- 	{
-@@ -886,7 +886,7 @@ java_printchar (int c, struct type *type
- static void
- java_printstr (struct ui_file *stream, struct type *type,
- 	       const gdb_byte *string,
--	       unsigned int length, const char *encoding, int force_ellipses,
-+	       ULONGEST length, const char *encoding, int force_ellipses,
- 	       const struct value_print_options *options)
- {
-   const char *type_encoding = java_get_encoding (type);
-Index: gdb-7.6.90.20140127/gdb/jv-lang.h
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/jv-lang.h	2014-02-06 18:07:54.364911117 +0100
-+++ gdb-7.6.90.20140127/gdb/jv-lang.h	2014-02-06 18:07:58.919916012 +0100
-@@ -42,8 +42,8 @@ struct builtin_java_type
- 
- extern const struct builtin_java_type *builtin_java_type (struct gdbarch *);
- 
--extern void java_val_print (struct type *, const gdb_byte *, int, CORE_ADDR,
--			    struct ui_file *, int,
-+extern void java_val_print (struct type *, const gdb_byte *, LONGEST,
-+			    CORE_ADDR, struct ui_file *, int,
- 			    const struct value *,
- 			    const struct value_print_options *);
- 
-Index: gdb-7.6.90.20140127/gdb/jv-valprint.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/jv-valprint.c	2014-02-06 18:07:54.365911119 +0100
-+++ gdb-7.6.90.20140127/gdb/jv-valprint.c	2014-02-06 18:07:58.919916012 +0100
-@@ -266,7 +266,7 @@ java_value_print (struct value *val, str
- 
- static void
- java_print_value_fields (struct type *type, const gdb_byte *valaddr,
--			 int offset,
-+			 LONGEST offset,
- 			 CORE_ADDR address, struct ui_file *stream,
- 			 int recurse,
- 			 const struct value *val,
-@@ -459,7 +459,7 @@ java_print_value_fields (struct type *ty
- 
- void
- java_val_print (struct type *type, const gdb_byte *valaddr,
--		int embedded_offset, CORE_ADDR address,
-+		LONGEST embedded_offset, CORE_ADDR address,
- 		struct ui_file *stream, int recurse,
- 		const struct value *val,
- 		const struct value_print_options *options)
-Index: gdb-7.6.90.20140127/gdb/language.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/language.c	2014-02-06 18:07:54.365911119 +0100
-+++ gdb-7.6.90.20140127/gdb/language.c	2014-02-06 18:07:58.919916012 +0100
-@@ -722,7 +722,7 @@ unk_lang_printchar (int c, struct type *
+--- gdb-8.0.orig/gdb/language.c	2017-08-19 20:04:59.806780698 +0200
++++ gdb-8.0/gdb/language.c	2017-08-19 20:05:10.077876785 +0200
+@@ -753,7 +753,7 @@
  
  static void
  unk_lang_printstr (struct ui_file *stream, struct type *type,
@@ -2478,20 +2047,20 @@ Index: gdb-7.6.90.20140127/gdb/language.c
  		   const char *encoding, int force_ellipses,
  		   const struct value_print_options *options)
  {
-@@ -741,7 +741,7 @@ unk_lang_print_type (struct type *type,
+@@ -772,7 +772,7 @@
  
  static void
- unk_lang_val_print (struct type *type, const gdb_byte *valaddr,
+ unk_lang_val_print (struct type *type,
 -		    int embedded_offset, CORE_ADDR address,
 +		    LONGEST embedded_offset, CORE_ADDR address,
  		    struct ui_file *stream, int recurse,
- 		    const struct value *val,
+ 		    struct value *val,
  		    const struct value_print_options *options)
-Index: gdb-7.6.90.20140127/gdb/language.h
+Index: gdb-8.0/gdb/language.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/language.h	2014-02-06 18:07:54.365911119 +0100
-+++ gdb-7.6.90.20140127/gdb/language.h	2014-02-06 18:07:58.919916012 +0100
-@@ -182,7 +182,7 @@ struct language_defn
+--- gdb-8.0.orig/gdb/language.h	2017-08-19 20:04:59.806780698 +0200
++++ gdb-8.0/gdb/language.h	2017-08-19 20:05:10.077876785 +0200
+@@ -197,7 +197,7 @@
  			  struct ui_file * stream);
  
      void (*la_printstr) (struct ui_file * stream, struct type *elttype,
@@ -2500,20 +2069,20 @@ Index: gdb-7.6.90.20140127/gdb/language.h
  			 const char *encoding, int force_ellipses,
  			 const struct value_print_options *);
  
-@@ -224,7 +224,7 @@ struct language_defn
+@@ -235,7 +235,7 @@
+        printing.  */
  
      void (*la_val_print) (struct type *type,
- 			  const gdb_byte *contents,
 -			  int embedded_offset, CORE_ADDR address,
 +			  LONGEST embedded_offset, CORE_ADDR address,
  			  struct ui_file *stream, int recurse,
- 			  const struct value *val,
+ 			  struct value *val,
  			  const struct value_print_options *options);
-Index: gdb-7.6.90.20140127/gdb/m2-lang.c
+Index: gdb-8.0/gdb/m2-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/m2-lang.c	2014-02-06 18:07:54.366911120 +0100
-+++ gdb-7.6.90.20140127/gdb/m2-lang.c	2014-02-06 18:07:58.920916013 +0100
-@@ -104,10 +104,10 @@ m2_printchar (int c, struct type *type,
+--- gdb-8.0.orig/gdb/m2-lang.c	2017-08-19 20:04:59.807780707 +0200
++++ gdb-8.0/gdb/m2-lang.c	2017-08-19 20:05:10.078876795 +0200
+@@ -104,10 +104,10 @@
  
  static void
  m2_printstr (struct ui_file *stream, struct type *type, const gdb_byte *string,
@@ -2526,7 +2095,7 @@ Index: gdb-7.6.90.20140127/gdb/m2-lang.c
    unsigned int things_printed = 0;
    int in_quotes = 0;
    int need_comma = 0;
-@@ -122,9 +122,9 @@ m2_printstr (struct ui_file *stream, str
+@@ -122,9 +122,9 @@
      {
        /* Position of the character we are examining
           to see whether it is repeated.  */
@@ -2538,7 +2107,7 @@ Index: gdb-7.6.90.20140127/gdb/m2-lang.c
  
        QUIT;
  
-@@ -150,7 +150,7 @@ m2_printstr (struct ui_file *stream, str
+@@ -150,7 +150,7 @@
  	      in_quotes = 0;
  	    }
  	  m2_printchar (string[i], type, stream);
@@ -2547,24 +2116,24 @@ Index: gdb-7.6.90.20140127/gdb/m2-lang.c
  	  i = rep1 - 1;
  	  things_printed += options->repeat_count_threshold;
  	  need_comma = 1;
-Index: gdb-7.6.90.20140127/gdb/m2-lang.h
+Index: gdb-8.0/gdb/m2-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/m2-lang.h	2014-02-06 18:07:54.366911120 +0100
-+++ gdb-7.6.90.20140127/gdb/m2-lang.h	2014-02-06 18:07:58.920916013 +0100
-@@ -33,7 +33,7 @@ extern void m2_print_typedef (struct typ
+--- gdb-8.0.orig/gdb/m2-lang.h	2017-08-19 20:04:59.807780707 +0200
++++ gdb-8.0/gdb/m2-lang.h	2017-08-19 20:05:10.078876795 +0200
+@@ -34,7 +34,7 @@
  extern int m2_is_long_set (struct type *type);
  extern int m2_is_unbounded_array (struct type *type);
  
--extern void m2_val_print (struct type *, const gdb_byte *, int, CORE_ADDR,
-+extern void m2_val_print (struct type *, const gdb_byte *, LONGEST, CORE_ADDR,
+-extern void m2_val_print (struct type *, int, CORE_ADDR,
++extern void m2_val_print (struct type *, LONGEST, CORE_ADDR,
  			  struct ui_file *, int,
- 			  const struct value *,
+ 			  struct value *,
  			  const struct value_print_options *);
-Index: gdb-7.6.90.20140127/gdb/m2-typeprint.c
+Index: gdb-8.0/gdb/m2-typeprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/m2-typeprint.c	2014-02-06 18:07:54.366911120 +0100
-+++ gdb-7.6.90.20140127/gdb/m2-typeprint.c	2014-02-06 18:07:58.920916013 +0100
-@@ -233,9 +233,12 @@ static void m2_array (struct type *type,
+--- gdb-8.0.orig/gdb/m2-typeprint.c	2017-08-19 20:04:59.807780707 +0200
++++ gdb-8.0/gdb/m2-typeprint.c	2017-08-19 20:05:10.078876795 +0200
+@@ -234,9 +234,12 @@
  	  m2_print_bounds (TYPE_INDEX_TYPE (type), stream, show, -1, 1);
  	}
        else
@@ -2580,20 +2149,20 @@ Index: gdb-7.6.90.20140127/gdb/m2-typeprint.c
      }
    fprintf_filtered (stream, "] OF ");
    m2_print_type (TYPE_TARGET_TYPE (type), "", stream, show, level, flags);
-Index: gdb-7.6.90.20140127/gdb/m2-valprint.c
+Index: gdb-8.0/gdb/m2-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/m2-valprint.c	2014-02-06 18:07:54.366911120 +0100
-+++ gdb-7.6.90.20140127/gdb/m2-valprint.c	2014-02-06 18:07:58.920916013 +0100
-@@ -35,7 +35,7 @@ static int print_unpacked_pointer (struc
+--- gdb-8.0.orig/gdb/m2-valprint.c	2017-08-19 20:04:59.807780707 +0200
++++ gdb-8.0/gdb/m2-valprint.c	2017-08-19 20:05:10.078876795 +0200
+@@ -35,7 +35,7 @@
  				   struct ui_file *stream);
  static void
  m2_print_array_contents (struct type *type, const gdb_byte *valaddr,
 -			 int embedded_offset, CORE_ADDR address,
 +			 LONGEST embedded_offset, CORE_ADDR address,
  			 struct ui_file *stream, int recurse,
- 			 const struct value *val,
+ 			 struct value *val,
  			 const struct value_print_options *options,
-@@ -67,7 +67,7 @@ get_long_set_bounds (struct type *type,
+@@ -67,7 +67,7 @@
  
  static void
  m2_print_long_set (struct type *type, const gdb_byte *valaddr,
@@ -2602,7 +2171,7 @@ Index: gdb-7.6.90.20140127/gdb/m2-valprint.c
  		   struct ui_file *stream)
  {
    int empty_set        = 1;
-@@ -158,7 +158,7 @@ m2_print_long_set (struct type *type, co
+@@ -158,7 +158,7 @@
  
  static void
  m2_print_unbounded_array (struct type *type, const gdb_byte *valaddr,
@@ -2611,36 +2180,32 @@ Index: gdb-7.6.90.20140127/gdb/m2-valprint.c
  			  struct ui_file *stream, int recurse,
  			  const struct value_print_options *options)
  {
-@@ -262,7 +262,7 @@ print_variable_at_address (struct type *
+@@ -260,7 +260,7 @@
  
  static void
  m2_print_array_contents (struct type *type, const gdb_byte *valaddr,
 -			 int embedded_offset, CORE_ADDR address,
 +			 LONGEST embedded_offset, CORE_ADDR address,
  			 struct ui_file *stream, int recurse,
- 			 const struct value *val,
+ 			 struct value *val,
  			 const struct value_print_options *options,
-@@ -308,14 +308,15 @@ static const struct generic_val_print_de
+@@ -308,13 +308,13 @@
     function; they are identical.  */
  
  void
--m2_val_print (struct type *type, const gdb_byte *valaddr, int embedded_offset,
--	      CORE_ADDR address, struct ui_file *stream, int recurse,
-+m2_val_print (struct type *type, const gdb_byte *valaddr,
-+	      LONGEST embedded_offset, CORE_ADDR address,
-+	      struct ui_file *stream, int recurse,
- 	      const struct value *original_value,
+-m2_val_print (struct type *type, int embedded_offset,
++m2_val_print (struct type *type, LONGEST embedded_offset,
+ 	      CORE_ADDR address, struct ui_file *stream, int recurse,
+ 	      struct value *original_value,
  	      const struct value_print_options *options)
  {
    struct gdbarch *gdbarch = get_type_arch (type);
--  unsigned int i = 0;	/* Number of characters printed.  */
 -  unsigned len;
-+  ULONGEST i = 0;	/* Number of characters printed.  */
 +  ULONGEST len;
    struct type *elttype;
    CORE_ADDR addr;
- 
-@@ -340,7 +341,7 @@ m2_val_print (struct type *type, const g
+   const gdb_byte *valaddr = value_contents_for_printing (original_value);
+@@ -340,7 +340,7 @@
  	         elements up to it.  */
  	      if (options->stop_print_at_null)
  		{
@@ -2649,12 +2214,21 @@ Index: gdb-7.6.90.20140127/gdb/m2-valprint.c
  
  		  /* Look for a NULL char.  */
  		  for (temp_len = 0;
-Index: gdb-7.6.90.20140127/gdb/memrange.c
+@@ -416,7 +416,7 @@
+ 	{
+ 	  struct type *range = elttype;
+ 	  LONGEST low_bound, high_bound;
+-	  int i;
++	  LONGEST i;
+ 	  int need_comma = 0;
+ 
+ 	  fputs_filtered ("{", stream);
+Index: gdb-8.0/gdb/memrange.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/memrange.c	2014-02-06 18:07:54.366911120 +0100
-+++ gdb-7.6.90.20140127/gdb/memrange.c	2014-02-06 18:07:58.920916013 +0100
-@@ -21,8 +21,8 @@
- #include "memrange.h"
+--- gdb-8.0.orig/gdb/memrange.c	2017-08-19 20:04:59.807780707 +0200
++++ gdb-8.0/gdb/memrange.c	2017-08-19 20:05:10.078876795 +0200
+@@ -22,8 +22,8 @@
+ #include <algorithm>
  
  int
 -mem_ranges_overlap (CORE_ADDR start1, int len1,
@@ -2664,11 +2238,11 @@ Index: gdb-7.6.90.20140127/gdb/memrange.c
  {
    ULONGEST h, l;
  
-Index: gdb-7.6.90.20140127/gdb/memrange.h
+Index: gdb-8.0/gdb/memrange.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/memrange.h	2014-02-06 18:07:54.367911121 +0100
-+++ gdb-7.6.90.20140127/gdb/memrange.h	2014-02-06 18:07:58.921916014 +0100
-@@ -30,7 +30,7 @@ struct mem_range
+--- gdb-8.0.orig/gdb/memrange.h	2017-08-19 20:04:59.808780716 +0200
++++ gdb-8.0/gdb/memrange.h	2017-08-19 20:05:10.079876804 +0200
+@@ -30,7 +30,7 @@
    CORE_ADDR start;
  
    /* Length of the range.  */
@@ -2677,7 +2251,7 @@ Index: gdb-7.6.90.20140127/gdb/memrange.h
  };
  
  typedef struct mem_range mem_range_s;
-@@ -40,8 +40,8 @@ DEF_VEC_O(mem_range_s);
+@@ -40,8 +40,8 @@
  /* Returns true if the ranges defined by [start1, start1+len1) and
     [start2, start2+len2) overlap.  */
  
@@ -2686,26 +2260,26 @@ Index: gdb-7.6.90.20140127/gdb/memrange.h
 +extern int mem_ranges_overlap (CORE_ADDR start1, LONGEST len1,
 +			       CORE_ADDR start2, LONGEST len2);
  
- /* Sort ranges by start address, then coalesce contiguous or
-    overlapping ranges.  */
-Index: gdb-7.6.90.20140127/gdb/mips-linux-nat.c
+ /* Returns true if ADDR is in RANGE.  */
+ 
+Index: gdb-8.0/gdb/mips-linux-nat.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/mips-linux-nat.c	2014-02-06 18:07:54.367911121 +0100
-+++ gdb-7.6.90.20140127/gdb/mips-linux-nat.c	2014-02-06 18:07:58.921916014 +0100
-@@ -588,7 +588,7 @@ mips_linux_stopped_data_address (struct
-    the specified region can be covered by the watch registers.  */
+--- gdb-8.0.orig/gdb/mips-linux-nat.c	2017-08-19 20:04:59.808780716 +0200
++++ gdb-8.0/gdb/mips-linux-nat.c	2017-08-19 20:05:10.079876804 +0200
+@@ -584,7 +584,7 @@
  
  static int
--mips_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+mips_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ mips_linux_region_ok_for_hw_watchpoint (struct target_ops *self,
+-					CORE_ADDR addr, int len)
++					CORE_ADDR addr, LONGEST len)
  {
    struct pt_watch_regs dummy_regs;
    int i;
-Index: gdb-7.6.90.20140127/gdb/opencl-lang.c
+Index: gdb-8.0/gdb/opencl-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/opencl-lang.c	2014-02-06 18:07:54.367911121 +0100
-+++ gdb-7.6.90.20140127/gdb/opencl-lang.c	2014-02-06 18:07:58.921916014 +0100
-@@ -80,11 +80,11 @@ builtin_opencl_type (struct gdbarch *gdb
+--- gdb-8.0.orig/gdb/opencl-lang.c	2017-08-19 20:04:59.808780716 +0200
++++ gdb-8.0/gdb/opencl-lang.c	2017-08-19 20:05:10.079876804 +0200
+@@ -78,11 +78,11 @@
  
  static struct type *
  lookup_opencl_vector_type (struct gdbarch *gdbarch, enum type_code code,
@@ -2719,99 +2293,41 @@ Index: gdb-7.6.90.20140127/gdb/opencl-lang.c
    struct type *type = NULL;
    struct type **types = builtin_opencl_type (gdbarch);
  
-@@ -174,9 +174,9 @@ lval_func_read (struct value *v)
-   struct lval_closure *c = (struct lval_closure *) value_computed_closure (v);
-   struct type *type = check_typedef (value_type (v));
+@@ -174,7 +174,7 @@
    struct type *eltype = TYPE_TARGET_TYPE (check_typedef (value_type (c->val)));
--  int offset = value_offset (v);
--  int elsize = TYPE_LENGTH (eltype);
+   LONGEST offset = value_offset (v);
+   LONGEST elsize = TYPE_LENGTH (eltype);
 -  int n, i, j = 0;
-+  LONGEST offset = value_offset (v);
-+  LONGEST elsize = TYPE_LENGTH (eltype);
 +  LONGEST n, i, j = 0;
    LONGEST lowb = 0;
    LONGEST highb = 0;
  
-@@ -203,9 +203,9 @@ lval_func_write (struct value *v, struct
-   struct lval_closure *c = (struct lval_closure *) value_computed_closure (v);
-   struct type *type = check_typedef (value_type (v));
+@@ -203,7 +203,7 @@
    struct type *eltype = TYPE_TARGET_TYPE (check_typedef (value_type (c->val)));
--  int offset = value_offset (v);
--  int elsize = TYPE_LENGTH (eltype);
+   LONGEST offset = value_offset (v);
+   LONGEST elsize = TYPE_LENGTH (eltype);
 -  int n, i, j = 0;
-+  LONGEST offset = value_offset (v);
-+  LONGEST elsize = TYPE_LENGTH (eltype);
 +  LONGEST n, i, j = 0;
    LONGEST lowb = 0;
    LONGEST highb = 0;
  
-@@ -243,17 +243,18 @@ lval_func_write (struct value *v, struct
- /* Return nonzero if all bits in V within OFFSET and LENGTH are valid.  */
- 
- static int
--lval_func_check_validity (const struct value *v, int offset, int length)
-+lval_func_check_validity (const struct value *v, LONGEST offset,
-+			  LONGEST length)
- {
-   struct lval_closure *c = (struct lval_closure *) value_computed_closure (v);
-+  struct type *t = check_typedef (value_type (c->val));
-   /* Size of the target type in bits.  */
--  int elsize =
--      TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
--  int startrest = offset % elsize;
--  int start = offset / elsize;
--  int endrest = (offset + length) % elsize;
--  int end = (offset + length) / elsize;
--  int i;
-+  LONGEST elsize = TYPE_LENGTH (TYPE_TARGET_TYPE (t)) * 8;
-+  LONGEST startrest = offset % elsize;
-+  LONGEST start = offset / elsize;
-+  LONGEST endrest = (offset + length) % elsize;
-+  LONGEST end = (offset + length) / elsize;
-+  LONGEST i;
- 
-   if (endrest)
-     end++;
-@@ -263,8 +264,8 @@ lval_func_check_validity (const struct v
- 
-   for (i = start; i < end; i++)
-     {
--      int comp_offset = (i == start) ? startrest : 0;
--      int comp_length = (i == end) ? endrest : elsize;
-+      LONGEST comp_offset = (i == start) ? startrest : 0;
-+      LONGEST comp_length = (i == end) ? endrest : elsize;
- 
-       if (!value_bits_valid (c->val, c->indices[i] * elsize + comp_offset,
- 			     comp_length))
-@@ -281,8 +282,8 @@ lval_func_check_any_valid (const struct
- {
-   struct lval_closure *c = (struct lval_closure *) value_computed_closure (v);
-   /* Size of the target type in bits.  */
--  int elsize =
--      TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
-+  LONGEST elsize =
-+	   TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
-   int i;
- 
-   for (i = 0; i < c->n; i++)
-@@ -297,17 +298,17 @@ lval_func_check_any_valid (const struct
+@@ -243,17 +243,17 @@
  
  static int
  lval_func_check_synthetic_pointer (const struct value *v,
--				   int offset, int length)
+-				   LONGEST offset, int length)
 +				   LONGEST offset, LONGEST length)
  {
    struct lval_closure *c = (struct lval_closure *) value_computed_closure (v);
    /* Size of the target type in bits.  */
 -  int elsize =
--      TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
++  LONGEST elsize =
+       TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
 -  int startrest = offset % elsize;
 -  int start = offset / elsize;
 -  int endrest = (offset + length) % elsize;
 -  int end = (offset + length) / elsize;
 -  int i;
-+  LONGEST elsize =
-+	   TYPE_LENGTH (TYPE_TARGET_TYPE (check_typedef (value_type (c->val)))) * 8;
 +  LONGEST startrest = offset % elsize;
 +  LONGEST start = offset / elsize;
 +  LONGEST endrest = (offset + length) % elsize;
@@ -2820,7 +2336,7 @@ Index: gdb-7.6.90.20140127/gdb/opencl-lang.c
  
    if (endrest)
      end++;
-@@ -317,8 +318,8 @@ lval_func_check_synthetic_pointer (const
+@@ -263,8 +263,8 @@
  
    for (i = start; i < end; i++)
      {
@@ -2831,11 +2347,11 @@ Index: gdb-7.6.90.20140127/gdb/opencl-lang.c
  
        if (!value_bits_synthetic_pointer (c->val,
  					 c->indices[i] * elsize + comp_offset,
-Index: gdb-7.6.90.20140127/gdb/p-lang.c
+Index: gdb-8.0/gdb/p-lang.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/p-lang.c	2014-02-06 18:07:54.368911122 +0100
-+++ gdb-7.6.90.20140127/gdb/p-lang.c	2014-02-06 18:07:58.921916014 +0100
-@@ -96,8 +96,8 @@ pascal_main_name (void)
+--- gdb-8.0.orig/gdb/p-lang.c	2017-08-19 20:04:59.808780716 +0200
++++ gdb-8.0/gdb/p-lang.c	2017-08-19 20:05:10.079876804 +0200
+@@ -95,8 +95,8 @@
     are not multiple of TARGET_CHAR_BIT then the results are wrong
     but this does not happen for Free Pascal nor for GPC.  */
  int
@@ -2846,7 +2362,7 @@ Index: gdb-7.6.90.20140127/gdb/p-lang.c
  		       struct type **char_type,
  		       const char **arrayname)
  {
-@@ -217,12 +217,12 @@ pascal_printchar (int c, struct type *ty
+@@ -216,12 +216,12 @@
  
  void
  pascal_printstr (struct ui_file *stream, struct type *type,
@@ -2861,7 +2377,7 @@ Index: gdb-7.6.90.20140127/gdb/p-lang.c
    unsigned int things_printed = 0;
    int in_quotes = 0;
    int need_comma = 0;
-@@ -250,9 +250,9 @@ pascal_printstr (struct ui_file *stream,
+@@ -249,9 +249,9 @@
      {
        /* Position of the character we are examining
           to see whether it is repeated.  */
@@ -2873,7 +2389,7 @@ Index: gdb-7.6.90.20140127/gdb/p-lang.c
        unsigned long int current_char;
  
        QUIT;
-@@ -284,7 +284,7 @@ pascal_printstr (struct ui_file *stream,
+@@ -283,7 +283,7 @@
  	      in_quotes = 0;
  	    }
  	  pascal_printchar (current_char, type, stream);
@@ -2882,20 +2398,20 @@ Index: gdb-7.6.90.20140127/gdb/p-lang.c
  	  i = rep1 - 1;
  	  things_printed += options->repeat_count_threshold;
  	  need_comma = 1;
-Index: gdb-7.6.90.20140127/gdb/p-lang.h
+Index: gdb-8.0/gdb/p-lang.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/p-lang.h	2014-02-06 18:07:54.368911122 +0100
-+++ gdb-7.6.90.20140127/gdb/p-lang.h	2014-02-06 18:07:58.922916016 +0100
-@@ -35,7 +35,7 @@ extern void pascal_print_type (struct ty
+--- gdb-8.0.orig/gdb/p-lang.h	2017-08-19 20:04:59.809780726 +0200
++++ gdb-8.0/gdb/p-lang.h	2017-08-19 20:05:10.080876813 +0200
+@@ -36,7 +36,7 @@
  extern void pascal_print_typedef (struct type *, struct symbol *,
  				  struct ui_file *);
  
--extern void pascal_val_print (struct type *, const gdb_byte *, int,
-+extern void pascal_val_print (struct type *, const gdb_byte *, LONGEST,
+-extern void pascal_val_print (struct type *, int,
++extern void pascal_val_print (struct type *, LONGEST,
  			      CORE_ADDR, struct ui_file *, int,
- 			      const struct value *,
+ 			      struct value *,
  			      const struct value_print_options *);
-@@ -49,13 +49,13 @@ extern void pascal_type_print_method_arg
+@@ -50,13 +50,13 @@
  /* These are in p-lang.c: */
  
  extern int
@@ -2911,29 +2427,20 @@ Index: gdb-7.6.90.20140127/gdb/p-lang.h
  			     const struct value_print_options *);
  
  extern struct type **const (pascal_builtin_types[]);
-@@ -71,7 +71,7 @@ extern void
- 				    const struct type_print_options *);
- 
- extern void pascal_object_print_value_fields (struct type *, const gdb_byte *,
--					      int,
-+					      LONGEST,
- 					      CORE_ADDR, struct ui_file *,
- 					      int,
- 					      const struct value *,
-Index: gdb-7.6.90.20140127/gdb/p-valprint.c
+Index: gdb-8.0/gdb/p-valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/p-valprint.c	2014-02-06 18:07:54.368911122 +0100
-+++ gdb-7.6.90.20140127/gdb/p-valprint.c	2014-02-06 18:07:58.922916016 +0100
-@@ -58,7 +58,7 @@ static const struct generic_val_print_de
+--- gdb-8.0.orig/gdb/p-valprint.c	2017-08-19 20:04:59.809780726 +0200
++++ gdb-8.0/gdb/p-valprint.c	2017-08-19 20:05:10.080876813 +0200
+@@ -59,7 +59,7 @@
  
  void
- pascal_val_print (struct type *type, const gdb_byte *valaddr,
+ pascal_val_print (struct type *type,
 -		  int embedded_offset, CORE_ADDR address,
 +		  LONGEST embedded_offset, CORE_ADDR address,
  		  struct ui_file *stream, int recurse,
- 		  const struct value *original_value,
+ 		  struct value *original_value,
  		  const struct value_print_options *options)
-@@ -69,8 +69,8 @@ pascal_val_print (struct type *type, con
+@@ -70,8 +70,8 @@
    unsigned len;
    LONGEST low_bound, high_bound;
    struct type *elttype;
@@ -2944,65 +2451,24 @@ Index: gdb-7.6.90.20140127/gdb/p-valprint.c
    struct type *char_type;
    CORE_ADDR addr;
    int want_space = 0;
-@@ -494,7 +494,7 @@ static void pascal_object_print_static_f
- 					      const struct value_print_options *);
- 
- static void pascal_object_print_value (struct type *, const gdb_byte *,
--				       int,
-+				       LONGEST,
- 				       CORE_ADDR, struct ui_file *, int,
- 				       const struct value *,
- 				       const struct value_print_options *,
-@@ -553,7 +553,7 @@ pascal_object_is_vtbl_member (struct typ
- 
- void
- pascal_object_print_value_fields (struct type *type, const gdb_byte *valaddr,
--				  int offset,
-+				  LONGEST offset,
- 				  CORE_ADDR address, struct ui_file *stream,
- 				  int recurse,
- 				  const struct value *val,
-@@ -729,7 +729,7 @@ pascal_object_print_value_fields (struct
- 
- static void
- pascal_object_print_value (struct type *type, const gdb_byte *valaddr,
--			   int offset,
-+			   LONGEST offset,
- 			   CORE_ADDR address, struct ui_file *stream,
- 			   int recurse,
- 			   const struct value *val,
-@@ -752,11 +752,11 @@ pascal_object_print_value (struct type *
- 
-   for (i = 0; i < n_baseclasses; i++)
-     {
--      int boffset = 0;
-+      LONGEST boffset = 0;
-       struct type *baseclass = check_typedef (TYPE_BASECLASS (type, i));
-       const char *basename = type_name_no_tag (baseclass);
-       const gdb_byte *base_valaddr = NULL;
--      int thisoffset;
-+      LONGEST thisoffset;
-       volatile struct gdb_exception ex;
-       int skip = 0;
- 
-Index: gdb-7.6.90.20140127/gdb/ppc-linux-nat.c
+Index: gdb-8.0/gdb/ppc-linux-nat.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/ppc-linux-nat.c	2014-02-06 18:07:54.369911123 +0100
-+++ gdb-7.6.90.20140127/gdb/ppc-linux-nat.c	2014-02-06 18:07:58.922916016 +0100
-@@ -1496,7 +1496,7 @@ ppc_linux_can_use_hw_breakpoint (int typ
- }
+--- gdb-8.0.orig/gdb/ppc-linux-nat.c	2017-08-19 20:04:59.809780726 +0200
++++ gdb-8.0/gdb/ppc-linux-nat.c	2017-08-19 20:05:10.080876813 +0200
+@@ -1445,7 +1445,7 @@
  
  static int
--ppc_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+ppc_linux_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ ppc_linux_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				       CORE_ADDR addr, int len)
++				       CORE_ADDR addr, LONGEST len)
  {
    /* Handle sub-8-byte quantities.  */
    if (len <= 0)
-Index: gdb-7.6.90.20140127/gdb/printcmd.c
+Index: gdb-8.0/gdb/printcmd.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/printcmd.c	2014-02-06 18:07:54.370911124 +0100
-+++ gdb-7.6.90.20140127/gdb/printcmd.c	2014-02-06 18:07:58.923916017 +0100
-@@ -289,7 +289,7 @@ print_formatted (struct value *val, int
+--- gdb-8.0.orig/gdb/printcmd.c	2017-08-19 20:04:59.810780735 +0200
++++ gdb-8.0/gdb/printcmd.c	2017-08-19 20:05:10.081876823 +0200
+@@ -280,7 +280,7 @@
  		 struct ui_file *stream)
  {
    struct type *type = check_typedef (value_type (val));
@@ -3011,7 +2477,7 @@ Index: gdb-7.6.90.20140127/gdb/printcmd.c
  
    if (VALUE_LVAL (val) == lval_memory)
      next_address = value_address (val) + len;
-@@ -367,7 +367,7 @@ print_scalar_formatted (const void *vala
+@@ -357,7 +357,7 @@
  {
    struct gdbarch *gdbarch = get_type_arch (type);
    LONGEST val_long = 0;
@@ -3020,59 +2486,24 @@ Index: gdb-7.6.90.20140127/gdb/printcmd.c
    enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
  
    /* String printing should go through val_print_scalar_formatted.  */
-Index: gdb-7.6.90.20140127/gdb/procfs.c
+Index: gdb-8.0/gdb/procfs.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/procfs.c	2014-02-06 18:07:54.370911124 +0100
-+++ gdb-7.6.90.20140127/gdb/procfs.c	2014-02-06 18:07:58.924916018 +0100
-@@ -4924,7 +4924,7 @@ procfs_remove_watchpoint (CORE_ADDR addr
- }
+--- gdb-8.0.orig/gdb/procfs.c	2017-08-19 20:04:59.811780744 +0200
++++ gdb-8.0/gdb/procfs.c	2017-08-19 20:05:10.082876832 +0200
+@@ -4864,7 +4864,7 @@
  
  static int
--procfs_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+procfs_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ procfs_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				    CORE_ADDR addr, int len)
++				    CORE_ADDR addr, LONGEST len)
  {
    /* The man page for proc(4) on Solaris 2.6 and up says that the
       system can support "thousands" of hardware watchpoints, but gives
-Index: gdb-7.6.90.20140127/gdb/python/py-prettyprint.c
+Index: gdb-8.0/gdb/regcache.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/python/py-prettyprint.c	2014-02-06 18:07:54.371911125 +0100
-+++ gdb-7.6.90.20140127/gdb/python/py-prettyprint.c	2014-02-06 18:07:58.924916018 +0100
-@@ -688,7 +688,7 @@ print_children (PyObject *printer, const
- 
- int
- apply_val_pretty_printer (struct type *type, const gdb_byte *valaddr,
--			  int embedded_offset, CORE_ADDR address,
-+			  LONGEST embedded_offset, CORE_ADDR address,
- 			  struct ui_file *stream, int recurse,
- 			  const struct value *val,
- 			  const struct value_print_options *options,
-@@ -843,7 +843,7 @@ gdbpy_default_visualizer (PyObject *self
- 
- int
- apply_val_pretty_printer (struct type *type, const gdb_byte *valaddr,
--			  int embedded_offset, CORE_ADDR address,
-+			  LONGEST embedded_offset, CORE_ADDR address,
- 			  struct ui_file *stream, int recurse,
- 			  const struct value *val,
- 			  const struct value_print_options *options,
-Index: gdb-7.6.90.20140127/gdb/python/python.h
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/python/python.h	2014-02-06 18:07:54.371911125 +0100
-+++ gdb-7.6.90.20140127/gdb/python/python.h	2014-02-06 18:07:58.924916018 +0100
-@@ -111,7 +111,7 @@ void source_python_script (FILE *file, c
- void run_python_script (int argc, char **argv);
- 
- int apply_val_pretty_printer (struct type *type, const gdb_byte *valaddr,
--			      int embedded_offset, CORE_ADDR address,
-+			      LONGEST embedded_offset, CORE_ADDR address,
- 			      struct ui_file *stream, int recurse,
- 			      const struct value *val,
- 			      const struct value_print_options *options,
-Index: gdb-7.6.90.20140127/gdb/regcache.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/regcache.c	2014-02-06 18:07:54.372911126 +0100
-+++ gdb-7.6.90.20140127/gdb/regcache.c	2014-02-06 18:07:58.924916018 +0100
-@@ -899,7 +899,7 @@ typedef void (regcache_write_ftype) (str
+--- gdb-8.0.orig/gdb/regcache.c	2017-08-19 20:04:59.811780744 +0200
++++ gdb-8.0/gdb/regcache.c	2017-08-19 20:05:10.082876832 +0200
+@@ -988,7 +988,7 @@
  
  static enum register_status
  regcache_xfer_part (struct regcache *regcache, int regnum,
@@ -3081,7 +2512,7 @@ Index: gdb-7.6.90.20140127/gdb/regcache.c
  		    enum register_status (*read) (struct regcache *regcache,
  						  int regnum,
  						  gdb_byte *buf),
-@@ -943,7 +943,7 @@ regcache_xfer_part (struct regcache *reg
+@@ -1033,7 +1033,7 @@
  
  enum register_status
  regcache_raw_read_part (struct regcache *regcache, int regnum,
@@ -3090,7 +2521,7 @@ Index: gdb-7.6.90.20140127/gdb/regcache.c
  {
    struct regcache_descr *descr = regcache->descr;
  
-@@ -954,7 +954,7 @@ regcache_raw_read_part (struct regcache
+@@ -1044,7 +1044,7 @@
  
  void
  regcache_raw_write_part (struct regcache *regcache, int regnum,
@@ -3099,7 +2530,7 @@ Index: gdb-7.6.90.20140127/gdb/regcache.c
  {
    struct regcache_descr *descr = regcache->descr;
  
-@@ -965,7 +965,7 @@ regcache_raw_write_part (struct regcache
+@@ -1055,7 +1055,7 @@
  
  enum register_status
  regcache_cooked_read_part (struct regcache *regcache, int regnum,
@@ -3108,7 +2539,7 @@ Index: gdb-7.6.90.20140127/gdb/regcache.c
  {
    struct regcache_descr *descr = regcache->descr;
  
-@@ -976,7 +976,7 @@ regcache_cooked_read_part (struct regcac
+@@ -1066,7 +1066,7 @@
  
  void
  regcache_cooked_write_part (struct regcache *regcache, int regnum,
@@ -3117,11 +2548,11 @@ Index: gdb-7.6.90.20140127/gdb/regcache.c
  {
    struct regcache_descr *descr = regcache->descr;
  
-Index: gdb-7.6.90.20140127/gdb/regcache.h
+Index: gdb-8.0/gdb/regcache.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/regcache.h	2014-02-06 18:07:54.372911126 +0100
-+++ gdb-7.6.90.20140127/gdb/regcache.h	2014-02-06 18:07:58.925916019 +0100
-@@ -89,9 +89,9 @@ extern void regcache_raw_write_unsigned
+--- gdb-8.0.orig/gdb/regcache.h	2017-08-19 20:04:59.812780754 +0200
++++ gdb-8.0/gdb/regcache.h	2017-08-19 20:05:10.083876841 +0200
+@@ -94,9 +94,9 @@
  
  extern enum register_status
    regcache_raw_read_part (struct regcache *regcache, int regnum,
@@ -3133,7 +2564,7 @@ Index: gdb-7.6.90.20140127/gdb/regcache.h
  
  void regcache_invalidate (struct regcache *regcache, int regnum);
  
-@@ -128,10 +128,11 @@ extern void regcache_cooked_write_unsign
+@@ -133,10 +133,11 @@
     write style operations.  */
  
  enum register_status regcache_cooked_read_part (struct regcache *regcache,
@@ -3148,37 +2579,37 @@ Index: gdb-7.6.90.20140127/gdb/regcache.h
  
  /* Special routines to read/write the PC.  */
  
-Index: gdb-7.6.90.20140127/gdb/remote.c
+Index: gdb-8.0/gdb/remote.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/remote.c	2014-02-06 18:07:54.374911128 +0100
-+++ gdb-7.6.90.20140127/gdb/remote.c	2014-02-06 18:07:58.926916020 +0100
-@@ -8413,7 +8413,7 @@ int remote_hw_watchpoint_length_limit =
- int remote_hw_breakpoint_limit = -1;
+--- gdb-8.0.orig/gdb/remote.c	2017-08-19 20:04:59.814780772 +0200
++++ gdb-8.0/gdb/remote.c	2017-08-19 20:05:10.085876860 +0200
+@@ -9915,7 +9915,7 @@
  
  static int
--remote_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+remote_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ remote_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				    CORE_ADDR addr, int len)
++				    CORE_ADDR addr, LONGEST len)
  {
    if (remote_hw_watchpoint_length_limit == 0)
      return 0;
-Index: gdb-7.6.90.20140127/gdb/spu-multiarch.c
+Index: gdb-8.0/gdb/spu-multiarch.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/spu-multiarch.c	2014-02-06 18:07:54.374911128 +0100
-+++ gdb-7.6.90.20140127/gdb/spu-multiarch.c	2014-02-06 18:07:58.927916021 +0100
-@@ -118,7 +118,7 @@ spu_thread_architecture (struct target_o
- 
+--- gdb-8.0.orig/gdb/spu-multiarch.c	2017-08-19 20:04:59.814780772 +0200
++++ gdb-8.0/gdb/spu-multiarch.c	2017-08-19 20:05:10.085876860 +0200
+@@ -127,7 +127,7 @@
  /* Override the to_region_ok_for_hw_watchpoint routine.  */
  static int
--spu_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+spu_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ spu_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				 CORE_ADDR addr, int len)
++				 CORE_ADDR addr, LONGEST len)
  {
-   struct target_ops *ops_beneath = find_target_beneath (&spu_ops);
-   while (ops_beneath && !ops_beneath->to_region_ok_for_hw_watchpoint)
-Index: gdb-7.6.90.20140127/gdb/stack.c
+   struct target_ops *ops_beneath = find_target_beneath (self);
+ 
+Index: gdb-8.0/gdb/stack.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/stack.c	2014-02-06 18:07:54.375911129 +0100
-+++ gdb-7.6.90.20140127/gdb/stack.c	2014-02-06 18:07:58.927916021 +0100
-@@ -180,7 +180,7 @@ print_stack_frame (struct frame_info *fr
+--- gdb-8.0.orig/gdb/stack.c	2017-08-19 20:04:59.815780782 +0200
++++ gdb-8.0/gdb/stack.c	2017-08-19 20:05:10.086876869 +0200
+@@ -189,7 +189,7 @@
     argument (not just the first nameless argument).  */
  
  static void
@@ -3187,7 +2618,7 @@ Index: gdb-7.6.90.20140127/gdb/stack.c
  			   int first, struct ui_file *stream)
  {
    struct gdbarch *gdbarch = get_frame_arch (frame);
-@@ -526,7 +526,7 @@ print_frame_args (struct symbol *func, s
+@@ -546,7 +546,7 @@
    /* Offset of next stack argument beyond the one we have seen that is
       at the highest offset, or -1 if we haven't come to a stack
       argument yet.  */
@@ -3195,8 +2626,8 @@ Index: gdb-7.6.90.20140127/gdb/stack.c
 +  LONGEST highest_offset = -1;
    /* Number of ints of arguments that we have printed so far.  */
    int args_printed = 0;
-   struct cleanup *old_chain;
-@@ -564,8 +564,8 @@ print_frame_args (struct symbol *func, s
+   /* True if we should print arguments, false otherwise.  */
+@@ -575,8 +575,8 @@
  	    case LOC_ARG:
  	    case LOC_REF_ARG:
  	      {
@@ -3207,7 +2638,7 @@ Index: gdb-7.6.90.20140127/gdb/stack.c
  
  		/* Compute address of next argument by adding the size of
  		   this argument and rounding to an int boundary.  */
-@@ -700,7 +700,7 @@ print_frame_args (struct symbol *func, s
+@@ -711,7 +711,7 @@
       enough about the stack to find them.  */
    if (num != -1)
      {
@@ -3216,11 +2647,11 @@ Index: gdb-7.6.90.20140127/gdb/stack.c
  
        if (highest_offset == -1)
  	start = gdbarch_frame_args_skip (get_frame_arch (frame));
-Index: gdb-7.6.90.20140127/gdb/symmisc.c
+Index: gdb-8.0/gdb/symmisc.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/symmisc.c	2014-02-06 18:07:54.375911129 +0100
-+++ gdb-7.6.90.20140127/gdb/symmisc.c	2014-02-06 18:07:58.927916021 +0100
-@@ -529,11 +529,11 @@ print_symbol (void *args)
+--- gdb-8.0.orig/gdb/symmisc.c	2017-08-19 20:04:59.815780782 +0200
++++ gdb-8.0/gdb/symmisc.c	2017-08-19 20:05:10.086876869 +0200
+@@ -604,11 +604,11 @@
  
  	case LOC_CONST_BYTES:
  	  {
@@ -3235,133 +2666,115 @@ Index: gdb-7.6.90.20140127/gdb/symmisc.c
  	    for (i = 0; i < TYPE_LENGTH (type); i++)
  	      fprintf_filtered (outfile, " %02x",
  				(unsigned) SYMBOL_VALUE_BYTES (symbol)[i]);
-Index: gdb-7.6.90.20140127/gdb/target.c
+Index: gdb-8.0/gdb/target.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/target.c	2014-02-06 18:07:54.376911130 +0100
-+++ gdb-7.6.90.20140127/gdb/target.c	2014-02-06 18:07:58.928916022 +0100
-@@ -52,7 +52,7 @@ static void default_terminal_info (const
- static int default_watchpoint_addr_within_range (struct target_ops *,
+--- gdb-8.0.orig/gdb/target.c	2017-08-19 20:04:59.816780791 +0200
++++ gdb-8.0/gdb/target.c	2017-08-19 20:05:10.087876879 +0200
+@@ -57,7 +57,7 @@
  						 CORE_ADDR, CORE_ADDR, int);
  
--static int default_region_ok_for_hw_watchpoint (CORE_ADDR, int);
-+static int default_region_ok_for_hw_watchpoint (CORE_ADDR, LONGEST);
+ static int default_region_ok_for_hw_watchpoint (struct target_ops *,
+-						CORE_ADDR, int);
++						CORE_ADDR, LONGEST);
  
- static void tcomplain (void) ATTRIBUTE_NORETURN;
+ static void default_rcmd (struct target_ops *, const char *, struct ui_file *);
  
-@@ -116,7 +116,7 @@ static int debug_to_stopped_data_address
- static int debug_to_watchpoint_addr_within_range (struct target_ops *,
- 						  CORE_ADDR, CORE_ADDR, int);
- 
--static int debug_to_region_ok_for_hw_watchpoint (CORE_ADDR, int);
-+static int debug_to_region_ok_for_hw_watchpoint (CORE_ADDR, LONGEST);
- 
- static int debug_to_can_accel_watchpoint_condition (CORE_ADDR, int, int,
- 						    struct expression *);
-@@ -3599,7 +3599,7 @@ target_fileio_read_stralloc (const char
- 
+@@ -3228,7 +3228,7 @@
  
  static int
--default_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+default_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
+ default_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				     CORE_ADDR addr, int len)
++				     CORE_ADDR addr, LONGEST len)
  {
    return (len <= gdbarch_ptr_bit (target_gdbarch ()) / TARGET_CHAR_BIT);
  }
-@@ -4566,7 +4566,7 @@ debug_to_can_use_hw_breakpoint (int type
- }
- 
- static int
--debug_to_region_ok_for_hw_watchpoint (CORE_ADDR addr, int len)
-+debug_to_region_ok_for_hw_watchpoint (CORE_ADDR addr, LONGEST len)
- {
-   CORE_ADDR retval;
- 
-Index: gdb-7.6.90.20140127/gdb/target.h
+Index: gdb-8.0/gdb/target.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/target.h	2014-02-06 18:07:54.377911131 +0100
-+++ gdb-7.6.90.20140127/gdb/target.h	2014-02-06 18:07:58.929916023 +0100
-@@ -428,7 +428,7 @@ struct target_ops
- 
+--- gdb-8.0.orig/gdb/target.h	2017-08-19 20:04:59.816780791 +0200
++++ gdb-8.0/gdb/target.h	2017-08-19 20:05:10.088876888 +0200
+@@ -555,7 +555,7 @@
      /* Documentation of this routine is provided with the corresponding
         target_* macro.  */
--    int (*to_region_ok_for_hw_watchpoint) (CORE_ADDR, int);
-+    int (*to_region_ok_for_hw_watchpoint) (CORE_ADDR, LONGEST);
+     int (*to_region_ok_for_hw_watchpoint) (struct target_ops *,
+-					   CORE_ADDR, int)
++					   CORE_ADDR, LONGEST)
+       TARGET_DEFAULT_FUNC (default_region_ok_for_hw_watchpoint);
  
-     int (*to_can_accel_watchpoint_condition) (CORE_ADDR, int, int,
- 					      struct expression *);
-Index: gdb-7.6.90.20140127/gdb/tracepoint.c
+     int (*to_can_accel_watchpoint_condition) (struct target_ops *,
+Index: gdb-8.0/gdb/tracepoint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/tracepoint.c	2014-02-06 18:07:54.379911134 +0100
-+++ gdb-7.6.90.20140127/gdb/tracepoint.c	2014-02-06 18:07:58.930916024 +0100
-@@ -935,13 +935,13 @@ add_register (struct collection_list *co
- static void
- add_memrange (struct collection_list *memranges, 
- 	      int type, bfd_signed_vma base,
--	      unsigned long len)
-+	      ULONGEST len)
+--- gdb-8.0.orig/gdb/tracepoint.c	2017-08-19 20:04:59.817780800 +0200
++++ gdb-8.0/gdb/tracepoint.c	2017-08-19 20:05:10.088876888 +0200
+@@ -904,10 +904,10 @@
+ void
+ collection_list::add_memrange (struct gdbarch *gdbarch,
+ 			       int type, bfd_signed_vma base,
+-			       unsigned long len)
++			       ULONGEST len)
  {
    if (info_verbose)
-     {
-       printf_filtered ("(%d,", type);
-       printf_vma (base);
--      printf_filtered (",%ld)\n", len);
-+      printf_filtered (",%s)\n", pulongest (len));
-     }
+-    printf_filtered ("(%d,%s,%ld)\n", type, paddress (gdbarch, base), len);
++    printf_filtered ("(%d,%s,%s)\n", type, paddress (gdbarch, base), pulongest (len));
  
    /* type: memrange_absolute == memory, other n == basereg */
-@@ -971,7 +971,7 @@ collect_symbol (struct collection_list *
- 		CORE_ADDR scope,
- 		int trace_string)
+   /* base: addr if memory, offset if reg relative.  */
+@@ -927,7 +927,7 @@
+ 				 CORE_ADDR scope,
+ 				 int trace_string)
  {
 -  unsigned long len;
 +  ULONGEST len;
    unsigned int reg;
    bfd_signed_vma offset;
    int treat_as_expr = 0;
-@@ -995,8 +995,8 @@ collect_symbol (struct collection_list *
- 	  char tmp[40];
- 
- 	  sprintf_vma (tmp, offset);
+@@ -948,8 +948,8 @@
+       offset = SYMBOL_VALUE_ADDRESS (sym);
+       if (info_verbose)
+ 	{
 -	  printf_filtered ("LOC_STATIC %s: collect %ld bytes at %s.\n",
 -			   SYMBOL_PRINT_NAME (sym), len,
 +	  printf_filtered ("LOC_STATIC %s: collect %s bytes at %s.\n",
 +			   SYMBOL_PRINT_NAME (sym), pulongest (len),
- 			   tmp /* address */);
+ 			   paddress (gdbarch, offset));
  	}
        /* A struct may be a C++ class with static fields, go to general
-@@ -1028,8 +1028,8 @@ collect_symbol (struct collection_list *
+@@ -981,9 +981,9 @@
        offset = frame_offset + SYMBOL_VALUE (sym);
        if (info_verbose)
  	{
--	  printf_filtered ("LOC_LOCAL %s: Collect %ld bytes at offset ",
--			   SYMBOL_PRINT_NAME (sym), len);
-+	  printf_filtered ("LOC_LOCAL %s: Collect %s bytes at offset ",
-+			   SYMBOL_PRINT_NAME (sym), pulongest (len));
- 	  printf_vma (offset);
- 	  printf_filtered (" from frame ptr reg %d\n", reg);
+-	  printf_filtered ("LOC_LOCAL %s: Collect %ld bytes at offset %s"
++	  printf_filtered ("LOC_LOCAL %s: Collect %s bytes at offset %s"
+ 			   " from frame ptr reg %d\n",
+-			   SYMBOL_PRINT_NAME (sym), len,
++			   SYMBOL_PRINT_NAME (sym), pulongest (len),
+ 			   paddress (gdbarch, offset), reg);
  	}
-@@ -1040,8 +1040,8 @@ collect_symbol (struct collection_list *
+       add_memrange (gdbarch, reg, offset, len);
+@@ -993,9 +993,9 @@
        offset = 0;
        if (info_verbose)
  	{
--	  printf_filtered ("LOC_REGPARM_ADDR %s: Collect %ld bytes at offset ",
--			   SYMBOL_PRINT_NAME (sym), len);
-+	  printf_filtered ("LOC_REGPARM_ADDR %s: Collect %s bytes at offset ",
-+			   SYMBOL_PRINT_NAME (sym), pulongest (len));
- 	  printf_vma (offset);
- 	  printf_filtered (" from reg %d\n", reg);
+-	  printf_filtered ("LOC_REGPARM_ADDR %s: Collect %ld bytes at offset %s"
++	  printf_filtered ("LOC_REGPARM_ADDR %s: Collect %s bytes at offset %s"
+ 			   " from reg %d\n",
+-			   SYMBOL_PRINT_NAME (sym), len,
++			   SYMBOL_PRINT_NAME (sym), pulongest (len),
+ 			   paddress (gdbarch, offset), reg);
  	}
-@@ -1052,8 +1052,8 @@ collect_symbol (struct collection_list *
+       add_memrange (gdbarch, reg, offset, len);
+@@ -1005,9 +1005,9 @@
        offset = frame_offset + SYMBOL_VALUE (sym);
        if (info_verbose)
  	{
--	  printf_filtered ("LOC_LOCAL %s: Collect %ld bytes at offset ",
--			   SYMBOL_PRINT_NAME (sym), len);
-+	  printf_filtered ("LOC_LOCAL %s: Collect %s bytes at offset ",
-+			   SYMBOL_PRINT_NAME (sym), pulongest (len));
- 	  printf_vma (offset);
- 	  printf_filtered (" from frame ptr reg %d\n", reg);
+-	  printf_filtered ("LOC_LOCAL %s: Collect %ld bytes at offset %s"
++	  printf_filtered ("LOC_LOCAL %s: Collect %s bytes at offset %s"
+ 			   " from frame ptr reg %d\n",
+-			   SYMBOL_PRINT_NAME (sym), len,
++			   SYMBOL_PRINT_NAME (sym), pulongest (len),
+ 			   paddress (gdbarch, offset), reg);
  	}
-@@ -2711,7 +2711,8 @@ scope_info (char *args, int from_tty)
+       add_memrange (gdbarch, reg, offset, len);
+@@ -2585,7 +2585,8 @@
    const char *symname;
    char *save_args = args;
    struct block_iterator iter;
@@ -3371,7 +2784,7 @@ Index: gdb-7.6.90.20140127/gdb/tracepoint.c
    struct gdbarch *gdbarch;
    int regno;
  
-@@ -2847,8 +2848,11 @@ scope_info (char *args, int from_tty)
+@@ -2727,8 +2728,11 @@
  		}
  	    }
  	  if (SYMBOL_TYPE (sym))
@@ -3385,24 +2798,11 @@ Index: gdb-7.6.90.20140127/gdb/tracepoint.c
  	}
        if (BLOCK_FUNCTION (block))
  	break;
-Index: gdb-7.6.90.20140127/gdb/typeprint.c
+Index: gdb-8.0/gdb/valarith.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/typeprint.c	2014-02-06 18:07:54.379911134 +0100
-+++ gdb-7.6.90.20140127/gdb/typeprint.c	2014-02-06 18:07:58.930916024 +0100
-@@ -409,7 +409,7 @@ whatis_exp (char *exp, int show)
-   struct type *real_type = NULL;
-   struct type *type;
-   int full = 0;
--  int top = -1;
-+  LONGEST top = -1;
-   int using_enc = 0;
-   struct value_print_options opts;
-   struct type_print_options flags = default_ptype_flags;
-Index: gdb-7.6.90.20140127/gdb/valarith.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/valarith.c	2014-02-06 18:07:54.380911135 +0100
-+++ gdb-7.6.90.20140127/gdb/valarith.c	2014-02-06 18:07:58.930916024 +0100
-@@ -190,15 +190,15 @@ value_subscript (struct value *array, LO
+--- gdb-8.0.orig/gdb/valarith.c	2017-08-19 20:04:59.818780810 +0200
++++ gdb-8.0/gdb/valarith.c	2017-08-19 20:05:10.089876897 +0200
+@@ -188,7 +188,7 @@
     to doubles, but no longer does.  */
  
  struct value *
@@ -3411,18 +2811,7 @@ Index: gdb-7.6.90.20140127/gdb/valarith.c
  {
    struct type *array_type = check_typedef (value_type (array));
    struct type *elt_type = check_typedef (TYPE_TARGET_TYPE (array_type));
--  unsigned int elt_size = TYPE_LENGTH (elt_type);
--  unsigned int elt_stride
-+  ULONGEST elt_size = TYPE_LENGTH (elt_type);
-+  ULONGEST elt_stride
-     = (TYPE_BYTE_STRIDE (TYPE_INDEX_TYPE (array_type)) == 0
-        ? elt_size : TYPE_BYTE_STRIDE (TYPE_INDEX_TYPE (array_type)));
--  unsigned int elt_offs = elt_stride * longest_to_int (index - lowerbound);
-+  ULONGEST elt_offs = elt_stride * longest_to_int (index - lowerbound);
-   struct value *v;
- 
-   if (index < lowerbound || (!TYPE_ARRAY_UPPER_BOUND_IS_UNDEFINED (array_type)
-@@ -635,7 +635,7 @@ value_concat (struct value *arg1, struct
+@@ -665,7 +665,7 @@
    struct value *inval1;
    struct value *inval2;
    struct value *outval = NULL;
@@ -3431,7 +2820,7 @@ Index: gdb-7.6.90.20140127/gdb/valarith.c
    int count, idx;
    char *ptr;
    char inchar;
-@@ -1488,7 +1488,7 @@ value_binop (struct value *arg1, struct
+@@ -1518,7 +1518,7 @@
  int
  value_logical_not (struct value *arg1)
  {
@@ -3440,7 +2829,7 @@ Index: gdb-7.6.90.20140127/gdb/valarith.c
    const gdb_byte *p;
    struct type *type1;
  
-@@ -1519,11 +1519,11 @@ value_logical_not (struct value *arg1)
+@@ -1549,11 +1549,11 @@
  static int
  value_strcmp (struct value *arg1, struct value *arg2)
  {
@@ -3455,45 +2844,20 @@ Index: gdb-7.6.90.20140127/gdb/valarith.c
  
    for (i = 0; i < len; i++)
      {
-Index: gdb-7.6.90.20140127/gdb/valops.c
+Index: gdb-8.0/gdb/valops.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/valops.c	2014-02-06 18:07:54.382911137 +0100
-+++ gdb-7.6.90.20140127/gdb/valops.c	2014-02-06 18:11:09.072119918 +0100
-@@ -51,11 +51,11 @@ static int typecmp (int staticp, int var
- 		    struct field t1[], struct value *t2[]);
- 
- static struct value *search_struct_field (const char *, struct value *, 
--					  int, struct type *, int);
-+					  LONGEST, struct type *, int);
- 
- static struct value *search_struct_method (const char *, struct value **,
- 					   struct value **,
--					   int, int *, struct type *);
-+					   LONGEST, int *, struct type *);
- 
- static int find_oload_champ_namespace (struct value **, int,
- 				       const char *, const char *,
-@@ -83,7 +83,7 @@ oload_classification classify_oload_matc
+--- gdb-8.0.orig/gdb/valops.c	2017-08-19 20:04:59.819780819 +0200
++++ gdb-8.0/gdb/valops.c	2017-08-19 20:05:10.090876907 +0200
+@@ -79,7 +79,7 @@
  					   int, int);
  
  static struct value *value_struct_elt_for_reference (struct type *,
 -						     int, struct type *,
 +						     LONGEST, struct type *,
- 						     char *,
+ 						     const char *,
  						     struct type *,
  						     int, enum noside);
-@@ -100,8 +100,8 @@ static CORE_ADDR allocate_space_in_infer
- static struct value *cast_into_complex (struct type *, struct value *);
- 
- static struct fn_field *find_method_list (struct value **, const char *,
--					  int, struct type *, int *,
--					  struct type **, int *);
-+					  LONGEST, struct type *, int *,
-+					  struct type **, LONGEST *);
- 
- void _initialize_valops (void);
- 
-@@ -186,7 +186,7 @@ find_function_in_inferior (const char *n
+@@ -183,7 +183,7 @@
     space.  */
  
  struct value *
@@ -3502,17 +2866,7 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
  {
    struct objfile *objf;
    struct value *val = find_function_in_inferior ("malloc", &objf);
-@@ -259,7 +259,8 @@ value_cast_structs (struct type *type, s
-   if (TYPE_NAME (t2) != NULL)
-     {
-       /* Try downcasting using the run-time type of the value.  */
--      int full, top, using_enc;
-+      int full, using_enc;
-+      LONGEST top;
-       struct type *real_type;
- 
-       real_type = value_rtti_type (v2, &full, &top, &using_enc);
-@@ -398,12 +399,12 @@ value_cast (struct type *type, struct va
+@@ -393,12 +393,12 @@
    if (code1 == TYPE_CODE_ARRAY)
      {
        struct type *element_type = TYPE_TARGET_TYPE (type);
@@ -3527,64 +2881,7 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
  	  LONGEST low_bound, high_bound, new_length;
  
  	  if (get_discrete_bounds (range_type, &low_bound, &high_bound) < 0)
-@@ -637,7 +638,7 @@ value_reinterpret_cast (struct type *typ
- static int
- dynamic_cast_check_1 (struct type *desired_type,
- 		      const gdb_byte *valaddr,
--		      int embedded_offset,
-+		      LONGEST embedded_offset,
- 		      CORE_ADDR address,
- 		      struct value *val,
- 		      struct type *search_type,
-@@ -649,8 +650,8 @@ dynamic_cast_check_1 (struct type *desir
- 
-   for (i = 0; i < TYPE_N_BASECLASSES (search_type) && result_count < 2; ++i)
-     {
--      int offset = baseclass_offset (search_type, i, valaddr, embedded_offset,
--				     address, val);
-+      LONGEST offset = baseclass_offset (search_type, i, valaddr,
-+					 embedded_offset, address, val);
- 
-       if (class_types_same_p (desired_type, TYPE_BASECLASS (search_type, i)))
- 	{
-@@ -684,7 +685,7 @@ dynamic_cast_check_1 (struct type *desir
- static int
- dynamic_cast_check_2 (struct type *desired_type,
- 		      const gdb_byte *valaddr,
--		      int embedded_offset,
-+		      LONGEST embedded_offset,
- 		      CORE_ADDR address,
- 		      struct value *val,
- 		      struct type *search_type,
-@@ -694,7 +695,7 @@ dynamic_cast_check_2 (struct type *desir
- 
-   for (i = 0; i < TYPE_N_BASECLASSES (search_type) && result_count < 2; ++i)
-     {
--      int offset;
-+      LONGEST offset;
- 
-       if (! BASETYPE_VIA_PUBLIC (search_type, i))
- 	continue;
-@@ -725,7 +726,8 @@ dynamic_cast_check_2 (struct type *desir
- struct value *
- value_dynamic_cast (struct type *type, struct value *arg)
- {
--  int full, top, using_enc;
-+  int full, using_enc;
-+  LONGEST top;
-   struct type *resolved_type = check_typedef (type);
-   struct type *arg_type = check_typedef (value_type (arg));
-   struct type *class_type, *rtti_type;
-@@ -1005,7 +1007,7 @@ value_at_lazy (struct type *type, CORE_A
- }
- 
- void
--read_value_memory (struct value *val, int embedded_offset,
-+read_value_memory (struct value *val, LONGEST embedded_offset,
- 		   int stack, CORE_ADDR memaddr,
- 		   gdb_byte *buffer, size_t length)
- {
-@@ -1155,7 +1157,7 @@ value_assign (struct value *toval, struc
+@@ -1065,7 +1065,7 @@
        {
  	const gdb_byte *dest_buffer;
  	CORE_ADDR changed_addr;
@@ -3593,146 +2890,16 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
          gdb_byte buffer[sizeof (LONGEST)];
  
  	if (value_bitsize (toval))
-@@ -1234,7 +1236,7 @@ value_assign (struct value *toval, struc
- 	    if (value_bitsize (toval))
- 	      {
- 		struct value *parent = value_parent (toval);
--		int offset = value_offset (parent) + value_offset (toval);
-+		LONGEST offset = value_offset (parent) + value_offset (toval);
- 		int changed_len;
- 		gdb_byte buffer[sizeof (LONGEST)];
- 		int optim, unavail;
-@@ -1715,7 +1717,7 @@ value_array (int lowbound, int highbound
- {
-   int nelem;
-   int idx;
--  unsigned int typelength;
-+  ULONGEST typelength;
-   struct value *val;
-   struct type *arraytype;
- 
-@@ -1890,7 +1892,7 @@ typecmp (int staticp, int varargs, int n
- 
- static void
- update_search_result (struct value **result_ptr, struct value *v,
--		      int *last_boffset, int boffset,
-+		      LONGEST *last_boffset, LONGEST boffset,
- 		      const char *name, struct type *type)
- {
-   if (v != NULL)
-@@ -1914,10 +1916,10 @@ update_search_result (struct value **res
-    lookup is ambiguous.  */
- 
- static void
--do_search_struct_field (const char *name, struct value *arg1, int offset,
-+do_search_struct_field (const char *name, struct value *arg1, LONGEST offset,
- 			struct type *type, int looking_for_baseclass,
- 			struct value **result_ptr,
--			int *last_boffset,
-+			LONGEST *last_boffset,
- 			struct type *outermost_type)
- {
-   int i;
-@@ -1966,7 +1968,7 @@ do_search_struct_field (const char *name
- 		   <variant field>.  */
- 
- 		struct value *v = NULL;
--		int new_offset = offset;
-+		LONGEST new_offset = offset;
- 
- 		/* This is pretty gross.  In G++, the offset in an
- 		   anonymous union is relative to the beginning of the
-@@ -2005,7 +2007,7 @@ do_search_struct_field (const char *name
- 			     && (strcmp_iw (name, 
- 					    TYPE_BASECLASS_NAME (type, 
- 								 i)) == 0));
--      int boffset = value_embedded_offset (arg1) + offset;
-+      LONGEST boffset = value_embedded_offset (arg1) + offset;
- 
-       if (BASETYPE_VIA_VIRTUAL (type, i))
- 	{
-@@ -2078,11 +2080,11 @@ do_search_struct_field (const char *name
-    fields, look for a baseclass named NAME.  */
- 
- static struct value *
--search_struct_field (const char *name, struct value *arg1, int offset,
-+search_struct_field (const char *name, struct value *arg1, LONGEST offset,
- 		     struct type *type, int looking_for_baseclass)
- {
-   struct value *result = NULL;
--  int boffset = 0;
-+  LONGEST boffset = 0;
- 
-   do_search_struct_field (name, arg1, offset, type, looking_for_baseclass,
- 			  &result, &boffset, type);
-@@ -2099,7 +2101,7 @@ search_struct_field (const char *name, s
- 
- static struct value *
- search_struct_method (const char *name, struct value **arg1p,
--		      struct value **args, int offset,
-+		      struct value **args, LONGEST offset,
- 		      int *static_memfuncp, struct type *type)
- {
-   int i;
-@@ -2163,8 +2165,8 @@ search_struct_method (const char *name,
- 
-   for (i = TYPE_N_BASECLASSES (type) - 1; i >= 0; i--)
-     {
--      int base_offset;
--      int this_offset;
-+      LONGEST base_offset;
-+      LONGEST this_offset;
- 
-       if (BASETYPE_VIA_VIRTUAL (type, i))
- 	{
-@@ -2391,8 +2393,8 @@ value_struct_elt_bitpos (struct value **
- 
- static struct fn_field *
- find_method_list (struct value **argp, const char *method,
--		  int offset, struct type *type, int *num_fns,
--		  struct type **basetype, int *boffset)
-+		  LONGEST offset, struct type *type, int *num_fns,
-+		  struct type **basetype, LONGEST *boffset)
- {
-   int i;
-   struct fn_field *f;
-@@ -2425,7 +2427,7 @@ find_method_list (struct value **argp, c
-   /* Not found in object, check in base subobjects.  */
-   for (i = TYPE_N_BASECLASSES (type) - 1; i >= 0; i--)
-     {
--      int base_offset;
-+      LONGEST base_offset;
- 
-       if (BASETYPE_VIA_VIRTUAL (type, i))
- 	{
-@@ -2461,7 +2463,7 @@ find_method_list (struct value **argp, c
- static struct fn_field *
- value_find_oload_method_list (struct value **argp, const char *method,
- 			      int offset, int *num_fns, 
--			      struct type **basetype, int *boffset)
-+			      struct type **basetype, LONGEST *boffset)
- {
-   struct type *t;
- 
-@@ -2551,7 +2553,7 @@ find_overload_match (struct value **args
-   /* Number of overloaded instances being considered.  */
-   int num_fns = 0;
-   struct type *basetype = NULL;
--  int boffset;
-+  LONGEST boffset;
- 
-   struct cleanup *all_cleanups = make_cleanup (null_cleanup, NULL);
- 
-@@ -3221,7 +3223,7 @@ compare_parameters (struct type *t1, str
+@@ -3340,7 +3340,7 @@
     the form "DOMAIN::NAME".  */
  
  static struct value *
 -value_struct_elt_for_reference (struct type *domain, int offset,
 +value_struct_elt_for_reference (struct type *domain, LONGEST offset,
- 				struct type *curtype, char *name,
+ 				struct type *curtype, const char *name,
  				struct type *intype, 
  				int want_address,
-@@ -3255,7 +3257,7 @@ value_struct_elt_for_reference (struct t
+@@ -3374,7 +3374,7 @@
  	  if (want_address)
  	    return value_from_longest
  	      (lookup_memberptr_type (TYPE_FIELD_TYPE (t, i), domain),
@@ -3741,7 +2908,7 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
  	  else if (noside != EVAL_NORMAL)
  	    return allocate_value (TYPE_FIELD_TYPE (t, i));
  	  else
-@@ -3423,7 +3425,7 @@ value_struct_elt_for_reference (struct t
+@@ -3542,7 +3542,7 @@
    for (i = TYPE_N_BASECLASSES (t) - 1; i >= 0; i--)
      {
        struct value *v;
@@ -3750,16 +2917,7 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
  
        if (BASETYPE_VIA_VIRTUAL (t, i))
  	base_offset = 0;
-@@ -3513,7 +3515,7 @@ value_maybe_namespace_elt (const struct
- 
- struct type *
- value_rtti_indirect_type (struct value *v, int *full, 
--			  int *top, int *using_enc)
-+			  LONGEST *top, int *using_enc)
- {
-   struct value *target;
-   struct type *type, *real_type, *target_type;
-@@ -3563,12 +3565,12 @@ value_rtti_indirect_type (struct value *
+@@ -3691,7 +3691,7 @@
  struct value *
  value_full_object (struct value *argp, 
  		   struct type *rtype, 
@@ -3768,53 +2926,20 @@ Index: gdb-7.6.90.20140127/gdb/valops.c
  		   int xusing_enc)
  {
    struct type *real_type;
-   int full = 0;
--  int top = -1;
-+  LONGEST top = -1;
-   int using_enc = 0;
-   struct value *new_val;
- 
-Index: gdb-7.6.90.20140127/gdb/valprint.c
+Index: gdb-8.0/gdb/valprint.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/valprint.c	2014-02-06 18:07:54.383911138 +0100
-+++ gdb-7.6.90.20140127/gdb/valprint.c	2014-02-06 18:07:58.932916026 +0100
-@@ -302,7 +302,7 @@ val_print_scalar_type_p (struct type *ty
- int
- valprint_check_validity (struct ui_file *stream,
- 			 struct type *type,
--			 int embedded_offset,
-+			 LONGEST embedded_offset,
- 			 const struct value *val)
- {
-   CHECK_TYPEDEF (type);
-@@ -375,7 +375,7 @@ val_print_invalid_address (struct ui_fil
+--- gdb-8.0.orig/gdb/valprint.c	2017-08-19 20:04:59.820780828 +0200
++++ gdb-8.0/gdb/valprint.c	2017-08-19 20:05:10.090876907 +0200
+@@ -933,7 +933,7 @@
  
  void
- generic_val_print (struct type *type, const gdb_byte *valaddr,
+ generic_val_print (struct type *type,
 -		   int embedded_offset, CORE_ADDR address,
 +		   LONGEST embedded_offset, CORE_ADDR address,
  		   struct ui_file *stream, int recurse,
- 		   const struct value *original_value,
+ 		   struct value *original_value,
  		   const struct value_print_options *options,
-@@ -737,7 +737,7 @@ generic_val_print (struct type *type, co
-    RECURSE.  */
- 
- void
--val_print (struct type *type, const gdb_byte *valaddr, int embedded_offset,
-+val_print (struct type *type, const gdb_byte *valaddr, LONGEST embedded_offset,
- 	   CORE_ADDR address, struct ui_file *stream, int recurse,
- 	   const struct value *val,
- 	   const struct value_print_options *options,
-@@ -958,7 +958,7 @@ val_print_type_code_flags (struct type *
- 
- void
- val_print_scalar_formatted (struct type *type,
--			    const gdb_byte *valaddr, int embedded_offset,
-+			    const gdb_byte *valaddr, LONGEST embedded_offset,
- 			    const struct value *val,
- 			    const struct value_print_options *options,
- 			    int size,
-@@ -1499,7 +1499,7 @@ print_decimal_chars (struct ui_file *str
+@@ -1873,7 +1873,7 @@
  
  void
  print_hex_chars (struct ui_file *stream, const gdb_byte *valaddr,
@@ -3823,15 +2948,9 @@ Index: gdb-7.6.90.20140127/gdb/valprint.c
  {
    const gdb_byte *p;
  
-@@ -1616,23 +1616,23 @@ maybe_print_array_index (struct type *in
- 
- void
- val_print_array_elements (struct type *type,
--			  const gdb_byte *valaddr, int embedded_offset,
-+			  const gdb_byte *valaddr, LONGEST embedded_offset,
- 			  CORE_ADDR address, struct ui_file *stream,
+@@ -1995,17 +1995,17 @@
  			  int recurse,
- 			  const struct value *val,
+ 			  struct value *val,
  			  const struct value_print_options *options,
 -			  unsigned int i)
 +			  ULONGEST i)
@@ -3839,8 +2958,7 @@ Index: gdb-7.6.90.20140127/gdb/valprint.c
    unsigned int things_printed = 0;
 -  unsigned len;
 +  ULONGEST len;
-   struct type *saved_type = type;
-   struct type *elttype, *index_type;
+   struct type *elttype, *index_type, *base_index_type;
 -  unsigned eltlen;
 +  ULONGEST eltlen;
    /* Position of the array element we are examining to see
@@ -3851,9 +2969,9 @@ Index: gdb-7.6.90.20140127/gdb/valprint.c
 -  unsigned int reps;
 +  ULONGEST reps;
    LONGEST low_bound, high_bound;
-   struct cleanup *back_to;
-   CORE_ADDR saved_address = address;
-@@ -1727,7 +1727,7 @@ val_print_array_elements (struct type *t
+   LONGEST low_pos, high_pos;
+ 
+@@ -2095,7 +2095,7 @@
  		     address, stream, recurse + 1, val, options,
  		     current_language);
  	  annotate_elt_rep (reps);
@@ -3862,7 +2980,7 @@ Index: gdb-7.6.90.20140127/gdb/valprint.c
  	  annotate_elt_rep_end ();
  
  	  i = rep1 - 1;
-@@ -2382,7 +2382,7 @@ print_converted_chars_to_obstack (struct
+@@ -2747,7 +2747,7 @@
  
  void
  generic_printstr (struct ui_file *stream, struct type *type, 
@@ -3871,34 +2989,20 @@ Index: gdb-7.6.90.20140127/gdb/valprint.c
  		  const char *encoding, int force_ellipses,
  		  int quote_char, int c_style_terminator,
  		  const struct value_print_options *options)
-Index: gdb-7.6.90.20140127/gdb/valprint.h
+Index: gdb-8.0/gdb/valprint.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/valprint.h	2014-02-06 18:07:54.384911139 +0100
-+++ gdb-7.6.90.20140127/gdb/valprint.h	2014-02-06 18:07:58.932916026 +0100
-@@ -115,11 +115,11 @@ extern void maybe_print_array_index (str
-                                      struct ui_file *stream,
- 				     const struct value_print_options *);
- 
--extern void val_print_array_elements (struct type *, const gdb_byte *, int,
-+extern void val_print_array_elements (struct type *, const gdb_byte *, LONGEST,
+--- gdb-8.0.orig/gdb/valprint.h	2017-08-19 20:04:59.820780828 +0200
++++ gdb-8.0/gdb/valprint.h	2017-08-19 20:05:10.090876907 +0200
+@@ -119,7 +119,7 @@
  				      CORE_ADDR, struct ui_file *, int,
- 				      const struct value *,
+ 				      struct value *,
  				      const struct value_print_options *,
 -				      unsigned int);
 +				      ULONGEST);
  
  extern void val_print_type_code_int (struct type *, const gdb_byte *,
  				     struct ui_file *);
-@@ -129,7 +129,7 @@ extern void val_print_type_code_flags (s
- 				       struct ui_file *stream);
- 
- extern void val_print_scalar_formatted (struct type *,
--					const gdb_byte *, int,
-+					const gdb_byte *, LONGEST,
- 					const struct value *,
- 					const struct value_print_options *,
- 					int,
-@@ -145,7 +145,7 @@ extern void print_decimal_chars (struct
+@@ -141,7 +141,7 @@
  				 unsigned int, enum bfd_endian);
  
  extern void print_hex_chars (struct ui_file *, const gdb_byte *,
@@ -3907,16 +3011,16 @@ Index: gdb-7.6.90.20140127/gdb/valprint.h
  
  extern void print_char_chars (struct ui_file *, struct type *,
  			      const gdb_byte *, unsigned int, enum bfd_endian);
-@@ -194,7 +194,7 @@ struct generic_val_print_decorations
+@@ -194,7 +194,7 @@
  
  
- extern void generic_val_print (struct type *type, const gdb_byte *valaddr,
+ extern void generic_val_print (struct type *type,
 -			       int embedded_offset, CORE_ADDR address,
 +			       LONGEST embedded_offset, CORE_ADDR address,
  			       struct ui_file *stream, int recurse,
- 			       const struct value *original_value,
+ 			       struct value *original_value,
  			       const struct value_print_options *options,
-@@ -204,7 +204,7 @@ extern void generic_emit_char (int c, st
+@@ -204,7 +204,7 @@
  			       int quoter, const char *encoding);
  
  extern void generic_printstr (struct ui_file *stream, struct type *type, 
@@ -3925,491 +3029,81 @@ Index: gdb-7.6.90.20140127/gdb/valprint.h
  			      const char *encoding, int force_ellipses,
  			      int quote_char, int c_style_terminator,
  			      const struct value_print_options *options);
-Index: gdb-7.6.90.20140127/gdb/value.c
+Index: gdb-8.0/gdb/value.c
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/value.c	2014-02-06 18:07:54.386911141 +0100
-+++ gdb-7.6.90.20140127/gdb/value.c	2014-02-06 18:10:39.376088625 +0100
-@@ -69,10 +69,10 @@ struct internal_function
- struct range
+--- gdb-8.0.orig/gdb/value.c	2017-08-19 20:04:59.821780838 +0200
++++ gdb-8.0/gdb/value.c	2017-08-19 20:05:10.091876916 +0200
+@@ -367,7 +367,8 @@
+ }
+ 
+ int
+-value_bits_any_optimized_out (const struct value *value, int bit_offset, int bit_length)
++value_bits_any_optimized_out (const struct value *value, LONGEST bit_offset,
++			      LONGEST bit_length)
  {
-   /* Lowest offset in the range.  */
--  int offset;
-+  LONGEST offset;
+   gdb_assert (!value->lazy);
  
-   /* Length of the range.  */
--  int length;
-+  LONGEST length;
- };
- 
- typedef struct range range_s;
-@@ -83,8 +83,8 @@ DEF_VEC_O(range_s);
-    [offset2, offset2+len2) overlap.  */
+@@ -813,9 +814,9 @@
+    Return true if the available bits match.  */
  
  static int
--ranges_overlap (int offset1, int len1,
--		int offset2, int len2)
-+ranges_overlap (LONGEST offset1, LONGEST len1,
-+		LONGEST offset2, LONGEST len2)
+-value_contents_bits_eq (const struct value *val1, int offset1,
+-			const struct value *val2, int offset2,
+-			int length)
++value_contents_bits_eq (const struct value *val1, LONGEST offset1,
++			const struct value *val2, LONGEST offset2,
++			LONGEST length)
  {
-   ULONGEST h, l;
- 
-@@ -108,7 +108,7 @@ range_lessthan (const range_s *r1, const
-    OFFSET+LENGTH).  */
- 
- static int
--ranges_contain (VEC(range_s) *ranges, int offset, int length)
-+ranges_contain (VEC(range_s) *ranges, LONGEST offset, LONGEST length)
- {
-   range_s what;
-   int i;
-@@ -246,7 +246,7 @@ struct value
-      lval == lval_register, this is a further offset from
-      location.address within the registers structure.  Note also the
-      member embedded_offset below.  */
--  int offset;
-+  LONGEST offset;
- 
-   /* Only used for bitfields; number of bits contained in them.  */
-   int bitsize;
-@@ -316,8 +316,8 @@ struct value
-      `type', and `embedded_offset' is zero, so everything works
-      normally.  */
-   struct type *enclosing_type;
--  int embedded_offset;
--  int pointed_to_offset;
-+  LONGEST embedded_offset;
-+  LONGEST pointed_to_offset;
- 
-   /* Values are stored in a chain, so that they can be deleted easily
-      over calls to the inferior.  Values assigned to internal
-@@ -348,7 +348,8 @@ value_bits_available (const struct value
- }
- 
- int
--value_bytes_available (const struct value *value, int offset, int length)
-+value_bytes_available (const struct value *value, LONGEST offset,
-+		       LONGEST length)
- {
-   return value_bits_available (value,
- 			       offset * TARGET_CHAR_BIT,
-@@ -555,7 +556,8 @@ mark_value_bits_unavailable (struct valu
- }
+   /* Each array element corresponds to a ranges source (unavailable,
+      optimized out).  '1' is for VAL1, '2' for VAL2.  */
+@@ -1455,7 +1456,8 @@
+    the following LENGTH bytes.  */
  
  void
--mark_value_bytes_unavailable (struct value *value, int offset, int length)
-+mark_value_bytes_unavailable (struct value *value, LONGEST offset,
-+			      LONGEST length)
+-mark_value_bytes_optimized_out (struct value *value, int offset, int length)
++mark_value_bytes_optimized_out (struct value *value, LONGEST offset,
++				LONGEST length)
  {
-   mark_value_bits_unavailable (value,
- 			       offset * TARGET_CHAR_BIT,
-@@ -569,7 +571,7 @@ mark_value_bytes_unavailable (struct val
- 
- static int
- find_first_range_overlap (VEC(range_s) *ranges, int pos,
--			  int offset, int length)
-+			  LONGEST offset, LONGEST length)
- {
-   range_s *r;
-   int i;
-@@ -760,9 +762,9 @@ value_available_contents_bits_eq (const
- }
- 
- int
--value_available_contents_eq (const struct value *val1, int offset1,
--			     const struct value *val2, int offset2,
--			     int length)
-+value_available_contents_eq (const struct value *val1, LONGEST offset1,
-+			     const struct value *val2, LONGEST offset2,
-+			     LONGEST length)
- {
-   return value_available_contents_bits_eq (val1, offset1 * TARGET_CHAR_BIT,
- 					   val2, offset2 * TARGET_CHAR_BIT,
-@@ -927,13 +929,13 @@ deprecated_set_value_type (struct value
-   value->type = type;
- }
- 
--int
-+LONGEST
- value_offset (const struct value *value)
- {
-   return value->offset;
- }
- void
--set_value_offset (struct value *value, int offset)
-+set_value_offset (struct value *value, LONGEST offset)
- {
-   value->offset = offset;
- }
-@@ -1103,8 +1105,9 @@ value_contents_all (struct value *value)
-    DST_OFFSET+LENGTH) range are wholly available.  */
- 
- void
--value_contents_copy_raw (struct value *dst, int dst_offset,
--			 struct value *src, int src_offset, int length)
-+value_contents_copy_raw (struct value *dst, ssize_t dst_offset,
-+			 struct value *src, ssize_t src_offset,
-+			 ssize_t length)
- {
-   range_s *r;
-   int i;
-@@ -1156,8 +1159,8 @@ value_contents_copy_raw (struct value *d
-    DST_OFFSET+LENGTH) range are wholly available.  */
- 
- void
--value_contents_copy (struct value *dst, int dst_offset,
--		     struct value *src, int src_offset, int length)
-+value_contents_copy (struct value *dst, ssize_t dst_offset,
-+		     struct value *src, ssize_t src_offset, ssize_t length)
- {
-   require_not_optimized_out (src);
- 
-@@ -1262,7 +1265,7 @@ value_entirely_optimized_out (const stru
- }
- 
- int
--value_bits_valid (const struct value *value, int offset, int length)
-+value_bits_valid (const struct value *value, LONGEST offset, LONGEST length)
- {
-   if (!value->optimized_out)
-     return 1;
-@@ -1275,7 +1278,7 @@ value_bits_valid (const struct value *va
- 
- int
- value_bits_synthetic_pointer (const struct value *value,
--			      int offset, int length)
-+			      LONGEST offset, LONGEST length)
- {
-   if (value->lval != lval_computed
-       || !value->location.computed.funcs->check_synthetic_pointer)
-@@ -1285,26 +1288,26 @@ value_bits_synthetic_pointer (const stru
- 								  length);
- }
- 
--int
-+LONGEST
- value_embedded_offset (struct value *value)
- {
-   return value->embedded_offset;
- }
- 
- void
--set_value_embedded_offset (struct value *value, int val)
-+set_value_embedded_offset (struct value *value, LONGEST val)
- {
-   value->embedded_offset = val;
- }
- 
--int
-+LONGEST
- value_pointed_to_offset (struct value *value)
- {
-   return value->pointed_to_offset;
- }
- 
- void
--set_value_pointed_to_offset (struct value *value, int val)
-+set_value_pointed_to_offset (struct value *value, LONGEST val)
- {
-   value->pointed_to_offset = val;
- }
-@@ -2157,7 +2160,7 @@ get_internalvar_function (struct interna
- }
- 
- void
--set_internalvar_component (struct internalvar *var, int offset, int bitpos,
-+set_internalvar_component (struct internalvar *var, LONGEST offset, int bitpos,
- 			   int bitsize, struct value *newval)
- {
-   gdb_byte *addr;
-@@ -2863,7 +2866,7 @@ set_value_enclosing_type (struct value *
-    FIELDNO says which field.  */
- 
- struct value *
--value_primitive_field (struct value *arg1, int offset,
-+value_primitive_field (struct value *arg1, LONGEST offset,
- 		       int fieldno, struct type *arg_type)
- {
-   struct value *v;
-@@ -2891,7 +2894,7 @@ value_primitive_field (struct value *arg
- 	 bit.  Assume that the address, offset, and embedded offset
- 	 are sufficiently aligned.  */
- 
--      int bitpos = TYPE_FIELD_BITPOS (arg_type, fieldno);
-+      LONGEST bitpos = TYPE_FIELD_BITPOS (arg_type, fieldno);
-       int container_bitsize = TYPE_LENGTH (type) * 8;
- 
-       if (arg1->optimized_out)
-@@ -2918,7 +2921,7 @@ value_primitive_field (struct value *arg
-       /* This field is actually a base subobject, so preserve the
- 	 entire object's contents for later references to virtual
- 	 bases, etc.  */
--      int boffset;
-+      LONGEST boffset;
- 
-       /* Lazy register values with offsets are not supported.  */
-       if (VALUE_LVAL (arg1) == lval_register && value_lazy (arg1))
-@@ -3008,7 +3011,7 @@ value_field (struct value *arg1, int fie
- struct value *
- value_fn_field (struct value **arg1p, struct fn_field *f,
- 		int j, struct type *type,
--		int offset)
-+		LONGEST offset)
- {
-   struct value *v;
-   struct type *ftype = TYPE_FN_FIELD_TYPE (f, j);
-@@ -3068,8 +3071,8 @@ value_fn_field (struct value **arg1p, st
- 
- static int
- unpack_value_bits_as_long_1 (struct type *field_type, const gdb_byte *valaddr,
--			     int embedded_offset, int bitpos, int bitsize,
--			     const struct value *original_value,
-+			     LONGEST embedded_offset, LONGEST bitpos,
-+			     int bitsize, const struct value *original_value,
- 			     LONGEST *result)
- {
-   enum bfd_endian byte_order = gdbarch_byte_order (get_type_arch (field_type));
-@@ -3077,7 +3080,7 @@ unpack_value_bits_as_long_1 (struct type
-   ULONGEST valmask;
-   int lsbcount;
-   int bytes_read;
--  int read_offset;
-+  LONGEST read_offset;
- 
-   /* Read the minimum number of bytes required; there may not be
-      enough bytes to read an entire ULONGEST.  */
-@@ -3147,7 +3150,7 @@ unpack_value_bits_as_long_1 (struct type
- 
- int
- unpack_value_bits_as_long (struct type *field_type, const gdb_byte *valaddr,
--			   int embedded_offset, int bitpos, int bitsize,
-+			   LONGEST embedded_offset, int bitpos, int bitsize,
- 			   const struct value *original_value,
- 			   LONGEST *result)
- {
-@@ -3165,10 +3168,10 @@ unpack_value_bits_as_long (struct type *
- 
- static int
- unpack_value_field_as_long_1 (struct type *type, const gdb_byte *valaddr,
--			      int embedded_offset, int fieldno,
-+			      LONGEST embedded_offset, int fieldno,
- 			      const struct value *val, LONGEST *result)
- {
--  int bitpos = TYPE_FIELD_BITPOS (type, fieldno);
-+  LONGEST bitpos = TYPE_FIELD_BITPOS (type, fieldno);
-   int bitsize = TYPE_FIELD_BITSIZE (type, fieldno);
-   struct type *field_type = TYPE_FIELD_TYPE (type, fieldno);
- 
-@@ -3184,7 +3187,7 @@ unpack_value_field_as_long_1 (struct typ
- 
- int
- unpack_value_field_as_long (struct type *type, const gdb_byte *valaddr,
--			    int embedded_offset, int fieldno,
-+			    LONGEST embedded_offset, int fieldno,
- 			    const struct value *val, LONGEST *result)
- {
-   gdb_assert (val != NULL);
-@@ -3216,7 +3219,7 @@ unpack_field_as_long (struct type *type,
- struct value *
- value_field_bitfield (struct type *type, int fieldno,
- 		      const gdb_byte *valaddr,
--		      int embedded_offset, const struct value *val)
-+		      LONGEST embedded_offset, const struct value *val)
- {
-   LONGEST l;
- 
-@@ -3243,12 +3246,12 @@ value_field_bitfield (struct type *type,
- 
- void
- modify_field (struct type *type, gdb_byte *addr,
--	      LONGEST fieldval, int bitpos, int bitsize)
-+	      LONGEST fieldval, LONGEST bitpos, int bitsize)
- {
-   enum bfd_endian byte_order = gdbarch_byte_order (get_type_arch (type));
-   ULONGEST oword;
-   ULONGEST mask = (ULONGEST) -1 >> (8 * sizeof (ULONGEST) - bitsize);
--  int bytesize;
-+  LONGEST bytesize;
- 
-   /* Normalize BITPOS.  */
-   addr += bitpos / 8;
-Index: gdb-7.6.90.20140127/gdb/value.h
+   mark_value_bits_optimized_out (value,
+ 				 offset * TARGET_CHAR_BIT,
+Index: gdb-8.0/gdb/value.h
 ===================================================================
---- gdb-7.6.90.20140127.orig/gdb/value.h	2014-02-06 18:07:54.387911142 +0100
-+++ gdb-7.6.90.20140127/gdb/value.h	2014-02-06 18:09:23.064006360 +0100
-@@ -82,8 +82,8 @@ extern void set_value_parent (struct val
-    within the registers structure.  Note also the member
-    embedded_offset below.  */
- 
--extern int value_offset (const struct value *);
--extern void set_value_offset (struct value *, int offset);
-+extern LONGEST value_offset (const struct value *);
-+extern void set_value_offset (struct value *, LONGEST offset);
- 
- /* The comment from "struct value" reads: ``Is it modifiable?  Only
-    relevant if lval != not_lval.''.  Shouldn't the value instead be
-@@ -152,10 +152,10 @@ extern struct type *value_actual_type (s
- 				       int resolve_simple_types,
- 				       int *real_type_found);
- 
--extern int value_pointed_to_offset (struct value *value);
--extern void set_value_pointed_to_offset (struct value *value, int val);
--extern int value_embedded_offset (struct value *value);
--extern void set_value_embedded_offset (struct value *value, int val);
-+extern LONGEST value_pointed_to_offset (struct value *value);
-+extern void set_value_pointed_to_offset (struct value *value, LONGEST val);
-+extern LONGEST value_embedded_offset (struct value *value);
-+extern void set_value_embedded_offset (struct value *value, LONGEST val);
- 
- /* For lval_computed values, this structure holds functions used to
-    retrieve and set the value (or portions of the value).
-@@ -183,7 +183,8 @@ struct lval_funcs
-   /* Check the validity of some bits in VALUE.  This should return 1
-      if all the bits starting at OFFSET and extending for LENGTH bits
-      are valid, or 0 if any bit is invalid.  */
--  int (*check_validity) (const struct value *value, int offset, int length);
-+  int (*check_validity) (const struct value *value, LONGEST offset,
-+			 LONGEST length);
- 
-   /* Return 1 if any bit in VALUE is valid, 0 if they are all invalid.  */
-   int (*check_any_valid) (const struct value *value);
-@@ -201,7 +202,7 @@ struct lval_funcs
+--- gdb-8.0.orig/gdb/value.h	2017-08-19 20:04:59.822780847 +0200
++++ gdb-8.0/gdb/value.h	2017-08-19 20:05:10.092876925 +0200
+@@ -246,7 +246,7 @@
    /* If non-NULL, this is used to determine whether the indicated bits
       of VALUE are a synthetic pointer.  */
    int (*check_synthetic_pointer) (const struct value *value,
--				  int offset, int length);
+-				  LONGEST offset, int length);
 +				  LONGEST offset, LONGEST length);
  
    /* Return a duplicate of VALUE's closure, for use in a new value.
       This may simply return the same closure, if VALUE's is
-@@ -238,7 +239,7 @@ extern struct value *allocate_computed_v
-    Otherwise, return 1.  */
+@@ -377,7 +377,8 @@
+    otherwise.  */
  
- extern int valprint_check_validity (struct ui_file *stream, struct type *type,
--				    int embedded_offset,
-+				    LONGEST embedded_offset,
- 				    const struct value *val);
+ extern int value_bits_any_optimized_out (const struct value *value,
+-					 int bit_offset, int bit_length);
++					 LONGEST bit_offset,
++					 LONGEST bit_length);
  
- extern struct value *allocate_optimized_out_value (struct type *type);
-@@ -420,13 +421,13 @@ extern struct value *coerce_array (struc
-    bits in the given range are valid, zero if any bit is invalid.  */
+ /* Like value_optimized_out, but return true iff the whole value is
+    optimized out.  */
+@@ -387,7 +388,7 @@
+    LENGTH bytes as optimized out.  */
  
- extern int value_bits_valid (const struct value *value,
--			     int offset, int length);
-+			     LONGEST offset, LONGEST length);
- 
- /* Given a value, determine whether the bits starting at OFFSET and
-    extending for LENGTH bits are a synthetic pointer.  */
- 
- extern int value_bits_synthetic_pointer (const struct value *value,
--					 int offset, int length);
-+					 LONGEST offset, LONGEST length);
- 
- /* Given a value, determine whether the contents bytes starting at
-    OFFSET and extending for LENGTH bytes are available.  This returns
-@@ -434,7 +435,7 @@ extern int value_bits_synthetic_pointer
-    byte is unavailable.  */
- 
- extern int value_bytes_available (const struct value *value,
--				  int offset, int length);
-+				  LONGEST offset, LONGEST length);
- 
- /* Given a value, determine whether the contents bits starting at
-    OFFSET and extending for LENGTH bits are available.  This returns
-@@ -456,7 +457,7 @@ extern int value_entirely_unavailable (s
-    LENGTH bytes as unavailable.  */
- 
- extern void mark_value_bytes_unavailable (struct value *value,
--					  int offset, int length);
-+					  LONGEST offset, LONGEST length);
+ extern void mark_value_bytes_optimized_out (struct value *value,
+-					    int offset, int length);
++					    LONGEST offset, LONGEST length);
  
  /* Mark VALUE's content bits starting at OFFSET and extending for
-    LENGTH bits as unavailable.  */
-@@ -472,7 +473,7 @@ extern void mark_value_bits_unavailable
-    example, to compare a complete object value with itself, including
-    its enclosing type chunk, you'd do:
- 
--     int len = TYPE_LENGTH (check_typedef (value_enclosing_type (val)));
-+     ULONGEST len = TYPE_LENGTH (check_typedef (value_enclosing_type (val)));
-      value_available_contents (val, 0, val, 0, len);
- 
-    Returns true iff the set of available contents match.  Unavailable
-@@ -499,9 +500,9 @@ extern void mark_value_bits_unavailable
-    gone, it works with const values.  Therefore, this routine must not
-    be called with lazy values.  */
- 
--extern int value_available_contents_eq (const struct value *val1, int offset1,
--					const struct value *val2, int offset2,
--					int length);
-+extern int value_available_contents_eq (const struct value *val1, LONGEST offset1,
-+					const struct value *val2, LONGEST offset2,
-+					LONGEST length);
- 
- /* Read LENGTH bytes of memory starting at MEMADDR into BUFFER, which
-    is (or will be copied to) VAL's contents buffer offset by
-@@ -510,7 +511,7 @@ extern int value_available_contents_eq (
-    memory is likewise unavailable.  STACK indicates whether the memory
-    is known to be stack memory.  */
- 
--extern void read_value_memory (struct value *val, int embedded_offset,
-+extern void read_value_memory (struct value *val, LONGEST embedded_offset,
- 			       int stack, CORE_ADDR memaddr,
- 			       gdb_byte *buffer, size_t length);
- 
-@@ -544,7 +545,7 @@ extern CORE_ADDR unpack_pointer (struct
- 
- extern int unpack_value_bits_as_long (struct type *field_type,
- 				      const gdb_byte *valaddr,
--				      int embedded_offset, int bitpos,
-+				      LONGEST embedded_offset, int bitpos,
- 				      int bitsize,
- 				      const struct value *original_value,
- 				      LONGEST *result);
-@@ -553,12 +554,12 @@ extern LONGEST unpack_field_as_long (str
- 				     const gdb_byte *valaddr,
- 				     int fieldno);
- extern int unpack_value_field_as_long (struct type *type, const gdb_byte *valaddr,
--				int embedded_offset, int fieldno,
-+				LONGEST embedded_offset, int fieldno,
- 				const struct value *val, LONGEST *result);
- 
- extern struct value *value_field_bitfield (struct type *type, int fieldno,
- 					   const gdb_byte *valaddr,
--					   int embedded_offset,
-+					   LONGEST embedded_offset,
- 					   const struct value *val);
- 
- extern void pack_long (gdb_byte *buf, struct type *type, LONGEST num);
-@@ -616,12 +617,12 @@ extern struct value *default_read_var_va
- 
- extern struct value *allocate_value (struct type *type);
- extern struct value *allocate_value_lazy (struct type *type);
--extern void value_contents_copy (struct value *dst, int dst_offset,
--				 struct value *src, int src_offset,
--				 int length);
--extern void value_contents_copy_raw (struct value *dst, int dst_offset,
--				     struct value *src, int src_offset,
--				     int length);
-+extern void value_contents_copy (struct value *dst, ssize_t dst_offset,
-+				 struct value *src, ssize_t src_offset,
-+				 ssize_t length);
-+extern void value_contents_copy_raw (struct value *dst, ssize_t dst_offset,
-+				     struct value *src, ssize_t src_offset,
-+				     ssize_t length);
- 
- extern struct value *allocate_repeat_value (struct type *type, int count);
- 
-@@ -698,16 +699,16 @@ extern int find_overload_match (struct v
- 
- extern struct value *value_field (struct value *arg1, int fieldno);
- 
--extern struct value *value_primitive_field (struct value *arg1, int offset,
-+extern struct value *value_primitive_field (struct value *arg1, LONGEST offset,
+    LENGTH bits as optimized out.  */
+@@ -819,12 +820,11 @@
  					    int fieldno,
  					    struct type *arg_type);
  
- 
--extern struct type *value_rtti_indirect_type (struct value *, int *, int *,
-+extern struct type *value_rtti_indirect_type (struct value *, int *, LONGEST *,
+-
+ extern struct type *value_rtti_indirect_type (struct value *, int *, LONGEST *,
  					      int *);
  
  extern struct value *value_full_object (struct value *, struct type *, int,
@@ -4418,44 +3112,7 @@ Index: gdb-7.6.90.20140127/gdb/value.h
  
  extern struct value *value_cast_pointers (struct type *, struct value *, int);
  
-@@ -802,7 +803,7 @@ extern void set_internalvar_string (stru
- extern void clear_internalvar (struct internalvar *var);
- 
- extern void set_internalvar_component (struct internalvar *var,
--				       int offset,
-+				       LONGEST offset,
- 				       int bitpos, int bitsize,
- 				       struct value *newvalue);
- 
-@@ -883,7 +884,7 @@ extern struct value *value_x_unop (struc
- 				   enum noside noside);
- 
- extern struct value *value_fn_field (struct value **arg1p, struct fn_field *f,
--				     int j, struct type *type, int offset);
-+				     int j, struct type *type, LONGEST offset);
- 
- extern int binop_types_user_defined_p (enum exp_opcode op,
- 				       struct type *type1,
-@@ -911,7 +912,8 @@ extern void release_value_or_incref (str
- extern int record_latest_value (struct value *val);
- 
- extern void modify_field (struct type *type, gdb_byte *addr,
--			  LONGEST fieldval, int bitpos, int bitsize);
-+			  LONGEST fieldval, LONGEST bitpos,
-+			  int bitsize);
- 
- extern void type_print (struct type *type, const char *varstring,
- 			struct ui_file *stream, int show);
-@@ -941,7 +943,7 @@ extern void value_print_array_elements (
- extern struct value *value_release_to_mark (struct value *mark);
- 
- extern void val_print (struct type *type, const gdb_byte *valaddr,
--		       int embedded_offset, CORE_ADDR address,
-+		       LONGEST embedded_offset, CORE_ADDR address,
- 		       struct ui_file *stream, int recurse,
- 		       const struct value *val,
- 		       const struct value_print_options *options,
-@@ -990,10 +992,11 @@ extern struct value *value_literal_compl
+@@ -1113,10 +1113,11 @@
  extern struct value *find_function_in_inferior (const char *,
  						struct objfile **);
  
@@ -4469,3 +3126,266 @@ Index: gdb-7.6.90.20140127/gdb/value.h
  
  /* User function handler.  */
  
+Index: gdb-8.0/gdb/s390-linux-nat.c
+===================================================================
+--- gdb-8.0.orig/gdb/s390-linux-nat.c	2017-08-19 20:04:59.822780847 +0200
++++ gdb-8.0/gdb/s390-linux-nat.c	2017-08-19 20:05:10.092876925 +0200
+@@ -900,7 +900,7 @@
+ 
+ static int
+ s390_region_ok_for_hw_watchpoint (struct target_ops *self,
+-				  CORE_ADDR addr, int cnt)
++				  CORE_ADDR addr, LONGEST cnt)
+ {
+   return 1;
+ }
+Index: gdb-8.0/gdb/target-delegates.c
+===================================================================
+--- gdb-8.0.orig/gdb/target-delegates.c	2017-08-19 20:04:59.823780856 +0200
++++ gdb-8.0/gdb/target-delegates.c	2017-08-19 20:05:10.093876935 +0200
+@@ -760,14 +760,14 @@
+ }
+ 
+ static int
+-delegate_region_ok_for_hw_watchpoint (struct target_ops *self, CORE_ADDR arg1, int arg2)
++delegate_region_ok_for_hw_watchpoint (struct target_ops *self, CORE_ADDR arg1, LONGEST arg2)
+ {
+   self = self->beneath;
+   return self->to_region_ok_for_hw_watchpoint (self, arg1, arg2);
+ }
+ 
+ static int
+-debug_region_ok_for_hw_watchpoint (struct target_ops *self, CORE_ADDR arg1, int arg2)
++debug_region_ok_for_hw_watchpoint (struct target_ops *self, CORE_ADDR arg1, LONGEST arg2)
+ {
+   int result;
+   fprintf_unfiltered (gdb_stdlog, "-> %s->to_region_ok_for_hw_watchpoint (...)\n", debug_target.to_shortname);
+@@ -777,7 +777,7 @@
+   fputs_unfiltered (", ", gdb_stdlog);
+   target_debug_print_CORE_ADDR (arg1);
+   fputs_unfiltered (", ", gdb_stdlog);
+-  target_debug_print_int (arg2);
++  target_debug_print_LONGEST (arg2);
+   fputs_unfiltered (") = ", gdb_stdlog);
+   target_debug_print_int (result);
+   fputs_unfiltered ("\n", gdb_stdlog);
+Index: gdb-8.0/gdb/aarch64-linux-nat.c
+===================================================================
+--- gdb-8.0.orig/gdb/aarch64-linux-nat.c	2017-08-19 20:04:59.823780856 +0200
++++ gdb-8.0/gdb/aarch64-linux-nat.c	2017-08-19 20:05:10.093876935 +0200
+@@ -708,7 +708,7 @@
+ 
+ static int
+ aarch64_linux_region_ok_for_hw_watchpoint (struct target_ops *self,
+-					   CORE_ADDR addr, int len)
++					   CORE_ADDR addr, LONGEST len)
+ {
+   return aarch64_linux_region_ok_for_watchpoint (addr, len);
+ }
+Index: gdb-8.0/gdb/nat/x86-dregs.c
+===================================================================
+--- gdb-8.0.orig/gdb/nat/x86-dregs.c	2017-08-19 20:04:59.823780856 +0200
++++ gdb-8.0/gdb/nat/x86-dregs.c	2017-08-19 20:05:10.093876935 +0200
+@@ -384,7 +384,7 @@
+ 
+ static int
+ x86_handle_nonaligned_watchpoint (struct x86_debug_reg_state *state,
+-				  x86_wp_op_t what, CORE_ADDR addr, int len,
++				  x86_wp_op_t what, CORE_ADDR addr, LONGEST len,
+ 				  enum target_hw_bp_type type)
+ {
+   int retval = 0;
+@@ -552,7 +552,7 @@
+ 
+ int
+ x86_dr_region_ok_for_watchpoint (struct x86_debug_reg_state *state,
+-				 CORE_ADDR addr, int len)
++				 CORE_ADDR addr, LONGEST len)
+ {
+   int nregs;
+ 
+Index: gdb-8.0/gdb/compile/compile-c-support.c
+===================================================================
+--- gdb-8.0.orig/gdb/compile/compile-c-support.c	2017-08-19 20:04:59.824780866 +0200
++++ gdb-8.0/gdb/compile/compile-c-support.c	2017-08-19 20:05:10.093876935 +0200
+@@ -309,11 +309,11 @@
+ 
+ 	      default:
+ 		fprintf_unfiltered (stream,
+-				    "  unsigned char %s[%d]"
++				    "  unsigned char %s[%s]"
+ 				    " __attribute__((__aligned__("
+ 				    "__BIGGEST_ALIGNMENT__)))",
+ 				    regname,
+-				    TYPE_LENGTH (regtype));
++				    pulongest (TYPE_LENGTH (regtype)));
+ 	      }
+ 	    fputs_unfiltered (";\n", stream);
+ 
+Index: gdb-8.0/gdb/nat/x86-dregs.h
+===================================================================
+--- gdb-8.0.orig/gdb/nat/x86-dregs.h	2017-08-19 20:04:59.824780866 +0200
++++ gdb-8.0/gdb/nat/x86-dregs.h	2017-08-19 20:05:10.094876944 +0200
+@@ -116,7 +116,7 @@
+ /* Return non-zero if we can watch a memory region that starts at
+    address ADDR and whose length is LEN bytes.  */
+ extern int x86_dr_region_ok_for_watchpoint (struct x86_debug_reg_state *state,
+-					    CORE_ADDR addr, int len);
++					    CORE_ADDR addr, LONGEST len);
+ 
+ /* If the inferior has some break/watchpoint that triggered, set the
+    address associated with that break/watchpoint and return true.
+Index: gdb-8.0/gdb/x86-nat.c
+===================================================================
+--- gdb-8.0.orig/gdb/x86-nat.c	2017-08-19 20:04:59.824780866 +0200
++++ gdb-8.0/gdb/x86-nat.c	2017-08-19 20:05:10.094876944 +0200
+@@ -174,7 +174,7 @@
+ 
+ static int
+ x86_region_ok_for_watchpoint (struct target_ops *self,
+-			      CORE_ADDR addr, int len)
++			      CORE_ADDR addr, LONGEST len)
+ {
+   struct x86_debug_reg_state *state
+     = x86_debug_reg_state (ptid_get_pid (inferior_ptid));
+Index: gdb-8.0/gdb/rust-lang.c
+===================================================================
+--- gdb-8.0.orig/gdb/rust-lang.c	2017-08-19 20:04:59.824780866 +0200
++++ gdb-8.0/gdb/rust-lang.c	2017-08-19 20:05:10.094876944 +0200
+@@ -439,7 +439,7 @@
+ 
+ static void
+ rust_printstr (struct ui_file *stream, struct type *type,
+-	       const gdb_byte *string, unsigned int length,
++	       const gdb_byte *string, ULONGEST length,
+ 	       const char *user_encoding, int force_ellipses,
+ 	       const struct value_print_options *options)
+ {
+@@ -563,7 +563,7 @@
+ /* la_val_print implementation for Rust.  */
+ 
+ static void
+-rust_val_print (struct type *type, int embedded_offset,
++rust_val_print (struct type *type, LONGEST embedded_offset,
+ 		CORE_ADDR address, struct ui_file *stream, int recurse,
+ 		struct value *val,
+ 		const struct value_print_options *options)
+Index: gdb-8.0/gdb/arch-utils.c
+===================================================================
+--- gdb-8.0.orig/gdb/arch-utils.c	2017-08-19 20:04:59.825780875 +0200
++++ gdb-8.0/gdb/arch-utils.c	2017-08-19 20:05:10.095876953 +0200
+@@ -247,7 +247,7 @@
+ 
+ const struct floatformat **
+ default_floatformat_for_type (struct gdbarch *gdbarch,
+-			      const char *name, int len)
++			      const char *name, LONGEST len)
+ {
+   const struct floatformat **format = NULL;
+ 
+Index: gdb-8.0/gdb/arch-utils.h
+===================================================================
+--- gdb-8.0.orig/gdb/arch-utils.h	2017-08-19 20:04:59.825780875 +0200
++++ gdb-8.0/gdb/arch-utils.h	2017-08-19 20:05:10.095876953 +0200
+@@ -144,7 +144,7 @@
+ /* Default implementation of gdbarch_floatformat_for_type.  */
+ extern const struct floatformat **
+   default_floatformat_for_type (struct gdbarch *gdbarch,
+-				const char *name, int len);
++				const char *name, LONGEST len);
+ 
+ extern CORE_ADDR generic_skip_trampoline_code (struct frame_info *frame,
+ 					       CORE_ADDR pc);
+Index: gdb-8.0/gdb/findcmd.c
+===================================================================
+--- gdb-8.0.orig/gdb/findcmd.c	2017-08-19 20:04:59.825780875 +0200
++++ gdb-8.0/gdb/findcmd.c	2017-08-19 20:05:10.095876953 +0200
+@@ -180,7 +180,7 @@
+ 	 need to grow the pattern buf.  */
+       pattern_buf_size_need = (pattern_buf_end - pattern_buf
+ 			       + std::max (TYPE_LENGTH (t),
+-					   (unsigned) sizeof (int64_t)));
++					   (ULONGEST) sizeof (int64_t)));
+       if (pattern_buf_size_need > pattern_buf_size)
+ 	{
+ 	  size_t current_offset = pattern_buf_end - pattern_buf;
+Index: gdb-8.0/gdb/gdbarch.c
+===================================================================
+--- gdb-8.0.orig/gdb/gdbarch.c	2017-08-19 20:04:59.826780885 +0200
++++ gdb-8.0/gdb/gdbarch.c	2017-08-19 20:05:10.096876963 +0200
+@@ -1806,7 +1806,7 @@
+ }
+ 
+ const struct floatformat **
+-gdbarch_floatformat_for_type (struct gdbarch *gdbarch, const char *name, int length)
++gdbarch_floatformat_for_type (struct gdbarch *gdbarch, const char *name, LONGEST length)
+ {
+   gdb_assert (gdbarch != NULL);
+   gdb_assert (gdbarch->floatformat_for_type != NULL);
+Index: gdb-8.0/gdb/gdbarch.h
+===================================================================
+--- gdb-8.0.orig/gdb/gdbarch.h	2017-08-19 20:04:59.826780885 +0200
++++ gdb-8.0/gdb/gdbarch.h	2017-08-19 20:05:10.096876963 +0200
+@@ -203,8 +203,8 @@
+    NAME, if non-NULL, is the type name, which may be used to distinguish
+    different target formats of the same length. */
+ 
+-typedef const struct floatformat ** (gdbarch_floatformat_for_type_ftype) (struct gdbarch *gdbarch, const char *name, int length);
+-extern const struct floatformat ** gdbarch_floatformat_for_type (struct gdbarch *gdbarch, const char *name, int length);
++typedef const struct floatformat ** (gdbarch_floatformat_for_type_ftype) (struct gdbarch *gdbarch, const char *name, LONGEST length);
++extern const struct floatformat ** gdbarch_floatformat_for_type (struct gdbarch *gdbarch, const char *name, LONGEST length);
+ extern void set_gdbarch_floatformat_for_type (struct gdbarch *gdbarch, gdbarch_floatformat_for_type_ftype *floatformat_for_type);
+ 
+ /* For most targets, a pointer on the target and its representation as an
+Index: gdb-8.0/gdb/gdbarch.sh
+===================================================================
+--- gdb-8.0.orig/gdb/gdbarch.sh	2017-08-19 20:04:59.827780894 +0200
++++ gdb-8.0/gdb/gdbarch.sh	2017-08-19 20:05:10.097876972 +0200
+@@ -392,7 +392,7 @@
+ # Returns the floating-point format to be used for values of length LENGTH.
+ # NAME, if non-NULL, is the type name, which may be used to distinguish
+ # different target formats of the same length.
+-m:const struct floatformat **:floatformat_for_type:const char *name, int length:name, length:0:default_floatformat_for_type::0
++m:const struct floatformat **:floatformat_for_type:const char *name, LONGEST length:name, length:0:default_floatformat_for_type::0
+ 
+ # For most targets, a pointer on the target and its representation as an
+ # address in GDB have the same size and "look the same".  For such a
+Index: gdb-8.0/gdb/i386-tdep.c
+===================================================================
+--- gdb-8.0.orig/gdb/i386-tdep.c	2017-08-19 20:04:59.828780903 +0200
++++ gdb-8.0/gdb/i386-tdep.c	2017-08-19 20:05:10.098876982 +0200
+@@ -8180,7 +8180,7 @@
+ 
+ const struct floatformat **
+ i386_floatformat_for_type (struct gdbarch *gdbarch,
+-			   const char *name, int len)
++			   const char *name, LONGEST len)
+ {
+   if (len == 128 && name)
+     if (strcmp (name, "__float128") == 0
+Index: gdb-8.0/gdb/ppc-linux-tdep.c
+===================================================================
+--- gdb-8.0.orig/gdb/ppc-linux-tdep.c	2017-08-19 20:04:59.829780913 +0200
++++ gdb-8.0/gdb/ppc-linux-tdep.c	2017-08-19 20:05:10.098876982 +0200
+@@ -1632,7 +1632,7 @@
+ 
+ const struct floatformat **
+ ppc_floatformat_for_type (struct gdbarch *gdbarch,
+-                          const char *name, int len)
++                          const char *name, LONGEST len)
+ {
+   if (len == 128 && name)
+     if (strcmp (name, "__float128") == 0
+Index: gdb-8.0/gdb/tracepoint.h
+===================================================================
+--- gdb-8.0.orig/gdb/tracepoint.h	2017-08-19 20:04:59.829780913 +0200
++++ gdb-8.0/gdb/tracepoint.h	2017-08-19 20:05:10.099876991 +0200
+@@ -254,7 +254,7 @@
+   void add_register (unsigned int regno);
+   void add_memrange (struct gdbarch *gdbarch,
+ 		     int type, bfd_signed_vma base,
+-		     unsigned long len);
++		     ULONGEST len);
+   void collect_symbol (struct symbol *sym,
+ 		       struct gdbarch *gdbarch,
+ 		       long frame_regno, long frame_offset,

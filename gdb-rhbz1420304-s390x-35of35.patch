@@ -1,0 +1,67 @@
+commit 1ef692ea23714876cc30b1a3ab3ef33a1369f17a
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Tue Aug 1 15:13:40 2017 +0200
+
+    S/390: Fix claimfile failures
+    
+    This fixes a segfault when trying to access the local_plt field in the
+    s390 specific elf data althoug the underlaying object is a generic elf
+    object.
+    
+    This fixes the following testsuite failures:
+    
+    < FAIL: plugin claimfile replace symbol with source
+    < FAIL: plugin claimfile resolve symbol with source
+    < FAIL: plugin claimfile replace file with source
+    < FAIL: plugin set symbol visibility with source
+    < FAIL: plugin ignore lib with source
+    < FAIL: plugin claimfile replace lib with source
+    < FAIL: plugin 2 with source lib
+    < FAIL: load plugin 2 with source
+    < FAIL: plugin 3 with source lib
+    < FAIL: load plugin 3 with source
+    
+    bfd/ChangeLog:
+    
+    2017-08-01  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf32-s390.c (elf_s390_finish_dynamic_sections): Skip if it
+            isn't the S/390 specific elf data.
+            * elf64-s390.c (elf_s390_finish_dynamic_sections): Likewise.
+
+### a/bfd/ChangeLog
+### b/bfd/ChangeLog
+## -1,3 +1,9 @@
++2017-08-01  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
++
++	* elf32-s390.c (elf_s390_finish_dynamic_sections): Skip if it
++	isn't the S/390 specific elf data.
++	* elf64-s390.c (elf_s390_finish_dynamic_sections): Likewise.
++
+ 2017-07-31  Kuan-Lin Chen  <rufus@andestech.com>
+ 
+ 	* elfxx-riscv.c (riscv_elf_add_sub_reloc): New function.
+--- a/bfd/elf32-s390.c
++++ b/bfd/elf32-s390.c
+@@ -4001,6 +4001,9 @@ elf_s390_finish_dynamic_sections (bfd *output_bfd,
+ 
+       symtab_hdr = &elf_symtab_hdr (ibfd);
+ 
++      if (!is_s390_elf (ibfd))
++	continue;
++
+       local_plt = elf_s390_local_plt (ibfd);
+       if (local_plt != NULL)
+ 	for (i = 0; i < symtab_hdr->sh_info; i++)
+--- a/bfd/elf64-s390.c
++++ b/bfd/elf64-s390.c
+@@ -3814,6 +3814,9 @@ elf_s390_finish_dynamic_sections (bfd *output_bfd,
+ 
+       symtab_hdr = &elf_symtab_hdr (ibfd);
+ 
++      if (!is_s390_elf (ibfd))
++	continue;
++
+       local_plt = elf_s390_local_plt (ibfd);
+       if (local_plt != NULL)
+ 	for (i = 0; i < symtab_hdr->sh_info; i++)

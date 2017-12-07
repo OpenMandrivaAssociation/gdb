@@ -1,0 +1,46 @@
+commit 8fe09d7421db51bc13c9228547d63e6315bd6bd0
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Thu Sep 21 17:45:18 2017 +0200
+
+    S/390: Fix Elf note swap s390_gs_bc vs. s390_gs_cb
+    
+    Fix two typos that resulted in swapping the BFD names for the core note
+    register sections NT_S390_GS_CB and NT_S390_GS_BC.
+    
+    bfd/ChangeLog:
+    
+            * elf.c (elfcore_grok_note): For the cases NT_S390_GS_CB and
+            NT_S390_GS_BC, correct the previously swapped invocations of
+            elfcore_grok_s390_gs_bc and elfcore_grok_s390_gs_cb.
+
+### a/bfd/ChangeLog
+### b/bfd/ChangeLog
+## -1,3 +1,9 @@
++2017-09-21  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
++	* elf.c (elfcore_grok_note): For the cases NT_S390_GS_CB and
++	NT_S390_GS_BC, correct the previously swapped invocations of
++	elfcore_grok_s390_gs_bc and elfcore_grok_s390_gs_cb.
++
+ 2017-09-19  Alan Modra  <amodra@gmail.com>
+ 
+ 	PR 21441
+--- a/bfd/elf.c
++++ b/bfd/elf.c
+@@ -9698,14 +9698,14 @@ elfcore_grok_note (bfd *abfd, Elf_Internal_Note *note)
+     case NT_S390_GS_CB:
+       if (note->namesz == 6
+ 	  && strcmp (note->namedata, "LINUX") == 0)
+-	return elfcore_grok_s390_gs_bc (abfd, note);
++	return elfcore_grok_s390_gs_cb (abfd, note);
+       else
+ 	return TRUE;
+ 
+     case NT_S390_GS_BC:
+       if (note->namesz == 6
+ 	  && strcmp (note->namedata, "LINUX") == 0)
+-	return elfcore_grok_s390_gs_cb (abfd, note);
++	return elfcore_grok_s390_gs_bc (abfd, note);
+       else
+ 	return TRUE;
+ 

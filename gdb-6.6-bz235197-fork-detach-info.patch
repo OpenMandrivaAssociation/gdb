@@ -3,23 +3,10 @@
 	Port to GDB-6.8pre.
 	Remove the `[' character from the GDB-6.8 default message.
 
-Index: gdb-7.6.90.20140127/gdb/linux-nat.c
-===================================================================
---- gdb-7.6.90.20140127.orig/gdb/linux-nat.c	2014-02-04 23:47:39.275034491 +0100
-+++ gdb-7.6.90.20140127/gdb/linux-nat.c	2014-02-04 23:48:11.943074132 +0100
-@@ -426,7 +426,7 @@ holding the child stopped.  Try \"set de
- 	      remove_breakpoints_pid (ptid_get_pid (inferior_ptid));
- 	    }
- 
--	  if (info_verbose || debug_linux_nat)
-+	  if (1 /* Fedora Bug 235197 */ || info_verbose || debug_linux_nat)
- 	    {
- 	      target_terminal_ours ();
- 	      fprintf_filtered (gdb_stdlog,
-Index: gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.c
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/fork-detach.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.c	2014-02-04 23:47:39.275034491 +0100
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/fork-detach.c	2016-02-15 23:25:36.686600598 +0100
 @@ -0,0 +1,57 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -78,10 +65,10 @@ Index: gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.c
 +    }
 +  return 0;
 +}
-Index: gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.exp
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/fork-detach.exp
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.exp	2014-02-04 23:47:39.276034493 +0100
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/fork-detach.exp	2016-02-15 23:27:55.792588265 +0100
 @@ -0,0 +1,36 @@
 +# Copyright 2007 Free Software Foundation, Inc.
 +
@@ -101,7 +88,7 @@ Index: gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.exp
 +
 +set testfile fork-detach
 +set srcfile ${testfile}.c
-+set binfile ${objdir}/${subdir}/${testfile}
++set binfile [standard_output_file ${testfile}]
 +if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug}] != "" } {
 +    untested "Couldn't compile test program"
 +    return -1
@@ -119,3 +106,38 @@ Index: gdb-7.6.90.20140127/gdb/testsuite/gdb.base/fork-detach.exp
 +gdb_test "" \
 +         "Detaching after fork from child process.*\\\[Inferior .* exited normally\\\]" \
 +         "Info message caught"
+Index: gdb-7.10.90.20160211/gdb/infrun.c
+===================================================================
+--- gdb-7.10.90.20160211.orig/gdb/infrun.c	2016-02-15 23:25:01.432350289 +0100
++++ gdb-7.10.90.20160211/gdb/infrun.c	2016-02-15 23:27:49.274541986 +0100
+@@ -478,7 +478,7 @@
+ 	      remove_breakpoints_pid (ptid_get_pid (inferior_ptid));
+ 	    }
+ 
+-	  if (info_verbose || debug_infrun)
++	  if (1 /* Fedora Bug 235197 */ || info_verbose || debug_infrun)
+ 	    {
+ 	      /* Ensure that we have a process ptid.  */
+ 	      ptid_t process_ptid = pid_to_ptid (ptid_get_pid (child_ptid));
+Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/catch-syscall.exp
+===================================================================
+--- gdb-7.10.90.20160211.orig/gdb/testsuite/gdb.base/catch-syscall.exp	2016-02-15 23:25:01.432350289 +0100
++++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/catch-syscall.exp	2016-02-15 23:25:36.689600619 +0100
+@@ -165,7 +165,7 @@
+     # Deleting the catchpoints
+     delete_breakpoints
+ 
+-    gdb_continue_to_end
++    gdb_continue_to_end "" continue 1
+ }
+ 
+ proc test_catch_syscall_without_args {} {
+@@ -236,7 +236,7 @@
+ 	# If it doesn't, everything is right (since we don't have
+ 	# a syscall named "mlock" in it).  Otherwise, this is a failure.
+ 	set thistest "catch syscall with unused syscall ($syscall_name)"
+-	gdb_continue_to_end $thistest
++	gdb_continue_to_end $thistest continue 1
+     }
+ }
+ 

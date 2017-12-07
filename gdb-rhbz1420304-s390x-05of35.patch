@@ -1,0 +1,58 @@
+commit ffc61c5de1a5a89e3e37fb9376725c32a839c34d
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Mon May 29 12:36:57 2017 +0200
+
+    S/390: Add ipte/idte variants with optional operands
+    
+    This patch adds missing variants of ipte and idte instructions added with later CPU
+    generations.
+    
+    ipte got an optional operand with z196 and another one with zEC12.
+    idte got an optional operand with zEC12
+    
+    opcodes/ChangeLog:
+    
+    2017-05-30  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * s390-opc.c: Add new idte/ipte variants.
+            * s390-opc.txt: Likewise.
+    
+    gas/ChangeLog:
+    
+    2017-05-30  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * testsuite/gas/s390/zarch-z196.d: Add new idte/ipte variants.
+            * testsuite/gas/s390/zarch-z196.s: Likewise.
+            * testsuite/gas/s390/zarch-zEC12.d: Likewise.
+            * testsuite/gas/s390/zarch-zEC12.s: Likewise.
+
+--- a/opcodes/s390-opc.c
++++ b/opcodes/s390-opc.c
+@@ -355,7 +355,7 @@ const struct s390_operand s390_operands[] =
+ #define INSTR_RRF_FEUFEFE  4, { FE_24,FE_16,FE_28,U4_20,0,0 }    /* e.g. qaxtr */
+ #define INSTR_RRF_FUFF2    4, { F_24,F_28,F_16,U4_20,0,0 }       /* e.g. adtra */
+ #define INSTR_RRF_FEUFEFE2 4, { FE_24,FE_28,FE_16,U4_20,0,0 }    /* e.g. axtra */
+-#define INSTR_RRF_RURR     4, { R_24,R_28,R_16,U4_20,0,0 }       /* e.g. .insn */
++#define INSTR_RRF_RURR     4, { R_24,R_28,R_16,U4_20,0,0 }       /* e.g. ipte  */
+ #define INSTR_RRF_RURR2    4, { R_24,R_16,R_28,U4_20,0,0 }       /* e.g. lptea */
+ #define INSTR_RRF_R0RR     4, { R_24,R_16,R_28,0,0,0 }           /* e.g. idte  */
+ #define INSTR_RRF_R0RR2    4, { R_24,R_28,R_16,0,0,0 }           /* e.g. ark   */
+--- a/opcodes/s390-opc.txt
++++ b/opcodes/s390-opc.txt
+@@ -1116,6 +1116,7 @@ b92b kmo RRE_RR "cipher message with OFB" z196 zarch
+ b92c pcc RRE_00 "perform cryptographic computation" z196 zarch
+ b92d kmctr RRF_R0RR "cipher message with counter" z196 zarch
+ b928 pckmo RRE_00 "perform cryptographic key management operation" z196 zarch
++b221 ipte RRF_R0RR2 "invalidate page table entry" z196 zarch optparm
+ 
+ # The new instructions of the IBM zEnterprise EC12
+ b2ec etnd RRE_R0 "extract transaction nesting depth" zEC12 zarch htm
+@@ -1143,6 +1144,8 @@ ed00000000aa cdzt RSL_LRDFU "convert from zoned long" zEC12 zarch
+ ed00000000ab cxzt RSL_LRDFEU "convert from zoned extended" zEC12 zarch
+ ed00000000a8 czdt RSL_LRDFU "convert to zoned long" zEC12 zarch
+ ed00000000a9 czxt RSL_LRDFEU "convert to zoned extended" zEC12 zarch
++b98e idte RRF_RURR2 "invalidate dat table entry" zEC12 zarch optparm
++b221 ipte RRF_RURR "invalidate page table entry" zEC12 zarch optparm2
+ 
+ # The new instructions of IBM z13
+ 

@@ -256,8 +256,8 @@ diff -u -ruNp gdb-6.3-unpatched/gdb/testsuite/gdb.arch/powerpc-bcl-prologue.exp 
 +   fail "powerpc arch test"
 +   return
 +}
-+set objfile2 ${objdir}/${subdir}/${testfile}-asm.o
-+set binfile ${objdir}/${subdir}/${testfile}
++set objfile2 [standard_output_file ${testfile}-asm.o]
++set binfile [standard_output_file ${testfile}]
 +
 +if { [gdb_compile "${srcdir}/${subdir}/${srcfile1} ${srcdir}/${subdir}/${srcfile2}" ${binfile} executable $flags] != ""} {
 +    return -1

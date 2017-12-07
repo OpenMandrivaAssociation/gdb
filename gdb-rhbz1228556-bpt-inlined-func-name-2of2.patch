@@ -1,0 +1,212 @@
+commit 4a27f119f59a44395e0a34b1526cee709e1d3fce
+Author: Keith Seitz <keiths@redhat.com>
+Date:   Fri Oct 27 10:57:23 2017 -0700
+
+    Use SaL symbol name when reporting breakpoint locations
+    
+    Currently, "info break" can show some (perhaps) unexpected results when
+    setting a breakpoint on an inlined function:
+    
+    (gdb) list
+    1       #include <stdio.h>
+    2
+    3       static inline void foo()
+    4       {
+    5               printf("Hello world\n");
+    6       }
+    7
+    8       int main()
+    9       {
+    10              foo();
+    11              return 0;
+    12      }
+    13
+    (gdb) b foo
+    Breakpoint 1 at 0x400434: file foo.c, line 5.
+    (gdb) i b
+    Num     Type           Disp Enb Address            What
+    1       breakpoint     keep y   0x0000000000400434 in main at foo.c:5
+    
+    GDB reported that we understood what "foo" was, but we then report that the
+    breakpoint is actually set in main. While that is literally true, we can
+    do a little better.
+    
+    This is accomplished by copying the symbol for which the breakpoint was set
+    into the bp_location.  From there, print_breakpoint_location can use this
+    information to print out symbol information (if available) instead of calling
+    find_pc_sect_function.
+    
+    With the patch installed,
+    
+    (gdb) i b
+    Num     Type           Disp Enb Address            What
+    1       breakpoint     keep y   0x0000000000400434 in foo at foo.c:5
+    
+    gdb/ChangeLog:
+    
+            * breakpoint.c (print_breakpoint_location): Use the symbol saved
+            in the bp_location, falling back to find_pc_sect_function when
+            needed.
+            (add_location_to_breakpoint): Save sal->symbol.
+            * breakpoint.h (struct bp_location) <symbol>: New field.
+            * symtab.c (find_function_start_sal): Save the symbol into the SaL.
+            * symtab.h (struct symtab_and_line) <symbol>: New field.
+    
+    gdb/testsuite/ChangeLog:
+    
+            * gdb.opt/inline-break.exp (break_info_1): New procedure.
+            Test "info break" for every inlined function breakpoint.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,3 +1,13 @@
++2017-10-27  Keith Seitz  <keiths@redhat.com>
++
++	* breakpoint.c (print_breakpoint_location): Use the symbol saved
++	in the bp_location, falling back to find_pc_sect_function when
++	needed.
++	(add_location_to_breakpoint): Save sal->symbol.
++	* breakpoint.h (struct bp_location) <symbol>: New field.
++	* symtab.c (find_function_start_sal): Save the symbol into the SaL.
++	* symtab.h (struct symtab_and_line) <symbol>: New field.
++
+ 2017-10-26  Patrick Frants  <osscontribute@gmail.com>
+ 
+ 	PR gdb/13669
+--- a/gdb/breakpoint.c
++++ b/gdb/breakpoint.c
+@@ -5956,8 +5956,11 @@ print_breakpoint_location (struct breakpoint *b,
+     uiout->field_string ("what", event_location_to_string (b->location.get ()));
+   else if (loc && loc->symtab)
+     {
+-      struct symbol *sym 
+-	= find_pc_sect_function (loc->address, loc->section);
++      const struct symbol *sym = loc->symbol;
++
++      if (sym == NULL)
++	sym = find_pc_sect_function (loc->address, loc->section);
++
+       if (sym)
+ 	{
+ 	  uiout->text ("in ");
+@@ -8743,6 +8746,7 @@ add_location_to_breakpoint (struct breakpoint *b,
+   loc->gdbarch = loc_gdbarch;
+   loc->line_number = sal->line;
+   loc->symtab = sal->symtab;
++  loc->symbol = sal->symbol;
+ 
+   set_breakpoint_location_function (loc,
+ 				    sal->explicit_pc || sal->explicit_line);
+--- a/gdb/breakpoint.h
++++ b/gdb/breakpoint.h
+@@ -486,6 +486,11 @@ public:
+      to find the corresponding source file name.  */
+ 
+   struct symtab *symtab;
++
++  /* The symbol found by the location parser, if any.  This may be used to
++     ascertain when an event location was set at a different location than
++     the one originally selected by parsing, e.g., inlined symbols.  */
++  const struct symbol *symbol = NULL;
+ };
+ 
+ /* The possible return values for print_bpstat, print_it_normal,
+### a/gdb/testsuite/ChangeLog
+### b/gdb/testsuite/ChangeLog
+## -1,3 +1,8 @@
++2017-10-27  Keith Seitz  <keiths@redhat.com>
++
++	* gdb.opt/inline-break.exp (break_info_1): New procedure.
++	Test "info break" for every inlined function breakpoint.
++
+ 2017-10-27  Yao Qi  <yao.qi@linaro.org>
+ 
+ 	* gdb.arch/insn-reloc.c (can_relocate_bl): Mark "x30" clobbered.
+--- a/gdb/testsuite/gdb.opt/inline-break.exp
++++ b/gdb/testsuite/gdb.opt/inline-break.exp
+@@ -24,6 +24,62 @@ if { [prepare_for_testing "failed to prepare" $testfile $srcfile \
+     return -1
+ }
+ 
++# Return a string that may be used to match the output of "info break NUM".
++#
++# Optional arguments:
++#
++# source    - the name of the source file
++# func      - the name of the function
++# disp      - the event disposition
++# enabled   - enable state
++# locs      - number of locations
++# line      - source line number (ignored without -source)
++
++proc break_info_1 {num args} {
++    global decimal
++
++    # Column delimiter
++    set c {[\t ]+}
++
++    # Row delimiter
++    set end {[\r\n \t]+}
++
++    # Table header
++    set header "[join [list Num Type Disp Enb Address What] ${c}]"
++
++    # Get/configure any optional parameters.
++    parse_args [list {source ""} {func ".*"} {disp "keep"} \
++		    {enabled "y"} {locs 1} [list line $decimal] \
++		    {type "breakpoint"}]
++
++    if {$source != ""} {
++	set source "$source:$line"
++    }
++
++    # Result starts with the standard header.
++    set result "$header${end}"
++
++    # Set up for multi-location breakpoint marker.
++    if {$locs == 1} {
++	set multi ".*"
++    } else {
++	set multi "<MULTIPLE>${end}"
++    }
++    append result "[join [list $num $type $disp $enabled $multi] $c]"
++
++    # Add location info.
++    for {set i 1} {$i <= $locs} {incr i} {
++	if {$locs > 1} {
++	    append result "[join [list $num.$i $enabled] $c].*"
++	}
++
++	#  Add function/source file info.
++	append result "in $func at .*$source${end}"
++    }
++
++    return $result
++}
++
+ #
+ # func1 is a static inlined function that is called once.
+ # The result should be a single-location breakpoint.
+@@ -111,3 +167,22 @@ gdb_test "print func1" \
+ #
+ gdb_test "print func2" \
+     "\\\$.* = {int \\(int\\)} .* <func2>"
++
++# Test that "info break" reports the location of the breakpoints "inside"
++# the inlined functions
++
++set results(1) [break_info_1 1 -source $srcfile -func "func1"]
++set results(2) [break_info_1 2 -locs 2 -source $srcfile -func "func2"]
++set results(3) [break_info_1 3 -source $srcfile -func "func3b"]
++set results(4) [break_info_1 4 -locs 2 -source $srcfile -func "func4b"]
++set results(5) [break_info_1 5 -locs 2 -source $srcfile -func "func5b"]
++set results(6) [break_info_1 6 -locs 3 -source $srcfile -func "func6b"]
++set results(7) [break_info_1 7 -locs 2 -source $srcfile -func "func7b"]
++set results(8) [break_info_1 8 -locs 3 -source $srcfile -func "func8b"]
++
++for {set i 1} {$i <= [array size results]} {incr i} {
++    send_log "Expecting: $results($i)\n"
++    gdb_test "info break $i" $results($i)
++}
++
++unset -nocomplain results

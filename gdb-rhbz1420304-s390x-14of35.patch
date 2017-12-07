@@ -1,0 +1,70 @@
+commit af547a9614969e1d1ea6fcec6b59cd77a606380f
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:27 2017 +0200
+
+    read/write_pieced_value: Respect value parent's offset
+    
+    In the case of targeting a bit-field, read_pieced_value and
+    write_pieced_value calculate the number of bits preceding the bit-field
+    without considering the relative offset of the value's parent.  This is
+    relevant for a structure variable like this:
+    
+      struct s {
+          uint64_t foo;
+          struct {
+              uint32_t bar;
+              uint32_t bf : 10;  /* <-- target bit-field */
+          } baz;
+      } s;
+    
+    In this scenario, if 'val' is a GDB value representing s.baz.bf,
+    val->parent represents the whole s.baz structure, and the following holds:
+    
+      - value_offset (val) == sizeof s.baz.bar == 4
+      - value_offset (val->parent) == sizeof s.foo == 8
+    
+    The current logic would only use value_offset(val), resulting in the wrong
+    offset into the target value.  This is fixed.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (read_pieced_value): Respect parent value's offset
+            when targeting a bit-field.
+            (write_pieced_value): Likewise.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (read_pieced_value): Respect parent value's offset
++	when targeting a bit-field.
++	(write_pieced_value): Likewise.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (struct piece_closure) <addr_size>: Remove field.
+ 	(allocate_piece_closure): Drop addr_size parameter.
+ 	(dwarf2_evaluate_loc_desc_full): Adjust call to
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -1776,7 +1776,8 @@ read_pieced_value (struct value *v)
+   bits_to_skip = 8 * value_offset (v);
+   if (value_bitsize (v))
+     {
+-      bits_to_skip += value_bitpos (v);
++      bits_to_skip += (8 * value_offset (value_parent (v))
++		       + value_bitpos (v));
+       type_len = value_bitsize (v);
+     }
+   else
+@@ -1946,7 +1947,8 @@ write_pieced_value (struct value *to, struct value *from)
+   bits_to_skip = 8 * value_offset (to);
+   if (value_bitsize (to))
+     {
+-      bits_to_skip += value_bitpos (to);
++      bits_to_skip += (8 * value_offset (value_parent (to))
++		       + value_bitpos (to));
+       type_len = value_bitsize (to);
+     }
+   else

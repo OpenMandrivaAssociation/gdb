@@ -1,0 +1,85 @@
+commit 93ec5e23766a9f75aa4950748cf73964028a8d1b
+Author: Andreas Krebbel <krebbel@linux.vnet.ibm.com>
+Date:   Mon Jun 26 11:01:58 2017 +0200
+
+    S/390: Fix testsuite segfault added with recent pgste patch.
+    
+    The recent pgste patch caused several testcases to fail with a
+    segfault.  Fixed with this patch by adding NULL pointer checks.
+    
+    regression-tested on s390x.
+    
+    bfd/ChangeLog:
+    
+    2017-06-26  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+    
+            * elf64-s390.c (elf_s390_additional_program_headers): Add NULL
+            pointer checks.
+            (elf_s390_modify_segment_map): Likewise.
+            (bfd_elf_s390_set_options): Lisewise.
+
+### a/bfd/ChangeLog
+### b/bfd/ChangeLog
+## -1,3 +1,10 @@
++2017-06-26  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
++
++	* elf64-s390.c (elf_s390_additional_program_headers): Add NULL
++	pointer checks.
++	(elf_s390_modify_segment_map): Likewise.
++	(bfd_elf_s390_set_options): Lisewise.
++
+ 2017-06-26  Alan Modra  <amodra@gmail.com>
+ 
+ 	* elflink.c (_bfd_elf_link_create_dynstrtab): Don't make dynobj
+--- a/bfd/elf64-s390.c
++++ b/bfd/elf64-s390.c
+@@ -3978,22 +3978,29 @@ elf_s390_additional_program_headers (bfd *abfd ATTRIBUTE_UNUSED,
+ {
+   struct elf_s390_link_hash_table *htab;
+ 
+-  htab = elf_s390_hash_table (info);
+-  return htab->params->pgste;
++  if (info)
++    {
++      htab = elf_s390_hash_table (info);
++      if (htab)
++	return htab->params->pgste;
++    }
++  return 0;
+ }
+ 
+ 
+ /* Add the PT_S390_PGSTE program header.  */
+ 
+ static bfd_boolean
+-elf_s390_modify_segment_map (bfd *abfd ATTRIBUTE_UNUSED,
+-			     struct bfd_link_info *info)
++elf_s390_modify_segment_map (bfd *abfd, struct bfd_link_info *info)
+ {
+   struct elf_s390_link_hash_table *htab;
+   struct elf_segment_map *m, *pm = NULL;
+ 
++  if (!abfd || !info)
++    return TRUE;
++
+   htab = elf_s390_hash_table (info);
+-  if (!htab->params->pgste)
++  if (!htab || !htab->params->pgste)
+     return TRUE;
+ 
+   /* If there is already a PT_S390_PGSTE header, avoid adding
+@@ -4027,8 +4034,12 @@ bfd_elf_s390_set_options (struct bfd_link_info *info,
+ {
+   struct elf_s390_link_hash_table *htab;
+ 
+-  htab = elf_s390_hash_table (info);
+-  htab->params = params;
++  if (info)
++    {
++      htab = elf_s390_hash_table (info);
++      if (htab)
++	htab->params = params;
++    }
+ 
+   return TRUE;
+ }

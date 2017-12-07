@@ -1,17 +1,22 @@
-Index: gdb-6.8.50.20090803/gdb/valops.c
+Index: gdb-7.12.50.20170207/gdb/valops.c
 ===================================================================
---- gdb-6.8.50.20090803.orig/gdb/valops.c	2009-08-04 06:30:45.000000000 +0200
-+++ gdb-6.8.50.20090803/gdb/valops.c	2009-08-04 06:33:05.000000000 +0200
-@@ -926,10 +926,18 @@ value_assign (struct value *toval, struc
+--- gdb-7.12.50.20170207.orig/gdb/valops.c	2017-02-26 17:26:43.839146565 +0100
++++ gdb-7.12.50.20170207/gdb/valops.c	2017-02-26 17:28:40.840988272 +0100
+@@ -1112,6 +1112,8 @@
  	struct gdbarch *gdbarch;
  	int value_reg;
  
--	/* Figure out which frame this is in currently.  */
--	frame = frame_find_by_id (VALUE_FRAME_ID (toval));
- 	value_reg = VALUE_REGNUM (toval);
++	value_reg = VALUE_REGNUM (toval);
++
+ 	/* Figure out which frame this is in currently.
+ 	
+ 	   We use VALUE_FRAME_ID for obtaining the value's frame id instead of
+@@ -1121,8 +1123,14 @@
+ 	   frame.  */
+ 	frame = frame_find_by_id (VALUE_FRAME_ID (toval));
  
-+	/* Figure out which frame this is in currently.  */
-+	frame = frame_find_by_id (VALUE_FRAME_ID (toval));
+-	value_reg = VALUE_REGNUM (toval);
+-
 +	/* "set $reg+=1" should work on programs with no debug info,
 +	   but frame_find_by_id returns NULL here (RH bug 436037).
 +	   Use current frame, it represents CPU state in this case.

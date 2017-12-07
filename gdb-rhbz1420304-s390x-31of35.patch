@@ -1,0 +1,169 @@
+commit 88ab90e860a46a1123fcfd13bfe51cd360e9c3f7
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Thu Jun 29 10:30:09 2017 +0200
+
+    S390: Support guarded-storage core note sections
+    
+    Newer Linux kernel versions offer two new register sets in support of the
+    z/Architecture's guarded storage facility: NT_S390_GS_CB, the
+    "guarded-storage registers", and NT_S390_GS_BC, the "guarded-storage
+    broadcast control block".  This patch adds support for the respective core
+    notes sections to binutils.
+    
+    bfd/ChangeLog:
+            * elf-bfd.h (elfcore_write_s390_gs_cb): Add prototype.
+            (elfcore_write_s390_gs_bc): Likewise.
+            * elf.c (elfcore_grok_s390_gs_cb): New function.
+            (elfcore_grok_s390_gs_bc): New function.
+            (elfcore_grok_note): Call them.
+            (elfcore_write_s390_gs_cb): New function.
+            (elfcore_write_s390_gs_bc): New function.
+            (elfcore_write_register_note): Call them.
+    
+    binutils/ChangeLog:
+            * readelf.c (get_note_type): Add NT_S390_GS_CB and NT_S390_GS_BC.
+    
+    include/ChangeLog:
+            * elf/common.h (NT_S390_GS_CB): New macro.
+            (NT_S390_GS_BC): Likewise.
+
+### a/bfd/ChangeLog
+### b/bfd/ChangeLog
+## -1,3 +1,14 @@
++2017-06-29  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
++	* elf-bfd.h (elfcore_write_s390_gs_cb): Add prototype.
++	(elfcore_write_s390_gs_bc): Likewise.
++	* elf.c (elfcore_grok_s390_gs_cb): New function.
++	(elfcore_grok_s390_gs_bc): New function.
++	(elfcore_grok_note): Call them.
++	(elfcore_write_s390_gs_cb): New function.
++	(elfcore_write_s390_gs_bc): New function.
++	(elfcore_write_register_note): Call them.
++
+ 2017-06-28  H.J. Lu  <hongjiu.lu@intel.com>
+ 
+ 	* libbfd.c (_bfd_generic_get_section_contents): Don't call
+--- a/bfd/elf-bfd.h
++++ b/bfd/elf-bfd.h
+@@ -2533,6 +2533,10 @@ extern char *elfcore_write_s390_vxrs_low
+   (bfd *, char *, int *, const void *, int);
+ extern char *elfcore_write_s390_vxrs_high
+   (bfd *, char *, int *, const void *, int);
++extern char *elfcore_write_s390_gs_cb
++  (bfd *, char *, int *, const void *, int);
++extern char *elfcore_write_s390_gs_bc
++  (bfd *, char *, int *, const void *, int);
+ extern char *elfcore_write_arm_vfp
+   (bfd *, char *, int *, const void *, int);
+ extern char *elfcore_write_aarch_tls
+--- a/bfd/elf.c
++++ b/bfd/elf.c
+@@ -9191,6 +9191,18 @@ elfcore_grok_s390_vxrs_high (bfd *abfd, Elf_Internal_Note *note)
+ }
+ 
+ static bfd_boolean
++elfcore_grok_s390_gs_cb (bfd *abfd, Elf_Internal_Note *note)
++{
++  return elfcore_make_note_pseudosection (abfd, ".reg-s390-gs-cb", note);
++}
++
++static bfd_boolean
++elfcore_grok_s390_gs_bc (bfd *abfd, Elf_Internal_Note *note)
++{
++  return elfcore_make_note_pseudosection (abfd, ".reg-s390-gs-bc", note);
++}
++
++static bfd_boolean
+ elfcore_grok_arm_vfp (bfd *abfd, Elf_Internal_Note *note)
+ {
+   return elfcore_make_note_pseudosection (abfd, ".reg-arm-vfp", note);
+@@ -9668,6 +9680,20 @@ elfcore_grok_note (bfd *abfd, Elf_Internal_Note *note)
+       else
+ 	return TRUE;
+ 
++    case NT_S390_GS_CB:
++      if (note->namesz == 6
++	  && strcmp (note->namedata, "LINUX") == 0)
++	return elfcore_grok_s390_gs_bc (abfd, note);
++      else
++	return TRUE;
++
++    case NT_S390_GS_BC:
++      if (note->namesz == 6
++	  && strcmp (note->namedata, "LINUX") == 0)
++	return elfcore_grok_s390_gs_cb (abfd, note);
++      else
++	return TRUE;
++
+     case NT_ARM_VFP:
+       if (note->namesz == 6
+ 	  && strcmp (note->namedata, "LINUX") == 0)
+@@ -10728,6 +10754,32 @@ elfcore_write_s390_vxrs_high (bfd *abfd,
+ }
+ 
+ char *
++elfcore_write_s390_gs_cb (bfd *abfd,
++			  char *buf,
++			  int *bufsiz,
++			  const void *s390_gs_cb,
++			  int size)
++{
++  char *note_name = "LINUX";
++  return elfcore_write_note (abfd, buf, bufsiz,
++			     note_name, NT_S390_GS_CB,
++			     s390_gs_cb, size);
++}
++
++char *
++elfcore_write_s390_gs_bc (bfd *abfd,
++			  char *buf,
++			  int *bufsiz,
++			  const void *s390_gs_bc,
++			  int size)
++{
++  char *note_name = "LINUX";
++  return elfcore_write_note (abfd, buf, bufsiz,
++			     note_name, NT_S390_GS_BC,
++			     s390_gs_bc, size);
++}
++
++char *
+ elfcore_write_arm_vfp (bfd *abfd,
+ 		       char *buf,
+ 		       int *bufsiz,
+@@ -10815,6 +10867,10 @@ elfcore_write_register_note (bfd *abfd,
+     return elfcore_write_s390_vxrs_low (abfd, buf, bufsiz, data, size);
+   if (strcmp (section, ".reg-s390-vxrs-high") == 0)
+     return elfcore_write_s390_vxrs_high (abfd, buf, bufsiz, data, size);
++  if (strcmp (section, ".reg-s390-gs-cb") == 0)
++    return elfcore_write_s390_gs_cb (abfd, buf, bufsiz, data, size);
++  if (strcmp (section, ".reg-s390-gs-bc") == 0)
++    return elfcore_write_s390_gs_bc (abfd, buf, bufsiz, data, size);
+   if (strcmp (section, ".reg-arm-vfp") == 0)
+     return elfcore_write_arm_vfp (abfd, buf, bufsiz, data, size);
+   if (strcmp (section, ".reg-aarch-tls") == 0)
+### a/include/ChangeLog
+### b/include/ChangeLog
+## -1,3 +1,8 @@
++2017-06-29  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
++	* elf/common.h (NT_S390_GS_CB): New macro.
++	(NT_S390_GS_BC): Likewise.
++
+ 2017-06-28  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	* opcode/aarch64.h: (AARCH64_FEATURE_DOTPROD): New.
+--- a/include/elf/common.h
++++ b/include/elf/common.h
+@@ -598,6 +598,10 @@
+ 					/*   note name must be "LINUX".  */
+ #define NT_S390_VXRS_HIGH	0x30a	/* S390 vector registers 16-31 */
+ 					/*   note name must be "LINUX".  */
++#define NT_S390_GS_CB	0x30b		/* s390 guarded storage registers */
++					/*   note name must be "LINUX".  */
++#define NT_S390_GS_BC	0x30c		/* s390 guarded storage broadcast control block */
++					/*   note name must be "LINUX".  */
+ #define NT_ARM_VFP	0x400		/* ARM VFP registers */
+ /* The following definitions should really use NT_AARCH_..., but defined
+    this way for compatibility with Linux.  */

@@ -62,10 +62,10 @@ Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/gcore-shmid0.exp
 +}
 +set timeout $oldtimeout
 +
-+set escapedfilename [string_to_regexp ${objdir}/${subdir}/gcore-shmid0.test]
++set escapedfilename [string_to_regexp [standard_output_file gcore-shmid0.test]]
 +
 +set test "save a corefile"
-+gdb_test_multiple "gcore ${objdir}/${subdir}/gcore-shmid0.test" $test {
++gdb_test_multiple "gcore [standard_output_file gcore-shmid0.test]" $test {
 +    -re "Saved corefile ${escapedfilename}\[\r\n\]+$gdb_prompt $" {
 +	pass $test
 +    }
@@ -80,7 +80,7 @@ Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/gcore-shmid0.exp
 +gdb_continue_to_end "finish"
 +
 +set test "core-file command"
-+gdb_test_multiple "core-file $objdir/$subdir/gcore-shmid0.test" $test {
++gdb_test_multiple "core-file [standard_output_file gcore-shmid0.test]" $test {
 +    -re ".* program is being debugged already.*y or n. $" {
 +	# gdb_load may connect us to a gdbserver.
 +	send_gdb "y\n"
@@ -108,7 +108,7 @@ Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/gcore-shmid0.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
 +++ gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/gcore-shmid0.c	2013-08-02 22:22:17.573599496 +0200
-@@ -0,0 +1,127 @@
+@@ -0,0 +1,128 @@
 +/* Copyright 2007, 2009 Free Software Foundation, Inc.
 +
 +   This file is part of GDB.
@@ -139,6 +139,7 @@ Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/gcore-shmid0.c
 +#include <stdlib.h>
 +#include <unistd.h>
 +#include <assert.h>
++#include <time.h>
 +
 +/* The same test running in a parallel testsuite may steal us the zero SID,
 +   even if we never get any EEXIST.  Just try a while.  */

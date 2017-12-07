@@ -1,0 +1,42 @@
+commit 07c9ca3bd8e6f83bcec49c922b52422c538f60f7
+Author: Andreas Arnez <arnez@linux.vnet.ibm.com>
+Date:   Tue Jun 13 15:20:28 2017 +0200
+
+    write_pieced_value: Fix buffer offset for memory pieces
+    
+    In write_pieced_value, when transferring the data to target memory via a
+    buffer, the bit offset within the target value is not reduced to its
+    sub-byte fraction before using it as a bit offset into the buffer.  This
+    is fixed.
+    
+    gdb/ChangeLog:
+    
+            * dwarf2loc.c (write_pieced_value): In DWARF_VALUE_MEMORY,
+            truncate full bytes from dest_offset_bits before using it as an
+            offset into the buffer.
+
+### a/gdb/ChangeLog
+### b/gdb/ChangeLog
+## -1,5 +1,11 @@
+ 2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+ 
++	* dwarf2loc.c (write_pieced_value): In DWARF_VALUE_MEMORY,
++	truncate full bytes from dest_offset_bits before using it as an
++	offset into the buffer.
++
++2017-06-13  Andreas Arnez  <arnez@linux.vnet.ibm.com>
++
+ 	* dwarf2loc.c (write_pieced_value): Include transfer size in
+ 	byte-wise check.
+ 
+--- a/gdb/dwarf2loc.c
++++ b/gdb/dwarf2loc.c
+@@ -2058,7 +2058,7 @@ write_pieced_value (struct value *to, struct value *from)
+ 	      read_memory (p->v.mem.addr + dest_offset, buffer.data (), 1);
+ 	      read_memory (p->v.mem.addr + dest_offset + this_size - 1,
+ 			   &buffer[this_size - 1], 1);
+-	      copy_bitwise (buffer.data (), dest_offset_bits,
++	      copy_bitwise (buffer.data (), dest_offset_bits % 8,
+ 			    contents, source_offset_bits,
+ 			    this_size_bits,
+ 			    bits_big_endian);

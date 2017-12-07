@@ -1,6 +1,6 @@
 --- /dev/null
-+++ b/gdb/testsuite/gdb.arch/powerpc-power7.exp
-@@ -0,0 +1,182 @@
++++ b/gdb/testsuite/gdb.arch/powerpc-power7rh.exp
+@@ -0,0 +1,178 @@
 +# Copyright 2009 Free Software Foundation, Inc.
 +
 +# This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,9 @@
 +    return
 +}
 +
-+set testfile "powerpc-power7"
++set testfile "powerpc-power7rh"
 +set srcfile ${testfile}.s
-+set objfile ${objdir}/${subdir}/${testfile}.o
++set objfile [standard_output_file ${testfile}.o]
 +
 +if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${objfile}" object {debug}] != "" } {
 +    untested "PowerPC Power7 instructions disassembly"
@@ -76,17 +76,13 @@
 +# [PATCH] Remove support for POWER7 VSX load/store with update instructions
 +# http://sourceware.org/ml/binutils/2009-09/msg00680.html
 +# http://sourceware.org/ml/binutils-cvs/2009-09/msg00331.html
-+# lxvd2ux vs3,r4,r5
-+func_check   0x4 ".long 0x7c642ed8"
++func_check   0x4 "lxvb16x vs3,r4,r5"
 +func_check   0x8 "lxvd2x  vs43,r4,r5"
-+# lxvd2ux vs43,r4,r5
-+func_check   0xc ".long 0x7d642ed9"
++func_check   0xc "lxvb16x vs43,r4,r5"
 +func_check  0x10 "stxvd2x vs3,r4,r5"
-+# stxvd2ux vs3,r4,r5
-+func_check  0x14 ".long 0x7c642fd8"
++func_check  0x14 "stxvb16x vs3,r4,r5"
 +func_check  0x18 "stxvd2x vs43,r4,r5"
-+# stxvd2ux vs43,r4,r5
-+func_check  0x1c ".long 0x7d642fd9"
++func_check  0x1c "stxvb16x vs43,r4,r5"
 +func_check  0x20 "xxmrghd vs3,vs4,vs5"
 +func_check  0x24 "xxmrghd vs43,vs44,vs45"
 +func_check  0x28 "xxmrgld vs3,vs4,vs5"
@@ -184,7 +180,7 @@
 +func_check 0x198 "frsqrtes. f14,f15"
 +func_check 0x19c "isel    r2,r3,r4,28"
 --- /dev/null
-+++ b/gdb/testsuite/gdb.arch/powerpc-power7.s
++++ b/gdb/testsuite/gdb.arch/powerpc-power7rh.s
 @@ -0,0 +1,107 @@
 +	.text
 +	.globl	func
