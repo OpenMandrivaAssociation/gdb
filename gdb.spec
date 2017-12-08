@@ -101,7 +101,7 @@ Source3: gdb-gstack.man
 #=fedora
 Source4: gdbinit
 
-Source1000: gdb.rpmlintrc
+Source1001: gdb.rpmlintrc
 
 # Work around out-of-date dejagnu that does not have KFAIL
 #=push: That dejagnu is too old to be supported.
