@@ -101,6 +101,8 @@ Source3: gdb-gstack.man
 #=fedora
 Source4: gdbinit
 
+Source1000: gdb.rpmlintrc
+
 # Work around out-of-date dejagnu that does not have KFAIL
 #=push: That dejagnu is too old to be supported.
 Patch1: gdb-6.3-rh-dummykfail-20041202.patch
@@ -1290,7 +1292,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 
 %files headless
 %{_prefix}/libexec/gdb
-%config(noreplace) %{_sysconfdir}/gdbinit
+%config %{_sysconfdir}/gdbinit
 %{_mandir}/*/gdb.1*
 %{_sysconfdir}/gdbinit.d
 %{_mandir}/*/gdbinit.5*
