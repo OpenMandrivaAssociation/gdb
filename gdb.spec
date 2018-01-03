@@ -1,6 +1,6 @@
 # WARNING: This package is synced with FC
-# Extract Mageia Linux name and version
-%define distro_version	%(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
+# Extract OpenMandriva Linux name and version
+%define distro_version %(perl -ne '/^([.\\w\\s]+) \\(.+\\).+/ and print $1' < /etc/release)
 
 %define Werror_cflags %nil
 
@@ -38,7 +38,7 @@ Version: 8.0.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 2
+Release: 3
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -745,7 +745,8 @@ and printing their data.
 
 This package provides INFO, HTML and PDF user manual for GDB.
 
-%package -n urpmi-debuginfo-install
+# (tpg) workaround for ABF, which publishes this package to debug media and gdb packages misses it's requires
+%package -n urpmi-debug-info-install
 Summary: debuginfo-install shim for urpmi
 License: CC0
 Group: System/Configuration/Packaging
@@ -754,9 +755,10 @@ Conflicts: gdb < 7.12-13
 Conflicts: dnf-utils
 # Generic provides to indicate what command it is, also provided by dnf-utils
 Provides: pkg-command(debuginfo-install)
+Provides: urpmidebug-info-install = %{EVRD}
 BuildArch: noarch
 
-%description -n urpmi-debuginfo-install
+%description -n urpmi-debug-info-install
 This package provides /usr/bin/debuginfo-install for using with urpmi.
 
 %prep
@@ -1302,7 +1304,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 
 # don't include the files in include, they are part of binutils
 
-%files -n urpmi-debuginfo-install
+%files -n urpmi-debug-info-install
 %{_bindir}/debuginfo-install
 
 %files gdbserver
