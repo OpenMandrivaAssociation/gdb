@@ -38,7 +38,7 @@ Version: 8.0.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 3
+Release: 4
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -79,7 +79,7 @@ Obsoletes: gdb64 < 5.3.91
 Conflicts: elfutils < 0.149
 
 # Require an implementation of /usr/bin/debuginfo-install
-Requires: urpmi-debuginfo-install
+Requires: urpmi-debug-info-install
 
 # GDB patches have the format `gdb-<version>-bz<red-hat-bz-#>-<desc>.patch'.
 # They should be created using patch level 1: diff -up ./gdb (or gdb-6.3/gdb).
@@ -755,7 +755,7 @@ Conflicts: gdb < 7.12-13
 Conflicts: dnf-utils
 # Generic provides to indicate what command it is, also provided by dnf-utils
 Provides: pkg-command(debuginfo-install)
-Provides: urpmidebug-info-install = %{EVRD}
+Provides: urpmi-debug-info-install = %{EVRD}
 BuildArch: noarch
 
 %description -n urpmi-debug-info-install
