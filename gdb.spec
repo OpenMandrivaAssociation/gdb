@@ -712,7 +712,8 @@ BuildRequires: rust
 %endif
 %endif
 BuildRequires: gcc-plugin-devel
- 
+BuildRequires: pkgconfig(zlib)
+
 %description headless
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
 Java, and other languages, by executing them in a controlled fashion
