@@ -17,6 +17,7 @@
 %bcond_with testsuite
 %bcond_without python
 %bcond_with babeltrace
+%bcond_with doc
 
 %{?scl:%scl_package gdb}
 %{!?scl:
@@ -686,8 +687,10 @@ BuildRequires: rpm-devel
 %global __python %{__python3}
 BuildRequires:   python3-devel
 Requires:   python3
+%if %{with doc}
 # gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
 BuildRequires:   texlive
+%endif
 %if %{with babeltrace}
 BuildRequires: libbabeltrace-devel
 %endif
@@ -732,6 +735,7 @@ and printing their data.
 This package provides a program that allows you to run GDB on a different
 machine than the one which is running the program being debugged.
 
+%if %{with doc}
 %package doc
 Summary: Documentation for GDB (the GNU source-level debugger)
 License: GFDL
@@ -745,6 +749,7 @@ Java, and other languages, by executing them in a controlled fashion
 and printing their data.
 
 This package provides INFO, HTML and PDF user manual for GDB.
+%endif
 
 # (tpg) workaround for ABF, which publishes this package to debug media and gdb packages misses it's requires
 %package -n urpmi-debug-info-install
@@ -1116,8 +1121,10 @@ done	# fprofile
 
 cd %{gdb_build}
 
+%if %{with doc}
 %make \
      -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split MAKEINFOFLAGS=--no-split
+%endif
 
 # Copy the <sourcetree>/gdb/NEWS file to the directory above it.
 cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
@@ -1315,6 +1322,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %{_libdir}/libinproctrace.so
 %endif # %{have_inproctrace}
 
+%if %{with doc}
 %files doc
 %doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
 %{_infodir}/annotate.info*
@@ -1337,3 +1345,4 @@ if [ -e %{_infodir}/gdb.info.xz ]
   %_remove_install_info gdb.info
   %_remove_install_info annotate.info
 fi
+%endif
