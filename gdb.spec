@@ -1052,7 +1052,11 @@ $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 	--without-rpm                                           \
 %endif
 	--with-lzma						\
+%ifarch %{armx}
+	--without-libunwind-ia64				\
+%else
 	--without-libunwind					\
+%endif
 	--enable-64-bit-bfd					\
 %if %{have_inproctrace}
 	--enable-inprocess-agent				\
