@@ -34,12 +34,12 @@ Name: %{?scl_prefix}gdb
 # See timestamp of source gnulib installed into gdb/gnulib/ .
 %global snapgnulib 20150822
 %global tarname gdb-%{version}
-Version: 8.0.1
+Version: 8.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 6
+Release: 1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -135,10 +135,6 @@ Patch118: gdb-6.3-gstack-20050411.patch
 # VSYSCALL and PIE
 #=fedoratest
 Patch122: gdb-6.3-test-pie-20050107.patch
-#=push+jan: May get obsoleted by Tom's unrelocated objfiles patch.
-Patch389: gdb-archer-pie-addons.patch
-#=push+jan: Breakpoints disabling matching should not be based on address.
-Patch394: gdb-archer-pie-addons-keep-disabled.patch
 
 # Get selftest working with sep-debug-info
 #=fedoratest
@@ -163,10 +159,6 @@ Patch161: gdb-6.3-inferior-notification-20050721.patch
 # Verify printing of inherited members test
 #=fedoratest
 Patch163: gdb-6.3-inheritancetest-20050726.patch
-
-# Add readnever option
-#=push
-Patch164: gdb-6.3-readnever-20050907.patch
 
 # Fix debuginfo addresses resolving for --emit-relocs Linux kernels (BZ 203661).
 #=push+jan: There was some mail thread about it, this patch may be a hack.
@@ -217,10 +209,6 @@ Patch229: gdb-6.3-bz140532-ppc-unwinding-test.patch
 #=fedoratest
 Patch231: gdb-6.3-bz202689-exec-from-pthread-test.patch
 
-# Backported fixups post the source tarball.
-#Xdrop: Just backports.
-Patch232: gdb-upstream.patch
-
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 #=fedoratest
 Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
@@ -248,29 +236,6 @@ Patch263: gdb-6.3-attach-see-vdso-test.patch
 # Test leftover zombie process (BZ 243845).
 #=fedoratest
 Patch271: gdb-6.5-bz243845-stale-testing-zombie-test.patch
-
-# New locating of the matching binaries from the pure core file (build-id).
-#=push+jan
-Patch274: gdb-6.6-buildid-locate.patch
-# Fix loading of core files without build-ids but with build-ids in executables.
-# Load strictly build-id-checked core files only if no executable is specified
-# (Jan Kratochvil, RH BZ 1339862).
-#=push+jan
-Patch659: gdb-6.6-buildid-locate-solib-missing-ids.patch
-#=push+jan
-Patch353: gdb-6.6-buildid-locate-rpm.patch
-#=push+jan
-Patch415: gdb-6.6-buildid-locate-core-as-arg.patch
-# Workaround librpm BZ 643031 due to its unexpected exit() calls (BZ 642879).
-#=push+jan
-Patch519: gdb-6.6-buildid-locate-rpm-librpm-workaround.patch
-# [SCL] Skip deprecated .gdb_index warning for Red Hat built files (BZ 953585).
-#=push+jan
-Patch833: gdb-6.6-buildid-locate-rpm-scl.patch
-# Fix 'gdb gives highly misleading error when debuginfo pkg is present,
-# but not corresponding binary pkg' (RH BZ 981154).
-#=push+jan
-Patch863: gdb-6.6-buildid-locate-misleading-warning-missing-debuginfo-rhbz981154.patch
 
 # Fix displaying of numeric char arrays as strings (BZ 224128).
 #=fedoratest: But it is failing anyway, one should check the behavior more.
@@ -325,10 +290,6 @@ Patch320: gdb-6.5-section-num-fixup-test.patch
 #=push+jan: This fix is incorrect.
 Patch330: gdb-6.8-bz436037-reg-no-longer-active.patch
 
-# Make the GDB quit processing non-abortable to cleanup everything properly.
-#=fedora: It was useful only after gdb-6.8-attach-signalled-detach-stopped.patch .
-Patch331: gdb-6.8-quit-never-aborts.patch
-
 # [RHEL5,RHEL6] Fix attaching to stopped processes.
 # [RHEL5] Workaround kernel for detaching SIGSTOPped processes (BZ 809382).
 #=fedora
@@ -341,10 +302,6 @@ Patch343: gdb-6.8-watchpoint-conditionals-test.patch
 # Fix resolving of variables at locations lists in prelinked libs (BZ 466901).
 #=fedoratest
 Patch348: gdb-6.8-bz466901-backtrace-full-prelinked.patch
-
-# Python patches of: http://sourceware.org/gdb/wiki/ProjectArcher
-#=push
-Patch349: gdb-archer.patch
 
 # New test for step-resume breakpoint placed in multiple threads at once.
 #=fedoratest
@@ -379,18 +336,9 @@ Patch407: gdb-lineno-makeup-test.patch
 #=fedoratest
 Patch408: gdb-ppc-power7-test.patch
 
-# Fix i386+x86_64 rwatch+awatch before run, regression against 6.8 (BZ 541866).
-# Fix i386 rwatch+awatch before run (BZ 688788, on top of BZ 541866).
-#=push+jan: It should be fixed properly instead.
-Patch417: gdb-bz541866-rwatch-before-run.patch
-
 # Workaround non-stop moribund locations exploited by kernel utrace (BZ 590623).
 #=push+jan: Currently it is still not fully safe.
 Patch459: gdb-moribund-utrace-workaround.patch
-
-# Fix follow-exec for C++ programs (bugreported by Martin Stransky).
-#=fedoratest
-Patch470: gdb-archer-next-over-throw-cxx-exec.patch
 
 # Backport DWARF-4 support (BZ 601887, Tom Tromey).
 #=fedoratest
@@ -460,14 +408,6 @@ Patch634: gdb-runtest-pie-override.patch
 #=fedora
 Patch642: gdb-readline62-ask-more-rh.patch
 
-# Print reasons for failed attach/spawn incl. SELinux deny_ptrace (BZ 786878).
-#=push+jan
-Patch653: gdb-attach-fail-reasons-5of5.patch
-
-# Workaround crashes from stale frame_info pointer (BZ 804256).
-#=push+jan
-Patch661: gdb-stale-frame_info.patch
-
 # Workaround PR libc/14166 for inferior calls of strstr.
 #=fedora: Compatibility with RHELs (unchecked which ones).
 Patch690: gdb-glibc-strstr-workaround.patch
@@ -480,43 +420,16 @@ Patch698: gdb-rhel5.9-testcase-xlf-var-inside-mod.patch
 #=fedoratest
 Patch703: gdb-rhbz-818343-set-solib-absolute-prefix-testcase.patch
 
-# Fix `GDB cannot access struct member whose offset is larger than 256MB'
-# (RH BZ 795424).
-#=push
-Patch811: gdb-rhbz795424-bitpos-20of25.patch
-Patch812: gdb-rhbz795424-bitpos-21of25.patch
-Patch813: gdb-rhbz795424-bitpos-22of25.patch
-Patch814: gdb-rhbz795424-bitpos-23of25.patch
-Patch816: gdb-rhbz795424-bitpos-25of25.patch
-Patch817: gdb-rhbz795424-bitpos-25of25-test.patch
-Patch818: gdb-rhbz795424-bitpos-lazyvalue.patch
-
 # Import regression test for `gdb/findvar.c:417: internal-error:
 # read_var_value: Assertion `frame' failed.' (RH BZ 947564) from RHEL 6.5.
 #=fedoratest
 Patch832: gdb-rhbz947564-findvar-assertion-frame-failed-testcase.patch
 
-# [rhel6] DTS backward Python compatibility API (BZ 1020004, Phil Muldoon).
-#=fedora
-Patch848: gdb-dts-rhel6-python-compat.patch
-
-# Fix crash of -readnow /usr/lib/debug/usr/bin/gnatbind.debug (BZ 1069211).
-#=push+jan
-Patch852: gdb-gnat-dwarf-crash-3of3.patch
-
 # Fix 'memory leak in infpy_read_memory()' (RH BZ 1007614)
 #=fedoratest
 Patch861: gdb-rhbz1007614-memleak-infpy_read_memory-test.patch
 
-# VLA (Fortran dynamic arrays) from Intel + archer-jankratochvil-vla tests.
-#=push
-Patch1058: gdb-vla-intel-fortran-strides.patch
-#=push
-Patch1132: gdb-vla-intel-fortran-vla-strings.patch
-#=push+jan
-Patch889: gdb-vla-intel-stringbt-fix.patch
 #=fedoratest
-Patch887: gdb-archer-vla-tests.patch
 Patch888: gdb-vla-intel-tests.patch
 
 # Continue backtrace even if a frame filter throws an exception (Phil Muldoon).
@@ -526,10 +439,6 @@ Patch918: gdb-btrobust.patch
 # Display Fortran strings in backtraces.
 #=fedoratest
 Patch925: gdb-fortran-frame-string.patch
-
-# Fix Python GIL with gdb.execute("continue") (Phil Muldoon, BZ 1116957).
-#=push
-Patch927: gdb-python-gil.patch
 
 # Testcase for '[SAP] Recursive dlopen causes SAP HANA installer to
 # crash.' (RH BZ 1156192).
@@ -555,11 +464,6 @@ Patch991: gdb-rhbz1186476-internal-error-unqualified-name-re-set-test.patch
 #=fedoratest
 Patch992: gdb-rhbz1350436-type-printers-error.patch
 
-# Fix '[ppc64] and [s390x] wrong prologue skip on -O2 -g code' (Jan
-# Kratochvil, RH BZ 1084404).
-#=fedoratest
-Patch1026: gdb-rhbz1084404-ppc64-s390x-wrong-prologue-skip-O2-g-3of3.patch
-
 # Never kill PID on: gdb exec PID (Jan Kratochvil, RH BZ 1219747).
 #=push+jan
 Patch1053: gdb-bz1219747-attach-kills.patch
@@ -567,10 +471,6 @@ Patch1053: gdb-bz1219747-attach-kills.patch
 # Fix the pahole command breakage due to its Python3 port (RH BZ 1264532).
 #=fedora
 Patch1044: gdb-pahole-python2.patch
-
-# Force libncursesw over libncurses to match the includes (RH BZ 1270534).
-#=push+jan
-Patch1056: gdb-fedora-libncursesw.patch
 
 # Test clflushopt instruction decode (for RH BZ 1262471).
 #=fedoratest
@@ -586,10 +486,6 @@ Patch1119: gdb-testsuite-readline63-sigint-revert.patch
 #=fedoratest
 Patch1113: gdb-rhbz1261564-aarch64-hw-watchpoint-test.patch 
 
-# Add messages suggesting more recent RHEL gdbserver (RH BZ 1321114).
-#=fedora
-Patch1118: gdb-container-rh-pkg.patch
-
 # New test for Python "Cannot locate object file for block" (for RH BZ 1325795).
 #=fedoratest
 Patch1123: gdb-rhbz1325795-framefilters-test.patch
@@ -598,19 +494,9 @@ Patch1123: gdb-rhbz1325795-framefilters-test.patch
 #=fedora
 Patch1143: gdb-linux_perf-bundle.patch
  
-# Fix TLS (such as 'errno') regression.
-#=push+jan
-Patch1149: gdb-tls-1of2.patch
-#=push+jan
-Patch1150: gdb-tls-2of2.patch
-
 # Fix gdb-headless /usr/bin/ executables (BZ 1390251).
 #=fedora
 Patch1152: gdb-libexec-add-index.patch
-
-# Fix gdb-add-index for 444 *.debug files.
-#=push+jan
-Patch1153: gdb-add-index-chmod.patch
 
 # New testcase for: Fix <tab>-completion crash (Gary Benson, RH BZ 1398387).
 #=fedoratest
@@ -620,57 +506,9 @@ Patch1155: gdb-rhbz1398387-tab-crash-test.patch
 #=push+jan
 Patch1171: v1.6.1-implicit-fallthrough.patch
 
-# [s390x] Backport arch12 support and other s390x fixes (RH BZ 1420304).
-Patch1210: gdb-rhbz1420304-s390x-01of35.patch
-Patch1211: gdb-rhbz1420304-s390x-02of35.patch
-Patch1212: gdb-rhbz1420304-s390x-03of35.patch
-Patch1213: gdb-rhbz1420304-s390x-04of35.patch
-Patch1214: gdb-rhbz1420304-s390x-05of35.patch
-Patch1215: gdb-rhbz1420304-s390x-06of35.patch
-Patch1216: gdb-rhbz1420304-s390x-07of35.patch
-Patch1217: gdb-rhbz1420304-s390x-08of35.patch
-Patch1218: gdb-rhbz1420304-s390x-09of35.patch
-Patch1219: gdb-rhbz1420304-s390x-10of35.patch
-Patch1220: gdb-rhbz1420304-s390x-11of35.patch
-Patch1221: gdb-rhbz1420304-s390x-12of35.patch
-Patch1222: gdb-rhbz1420304-s390x-13of35.patch
-Patch1223: gdb-rhbz1420304-s390x-14of35.patch
-Patch1224: gdb-rhbz1420304-s390x-15of35.patch
-Patch1225: gdb-rhbz1420304-s390x-16of35.patch
-Patch1226: gdb-rhbz1420304-s390x-17of35.patch
-Patch1227: gdb-rhbz1420304-s390x-18of35.patch
-Patch1228: gdb-rhbz1420304-s390x-19of35.patch
-Patch1229: gdb-rhbz1420304-s390x-20of35.patch
-Patch1230: gdb-rhbz1420304-s390x-21of35.patch
-Patch1231: gdb-rhbz1420304-s390x-22of35.patch
-Patch1232: gdb-rhbz1420304-s390x-23of35.patch
-Patch1233: gdb-rhbz1420304-s390x-24of35.patch
-Patch1234: gdb-rhbz1420304-s390x-25of35.patch
-Patch1235: gdb-rhbz1420304-s390x-26of35.patch
-Patch1236: gdb-rhbz1420304-s390x-27of35.patch
-Patch1237: gdb-rhbz1420304-s390x-28of35.patch
-Patch1238: gdb-rhbz1420304-s390x-29of35.patch
-Patch1239: gdb-rhbz1420304-s390x-30of35.patch
-Patch1240: gdb-rhbz1420304-s390x-31of35.patch
-Patch1241: gdb-rhbz1420304-s390x-32of35.patch
-Patch1242: gdb-rhbz1420304-s390x-33of35.patch
-Patch1243: gdb-rhbz1420304-s390x-34of35.patch
-Patch1244: gdb-rhbz1420304-s390x-35of35.patch
-
-# [s390x] Backport arch14 guarded-storage register support (RH BZ 1498758).
-Patch1255: gdb-rhbz1498758-1of5.patch
-Patch1256: gdb-rhbz1498758-2of5.patch
-Patch1257: gdb-rhbz1498758-3of5.patch
-Patch1258: gdb-rhbz1498758-4of5.patch
-Patch1259: gdb-rhbz1498758-5of5.patch
-
 # Use inlined func name for printing breakpoints (RH BZ 1228556, Keith Seitz).
 Patch1261: gdb-rhbz1228556-bpt-inlined-func-name-1of2.patch
 Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
-
-Patch10000: gdb-7.12-buildid-locate-mageia.patch
-
-Patch10001: gdb-8.0.1-rpm5.patch
 
 # http://svnweb.mageia.org/soft/rpm/debuginfo-install/trunk/debuginfo-install
 Source1000: debuginfo-install
@@ -784,11 +622,6 @@ find -name "*.info*"|xargs rm -f
 
 %patch9 -p1 -b .py37~
 
-%patch232 -p1
-%patch349 -p1
-%patch1058 -p1
-%patch1132 -p1
-%patch889 -p1
 %patch1 -p1
 
 %patch105 -p1
@@ -801,7 +634,6 @@ find -name "*.info*"|xargs rm -f
 %patch145 -p1
 %patch161 -p1
 %patch163 -p1
-%patch164 -p1
 %patch188 -p1
 %patch194 -p1
 %patch196 -p1
@@ -822,9 +654,6 @@ find -name "*.info*"|xargs rm -f
 %patch260 -p1
 %patch263 -p1
 %patch271 -p1
-%patch274 -p1
-%patch659 -p1
-%patch353 -p1
 %patch282 -p1
 %patch284 -p1
 %patch287 -p1
@@ -846,16 +675,10 @@ find -name "*.info*"|xargs rm -f
 %patch392 -p1
 %patch397 -p1
 %patch403 -p1
-%patch389 -p1
-%patch394 -p1
 %patch407 -p1
 %patch408 -p1
-%patch417 -p1
 %patch459 -p1
-%patch470 -p1
 %patch475 -p1
-%patch415 -p1
-%patch519 -p1
 %patch490 -p1
 %patch491 -p1
 %patch496 -p1
@@ -869,99 +692,30 @@ find -name "*.info*"|xargs rm -f
 %patch616 -p1
 %patch627 -p1
 %patch634 -p1
-%patch653 -p1
-%patch661 -p1
 %patch690 -p1
 %patch698 -p1
 %patch703 -p1
-%patch1210 -p1
-%patch1211 -p1
-%patch1212 -p1
-%patch1213 -p1
-%patch1214 -p1
-%patch1215 -p1
-%patch1216 -p1
-%patch1217 -p1
-%patch1218 -p1
-%patch1219 -p1
-%patch1220 -p1
-%patch1221 -p1
-%patch1222 -p1
-%patch1223 -p1
-%patch1224 -p1
-%patch1225 -p1
-%patch1226 -p1
-%patch1227 -p1
-%patch1228 -p1
-%patch1229 -p1
-%patch1230 -p1
-%patch1231 -p1
-%patch1232 -p1
-%patch1233 -p1
-%patch1234 -p1
-%patch1235 -p1
-%patch1236 -p1
-%patch1237 -p1
-%patch1238 -p1
-%patch1239 -p1
-%patch1240 -p1
-%patch1241 -p1
-%patch1242 -p1
-%patch1243 -p1
-%patch1244 -p1
-%patch811 -p1
-%patch812 -p1
-%patch813 -p1
-%patch814 -p1
-%patch816 -p1
-%patch817 -p1
-%patch818 -p1
 %patch832 -p1
-%patch852 -p1
 %patch861 -p1
-%patch863 -p1
-%patch887 -p1
 %patch888 -p1
 %patch918 -p1
 %patch925 -p1
-%patch927 -p1
 %patch977 -p1
 %patch978 -p1
 %patch984 -p1
 %patch991 -p1
 %patch992 -p1
-%patch1026 -p1
 %patch1053 -p1
-%patch1056 -p1
 %patch1073 -p1
-%patch848 -p1
-%patch833 -p1
 %patch642 -p1
 %patch337 -p1
-%patch331 -p1
 %patch1113 -p1
-%patch1118 -p1
 %patch1123 -p1
 %patch1143 -p1
-%patch1149 -p1
-%patch1150 -p1
 %patch1152 -p1
-%patch1153 -p1
 %patch1155 -p1
-%patch1255 -p1
-%patch1256 -p1
-%patch1257 -p1
-%patch1258 -p1
-%patch1259 -p1
-%patch1261 -p1
-%patch1262 -p1
 
 %patch1075 -p1
-
-# Mga: add urpmi option
-%patch10000 -p1
-
-%patch10001 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
@@ -1007,7 +761,6 @@ export LDFLAGS="%{?__global_ldflags} %{?_with_asan:-fsanitize=address}"
 # (akien) This is Fedora-specific, for us debuginfo-install works fine with urpmi directly
 # CFLAGS="$CFLAGS -DDNF_DEBUGINFO_INSTALL"
 
-# Patch833: gdb-6.6-buildid-locate-rpm-scl.patch
 %if 0%{?el6:1} && 0%{?scl:1}
 CFLAGS="$CFLAGS -DGDB_INDEX_VERIFY_VENDOR"
 %endif
@@ -1016,7 +769,6 @@ CFLAGS="$CFLAGS -DGDB_INDEX_VERIFY_VENDOR"
 CFLAGS="$CFLAGS -DNEED_RL_STATE_FEDORA_GDB"
 
 # Patch337: gdb-6.8-attach-signalled-detach-stopped.patch
-# Patch331: gdb-6.8-quit-never-aborts.patch
 %if 0%{?rhel:1} && 0%{?rhel} <= 6
 CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 %endif
@@ -1287,7 +1039,6 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/elinos.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/wrs-linux.py
 rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 
-# Patch848: gdb-dts-rhel6-python-compat.patch
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/FrameWrapper.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/backtrace.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
