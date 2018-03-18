@@ -4,6 +4,11 @@
 
 %define Werror_cflags %nil
 
+%if 0%{?omvver} >= 4000
+# RPM 4.14 has soversion 8
+%define rpmsover 8
+%endif
+
 # rpmbuild parameters:
 # --with testsuite: Run the testsuite (biarch if possible).  Default is without.
 # --with asan: gcc -fsanitize=address
@@ -13,7 +18,7 @@
 # --define 'scl somepkgname': Independent packages by scl-utils-build.
 # --without rpm: Don't build rpm support (for aarch64 bootstrap)
 
-%bcond_with rpm
+%bcond_without rpm
 %bcond_with testsuite
 %bcond_without python
 %bcond_with babeltrace
@@ -39,7 +44,7 @@ Version: 8.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 1
+Release: 2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -510,9 +515,6 @@ Patch1171: v1.6.1-implicit-fallthrough.patch
 Patch1261: gdb-rhbz1228556-bpt-inlined-func-name-1of2.patch
 Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 
-# http://svnweb.mageia.org/soft/rpm/debuginfo-install/trunk/debuginfo-install
-Source1000: debuginfo-install
-
 # RL_STATE_FEDORA_GDB would not be found for:
 # Patch642: gdb-readline62-ask-more-rh.patch
 # --with-system-readline
@@ -589,21 +591,6 @@ and printing their data.
 
 This package provides INFO, HTML and PDF user manual for GDB.
 
-# (tpg) workaround for ABF, which publishes this package to debug media and gdb packages misses it's requires
-%package -n urpmi-debug-info-install
-Summary: debuginfo-install shim for urpmi
-License: CC0
-Group: System/Configuration/Packaging
-# Conflict with older versions where debuginfo-install was bundled
-Conflicts: gdb < 7.12-13
-Conflicts: dnf-utils
-# Generic provides to indicate what command it is, also provided by dnf-utils
-Provides: pkg-command(debuginfo-install)
-Provides: urpmi-debuginfo-install = %{EVRD}
-BuildArch: noarch
-
-%description -n urpmi-debug-info-install
-This package provides /usr/bin/debuginfo-install for using with urpmi.
 
 %prep
 %setup -q -n %{gdb_src}
@@ -758,8 +745,7 @@ cd %{gdb_build}$fprofile
 export CFLAGS="$RPM_OPT_FLAGS %{?_with_asan:-fsanitize=address}"
 export LDFLAGS="%{?__global_ldflags} %{?_with_asan:-fsanitize=address}"
 
-# (akien) This is Fedora-specific, for us debuginfo-install works fine with urpmi directly
-# CFLAGS="$CFLAGS -DDNF_DEBUGINFO_INSTALL"
+CFLAGS="$CFLAGS -DDNF_DEBUGINFO_INSTALL"
 
 %if 0%{?el6:1} && 0%{?scl:1}
 CFLAGS="$CFLAGS -DGDB_INDEX_VERIFY_VENDOR"
@@ -803,7 +789,7 @@ $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 	--without-python					\
 %endif
 %if %{with rpm}
-	--with-rpm=librpm-5.4.so                                \
+	--with-rpm=librpm%{rpmsover}.so                         \
 %else
 	--without-rpm                                           \
 %endif
@@ -1068,9 +1054,6 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %{_datadir}/gdb
 
 # don't include the files in include, they are part of binutils
-
-%files -n urpmi-debug-info-install
-%{_bindir}/debuginfo-install
 
 %files gdbserver
 %{_bindir}/gdbserver
