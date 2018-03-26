@@ -976,8 +976,6 @@ do
   touch -r $RPM_BUILD_DIR/%{gdb_src}/gdb/ChangeLog $i
 done
 
-install -m 0775 %{SOURCE1000} %{buildroot}%{_bindir}
-
 # Remove the files that are part of a gdb build but that are owned and
 # provided by other packages.
 # These are part of binutils
