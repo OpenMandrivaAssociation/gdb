@@ -44,7 +44,7 @@ Version: 8.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 2
+Release: 3
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -520,15 +520,15 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 # --with-system-readline
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
-BuildRequires: expat-devel
-BuildRequires: lzma-devel
+BuildRequires: pkgconfig(expat)
+BuildRequires: pkgconfig(liblzma)
 %if %{with rpm}
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
-BuildRequires: rpm-devel
+BuildRequires: pkgconfig(rpm) >= 4.14.0-0
 %endif
 %global __python %{__python3}
-BuildRequires:   python3-devel
-Requires:   python3
+BuildRequires:   pkgconfig(python3)
+Requires:   python >= 3
 %if %{with pdf}
 # gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
 BuildRequires:   texlive
@@ -536,7 +536,7 @@ BuildRequires:   texlive
 %if %{with babeltrace}
 BuildRequires: libbabeltrace-devel
 %endif
-BuildRequires: guile-devel
+BuildRequires: pkgconfig(guile-2.2)
 %global have_libipt 0
 %ifarch %{ix86} x86_64
 #global have_libipt 1
