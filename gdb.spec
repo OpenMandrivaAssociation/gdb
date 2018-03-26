@@ -518,6 +518,10 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 # RL_STATE_FEDORA_GDB would not be found for:
 # Patch642: gdb-readline62-ask-more-rh.patch
 # --with-system-readline
+
+# OMV specific
+Patch2000: gdb-8.1-guile-2.2.patch
+
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
 BuildRequires: pkgconfig(expat)
@@ -703,6 +707,8 @@ find -name "*.info*"|xargs rm -f
 %patch1155 -p1
 
 %patch1075 -p1
+
+%patch2000 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
