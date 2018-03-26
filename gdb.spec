@@ -524,7 +524,7 @@ BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(liblzma)
 %if %{with rpm}
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
-BuildRequires: pkgconfig(rpm) >= 2:4.14.0-0
+BuildRequires: pkgconfig(rpm) >= 4.14.0-0
 %endif
 %global __python %{__python3}
 BuildRequires:   pkgconfig(python3)
@@ -536,7 +536,7 @@ BuildRequires:   texlive
 %if %{with babeltrace}
 BuildRequires: libbabeltrace-devel
 %endif
-BuildRequires: pkgconfig(guile-2.0)
+BuildRequires: pkgconfig(guile-2.2)
 %global have_libipt 0
 %ifarch %{ix86} x86_64
 #global have_libipt 1
