@@ -1072,22 +1072,3 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %endif
 %{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
-
-%post doc
-# This step is part of the installation of the RPM. Not to be confused
-# with the 'make install ' of the build (rpmbuild) process.
-
-# For --excludedocs:
-if [ -e %{_infodir}/gdb.info.xz ]
-then
-  %_install_info gdb.info
-  %_install_info annotate.info
-fi
-
-%preun doc
-# For --excludedocs:
-if [ -e %{_infodir}/gdb.info.xz ]
-  %_remove_install_info gdb.info
-  %_remove_install_info annotate.info
-fi
-
