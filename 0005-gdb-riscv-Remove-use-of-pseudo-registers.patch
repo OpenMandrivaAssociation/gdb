@@ -1,0 +1,90 @@
+From a45166b81fd0f0cab3a174e568af3d73e00e548f Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <andrew.burgess@embecosm.com>
+Date: Tue, 6 Mar 2018 16:19:52 +0000
+Subject: [PATCH 5/9] gdb/riscv: Remove use of pseudo registers
+
+The code making use of pseudo registers was initially intended to
+support running 32-bit ABI files on 64-bit riscv targets.  However, the
+implementation was incomplete, and broken.
+
+For now I've removed all reference to pseudo registers from the riscv
+target, we've not lost any functionality, and this cleans up failures in
+the selftests.
+
+Once the riscv target has matured a little we'll probably end up
+bringing back some of the use of pseudo registers in order to better
+support running 32-bit executables on a 64-bit target.
+
+gdb/ChangeLog:
+
+	* riscv-tdep.c (riscv_pseudo_register_read): Delete.
+	(riscv_pseudo_register_write): Delete.
+	(riscv_gdbarch_init): Remove all use of pseudo registers.
+---
+ gdb/ChangeLog    |  6 ++++++
+ gdb/riscv-tdep.c | 25 -------------------------
+ 2 files changed, 6 insertions(+), 25 deletions(-)
+
+diff --git a/gdb/ChangeLog b/gdb/ChangeLog
+index 16bee04849..4b75090c52 100644
+--- a/gdb/ChangeLog
++++ b/gdb/ChangeLog
+@@ -1,5 +1,11 @@
+ 2018-08-23  Andrew Burgess  <andrew.burgess@embecosm.com>
+ 
++	* riscv-tdep.c (riscv_pseudo_register_read): Delete.
++	(riscv_pseudo_register_write): Delete.
++	(riscv_gdbarch_init): Remove all use of pseudo registers.
++
++2018-03-06  Andrew Burgess  <andrew.burgess@embecosm.com>
++
+ 	* riscv-tdep.c (riscv_return_value): Change type to ULONGEST for
+ 	reading values from registers.
+ 
+diff --git a/gdb/riscv-tdep.c b/gdb/riscv-tdep.c
+index 3e1ad99c67..ce14806721 100644
+--- a/gdb/riscv-tdep.c
++++ b/gdb/riscv-tdep.c
+@@ -499,28 +499,6 @@ riscv_register_name (struct gdbarch *gdbarch, int regnum)
+   return NULL;
+ }
+ 
+-/* Implement the pseudo_register_read gdbarch method.  */
+-
+-static enum register_status
+-riscv_pseudo_register_read (struct gdbarch *gdbarch,
+-			    readable_regcache *regcache,
+-			    int regnum,
+-			    gdb_byte *buf)
+-{
+-  return regcache->raw_read (regnum, buf);
+-}
+-
+-/* Implement the pseudo_register_write gdbarch method.  */
+-
+-static void
+-riscv_pseudo_register_write (struct gdbarch *gdbarch,
+-			     struct regcache *regcache,
+-			     int cookednum,
+-			     const gdb_byte *buf)
+-{
+-  regcache_raw_write (regcache, cookednum, buf);
+-}
+-
+ /* Implement the register_type gdbarch method.  */
+ 
+ static struct type *
+@@ -2559,10 +2537,7 @@ riscv_gdbarch_init (struct gdbarch_info info,
+   set_gdbarch_sw_breakpoint_from_kind (gdbarch, riscv_sw_breakpoint_from_kind);
+ 
+   /* Register architecture.  */
+-  set_gdbarch_pseudo_register_read (gdbarch, riscv_pseudo_register_read);
+-  set_gdbarch_pseudo_register_write (gdbarch, riscv_pseudo_register_write);
+   set_gdbarch_num_regs (gdbarch, RISCV_LAST_REGNUM + 1);
+-  set_gdbarch_num_pseudo_regs (gdbarch, RISCV_LAST_REGNUM + 1);
+   set_gdbarch_sp_regnum (gdbarch, RISCV_SP_REGNUM);
+   set_gdbarch_pc_regnum (gdbarch, RISCV_PC_REGNUM);
+   set_gdbarch_ps_regnum (gdbarch, RISCV_FP_REGNUM);
+-- 
+2.18.0
+

@@ -44,7 +44,7 @@ Version: 8.1.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 1
+Release: 2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -520,6 +520,17 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 # OMV specific
 Patch2000: gdb-8.1-guile-2.2.patch
 
+# RISC-V support patches from https://github.com/riscv/riscv-binutils-gdb
+Patch2100: 0001-gdb-Initial-baremetal-riscv-support.patch
+Patch2101: 0002-gdb-riscv-Fixes-to-printf-format-strings.patch
+Patch2102: 0003-gdb-riscv-Additional-print-format-string-fixes.patch
+Patch2103: 0004-gdb-riscv-Fix-type-when-reading-register-from-regcac.patch
+Patch2104: 0005-gdb-riscv-Remove-use-of-pseudo-registers.patch
+Patch2105: 0006-gdb-riscv-Remove-Contributed-by.-comments.patch
+Patch2106: 0007-gdb-riscv-Remove-partial-target-description-support.patch
+Patch2107: 0008-gdb-Add-riscv-to-list-of-architectures-with-a-save_r.patch
+Patch2108: 0009-gdb-riscv-Fix-some-ARI-issues.patch
+
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
 BuildRequires: pkgconfig(expat)
@@ -705,6 +716,16 @@ find -name "*.info*"|xargs rm -f
 %patch1075 -p1
 
 %patch2000 -p1
+
+%patch2100 -p1 -b .riscv1~
+%patch2101 -p1 -b .riscv2~
+%patch2102 -p1 -b .riscv3~
+%patch2103 -p1 -b .riscv4~
+%patch2104 -p1 -b .riscv5~
+%patch2105 -p1 -b .riscv6~
+%patch2106 -p1 -b .riscv7~
+%patch2107 -p1 -b .riscv8~
+%patch2108 -p1 -b .riscv9~
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.

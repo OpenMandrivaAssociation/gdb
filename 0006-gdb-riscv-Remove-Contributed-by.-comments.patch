@@ -1,0 +1,70 @@
+From fc70624d85e9fb16b6457de9d203282a1c1a302f Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <andrew.burgess@embecosm.com>
+Date: Tue, 6 Mar 2018 16:31:40 +0000
+Subject: [PATCH 6/9] gdb/riscv: Remove 'Contributed by....' comments
+
+The GDB coding standard states these lines should never have been
+added.
+
+gdb/ChangeLog:
+
+	* riscv-tdep.c: Remove 'Contributed by ...' lines from header
+	comment.
+	* riscv-tdep.h: Likewise.
+---
+ gdb/ChangeLog    | 6 ++++++
+ gdb/riscv-tdep.c | 5 -----
+ gdb/riscv-tdep.h | 5 -----
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/gdb/ChangeLog b/gdb/ChangeLog
+index 4b75090c52..1717893fbd 100644
+--- a/gdb/ChangeLog
++++ b/gdb/ChangeLog
+@@ -1,5 +1,11 @@
+ 2018-08-23  Andrew Burgess  <andrew.burgess@embecosm.com>
+ 
++	* riscv-tdep.c: Remove 'Contributed by ...' lines from header
++	comment.
++	* riscv-tdep.h: Likewise.
++
++2018-03-06  Andrew Burgess  <andrew.burgess@embecosm.com>
++
+ 	* riscv-tdep.c (riscv_pseudo_register_read): Delete.
+ 	(riscv_pseudo_register_write): Delete.
+ 	(riscv_gdbarch_init): Remove all use of pseudo registers.
+diff --git a/gdb/riscv-tdep.c b/gdb/riscv-tdep.c
+index ce14806721..bc25edfa9f 100644
+--- a/gdb/riscv-tdep.c
++++ b/gdb/riscv-tdep.c
+@@ -2,11 +2,6 @@
+ 
+    Copyright (C) 2018 Free Software Foundation, Inc.
+ 
+-   Contributed by Alessandro Forin(af@cs.cmu.edu) at CMU
+-   and by Per Bothner(bothner@cs.wisc.edu) at U.Wisconsin
+-   and by Todd Snyder <todd@bluespec.com>
+-   and by Mike Frysinger <vapier@gentoo.org>.
+-
+    This file is part of GDB.
+ 
+    This program is free software; you can redistribute it and/or modify
+diff --git a/gdb/riscv-tdep.h b/gdb/riscv-tdep.h
+index 3c033dcc77..ab5e278759 100644
+--- a/gdb/riscv-tdep.h
++++ b/gdb/riscv-tdep.h
+@@ -2,11 +2,6 @@
+ 
+    Copyright (C) 2018 Free Software Foundation, Inc.
+ 
+-   Contributed by Alessandro Forin(af@cs.cmu.edu) at CMU
+-   and by Per Bothner(bothner@cs.wisc.edu) at U.Wisconsin
+-   and by Todd Snyder <todd@bluespec.com>
+-   and by Mike Frysinger <vapier@gentoo.org>.
+-
+    This file is part of GDB.
+ 
+    This program is free software; you can redistribute it and/or modify
+-- 
+2.18.0
+
