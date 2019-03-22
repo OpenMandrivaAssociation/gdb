@@ -23,6 +23,7 @@
 %bcond_without python
 %bcond_with babeltrace
 %bcond_with pdf
+%bcond_without guile
 
 %{?scl:%scl_package gdb}
 %{!?scl:
@@ -800,10 +801,9 @@ CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 %if %{with babeltrace}
 	--with-babeltrace					\
 %endif
-%ifarch %{armx} %{ix86} aarch64 znver1 x86_64
+%if %{with guile}
 	--with-guile						\
-%endif
-%ifarch riscv64
+%else
 	--without-guile						\
 %endif
 	--with-system-readline				\
@@ -1059,8 +1059,10 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
 %doc README NEWS
 %{_bindir}/gdb
+%if %{with guile}
 %{_bindir}/gcore
 %{_mandir}/*/gcore.1*
+%endif
 %{_bindir}/gstack
 %{_mandir}/*/gstack.1*
 %{_bindir}/pstack
