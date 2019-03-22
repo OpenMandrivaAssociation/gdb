@@ -76,7 +76,7 @@ Group:   Development/Tools
 Obsoletes: gdb64 < 5.3.91
 %endif
 
-%ifarch %{arm}
+%ifarch %{arm} riscv64
 %global have_inproctrace 0
 %else
 %global have_inproctrace 1
