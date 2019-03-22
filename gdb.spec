@@ -800,7 +800,12 @@ CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 %if %{with babeltrace}
 	--with-babeltrace					\
 %endif
+%ifarch %{armx} %{ix86} aarch64 znver1 x86_64
 	--with-guile						\
+%endif
+%ifarch riscv64
+	--without-guile						\
+%endif
 	--with-system-readline				\
 	--with-expat						\
 $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
