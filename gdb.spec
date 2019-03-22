@@ -578,6 +578,9 @@ GDB, the GNU debugger, allows you to debug programs written in C, C++,
 Java, and other languages, by executing them in a controlled fashion
 and printing their data.
 
+%ifnarch riscv64
+# GDB Server not ported yet on risc
+# 22 March 2019
 %package gdbserver
 Summary: A standalone server for GDB (the GNU source-level debugger)
 Group:   Development/Tools
@@ -590,6 +593,7 @@ and printing their data.
 
 This package provides a program that allows you to run GDB on a different
 machine than the one which is running the program being debugged.
+%endif
 
 %package doc
 Summary: Documentation for GDB (the GNU source-level debugger)
@@ -1082,13 +1086,17 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %{_datadir}/gdb
 
 # don't include the files in include, they are part of binutils
-
+%ifnarch riscv64
+# GDB Server not ported yet on risc
+# 22 March 2019
+%package 
 %files gdbserver
 %{_bindir}/gdbserver
 %{_mandir}/*/gdbserver.1*
 %if %{have_inproctrace}
 %{_libdir}/libinproctrace.so
 %endif # %{have_inproctrace}
+%endif
 
 %files doc
 %if %{with pdf}
