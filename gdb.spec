@@ -531,6 +531,7 @@ Patch2105: 0006-gdb-riscv-Remove-Contributed-by.-comments.patch
 Patch2106: 0007-gdb-riscv-Remove-partial-target-description-support.patch
 Patch2107: 0008-gdb-Add-riscv-to-list-of-architectures-with-a-save_r.patch
 Patch2108: 0009-gdb-riscv-Fix-some-ARI-issues.patch
+Patch2109: 0001-gdb-Fix-ia64-defining-TRAP_HWBKPT-before-including-g.patch
 
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
@@ -727,6 +728,7 @@ find -name "*.info*"|xargs rm -f
 %patch2106 -p1 -b .riscv7~
 %patch2107 -p1 -b .riscv8~
 %patch2108 -p1 -b .riscv9~
+%patch2109 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
