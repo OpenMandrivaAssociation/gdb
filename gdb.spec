@@ -40,12 +40,12 @@ Name: %{?scl_prefix}gdb
 # See timestamp of source gnulib installed into gdb/gnulib/ .
 %global snapgnulib 20150822
 %global tarname gdb-%{version}
-Version: 8.1.1
+Version:	8.3.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 3
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -191,7 +191,7 @@ Patch213: gdb-6.5-readline-long-line-crash-test.patch
 
 # Fix bogus 0x0 unwind of the thread's topmost function clone(3) (BZ 216711).
 #=fedora
-Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
+#Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
 
 # Test sideeffects of skipping ppc .so libs trampolines (BZ 218379).
 #=fedoratest
@@ -220,10 +220,6 @@ Patch234: gdb-6.6-bz230000-power6-disassembly-test.patch
 # Allow running `/usr/bin/gcore' with provided but inaccessible tty (BZ 229517).
 #=fedoratest
 Patch245: gdb-6.6-bz229517-gcore-without-terminal.patch
-
-# Notify user of a child forked process being detached (BZ 235197).
-#=push+jan: This is more about discussion if/what should be printed.
-Patch247: gdb-6.6-bz235197-fork-detach-info.patch
 
 # Avoid too long timeouts on failing cases of "annota1.exp annota3.exp".
 #=fedoratest
@@ -282,10 +278,6 @@ Patch311: gdb-6.3-focus-cmd-prev-test.patch
 #=fedoratest
 Patch315: gdb-6.8-bz442765-threaded-exec-test.patch
 
-# Silence memcpy check which returns false positive (sparc64)
-#=push: But it is just a GCC workaround, look up the existing GCC PR for it.
-Patch317: gdb-6.8-sparc64-silence-memcpy-check.patch
-
 # Test a crash on libraries missing the .text section.
 #=fedoratest
 Patch320: gdb-6.5-section-num-fixup-test.patch
@@ -293,11 +285,6 @@ Patch320: gdb-6.5-section-num-fixup-test.patch
 # Fix register assignments with no GDB stack frames (BZ 436037).
 #=push+jan: This fix is incorrect.
 Patch330: gdb-6.8-bz436037-reg-no-longer-active.patch
-
-# [RHEL5,RHEL6] Fix attaching to stopped processes.
-# [RHEL5] Workaround kernel for detaching SIGSTOPped processes (BZ 809382).
-#=fedora
-Patch337: gdb-6.8-attach-signalled-detach-stopped.patch
 
 # Test the watchpoints conditionals works.
 #=fedoratest
@@ -315,10 +302,6 @@ Patch381: gdb-simultaneous-step-resume-breakpoint-test.patch
 # Fix regression of undisplayed missing shared libraries caused by a fix for.
 #=fedoratest: It should be in glibc: libc-alpha: <20091004161706.GA27450@.*>
 Patch382: gdb-core-open-vdso-warning.patch
-
-# Fix syscall restarts for amd64->i386 biarch.
-#=push+jan
-Patch391: gdb-x86_64-i386-syscall-restart.patch
 
 # Fix stepping with OMP parallel Fortran sections (BZ 533176).
 #=push+jan: It requires some better DWARF annotations.
@@ -340,10 +323,6 @@ Patch407: gdb-lineno-makeup-test.patch
 #=fedoratest
 Patch408: gdb-ppc-power7-test.patch
 
-# Workaround non-stop moribund locations exploited by kernel utrace (BZ 590623).
-#=push+jan: Currently it is still not fully safe.
-Patch459: gdb-moribund-utrace-workaround.patch
-
 # Backport DWARF-4 support (BZ 601887, Tom Tromey).
 #=fedoratest
 Patch475: gdb-bz601887-dwarf4-rh-test.patch
@@ -351,10 +330,6 @@ Patch475: gdb-bz601887-dwarf4-rh-test.patch
 # [delayed-symfile] Test a backtrace regression on CFIs without DIE (BZ 614604).
 #=fedoratest
 Patch490: gdb-test-bt-cfi-without-die.patch
-
-# Provide /usr/bin/gdb-add-index for rpm-build (Tom Tromey).
-#=push: Re-check against the upstream version.
-Patch491: gdb-gdb-add-index-script.patch
 
 # Out of memory is just an error, not fatal (uninitialized VLS vars, BZ 568248).
 #=push+jan: Inferior objects should be read in parts, then this patch gets obsoleted.
@@ -381,20 +356,6 @@ Patch548: gdb-test-expr-cumulative-archer.patch
 Patch565: gdb-physname-pr11734-test.patch
 #=fedoratest
 Patch567: gdb-physname-pr12273-test.patch
-
-# Toolchain on sparc is slightly broken and debuginfo files are generated
-# with non 64bit aligned tables/offsets.
-# See for example readelf -S ../Xvnc.debug.
-#
-# As a consenquence calculation of sectp->filepos as used in
-# dwarf2_read_section (gdb/dwarf2read.c:1525) will return a non aligned buffer
-# that cannot be used directly as done with MMAP.
-# Usage will result in a BusError.
-#
-# While we figure out what's wrong in the toolchain and do a full archive
-# rebuild to fix it, we need to be able to use gdb :)
-#=push
-Patch579: gdb-7.2.50-sparc-add-workaround-to-broken-debug-files.patch
 
 # Test GDB opcodes/ disassembly of Intel Ivy Bridge instructions (BZ 696890).
 #=fedoratest
@@ -436,10 +397,6 @@ Patch861: gdb-rhbz1007614-memleak-infpy_read_memory-test.patch
 #=fedoratest
 Patch888: gdb-vla-intel-tests.patch
 
-# Continue backtrace even if a frame filter throws an exception (Phil Muldoon).
-#=push
-Patch918: gdb-btrobust.patch
-
 # Display Fortran strings in backtraces.
 #=fedoratest
 Patch925: gdb-fortran-frame-string.patch
@@ -468,10 +425,6 @@ Patch991: gdb-rhbz1186476-internal-error-unqualified-name-re-set-test.patch
 #=fedoratest
 Patch992: gdb-rhbz1350436-type-printers-error.patch
 
-# Never kill PID on: gdb exec PID (Jan Kratochvil, RH BZ 1219747).
-#=push+jan
-Patch1053: gdb-bz1219747-attach-kills.patch
-
 # Fix the pahole command breakage due to its Python3 port (RH BZ 1264532).
 #=fedora
 Patch1044: gdb-pahole-python2.patch
@@ -494,14 +447,6 @@ Patch1113: gdb-rhbz1261564-aarch64-hw-watchpoint-test.patch
 #=fedoratest
 Patch1123: gdb-rhbz1325795-framefilters-test.patch
 
-# [dts+el7] [x86*] Bundle linux_perf.h for libipt (RH BZ 1256513).
-#=fedora
-Patch1143: gdb-linux_perf-bundle.patch
- 
-# Fix gdb-headless /usr/bin/ executables (BZ 1390251).
-#=fedora
-Patch1152: gdb-libexec-add-index.patch
-
 # New testcase for: Fix <tab>-completion crash (Gary Benson, RH BZ 1398387).
 #=fedoratest
 Patch1155: gdb-rhbz1398387-tab-crash-test.patch
@@ -522,9 +467,6 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 Patch2000: gdb-8.1-guile-2.2.patch
 
 # RISC-V support patches from https://github.com/riscv/riscv-binutils-gdb
-Patch2100: 0001-gdb-Initial-baremetal-riscv-support.patch
-Patch2101: 0002-gdb-riscv-Fixes-to-printf-format-strings.patch
-Patch2102: 0003-gdb-riscv-Additional-print-format-string-fixes.patch
 Patch2103: 0004-gdb-riscv-Fix-type-when-reading-register-from-regcac.patch
 Patch2104: 0005-gdb-riscv-Remove-use-of-pseudo-registers.patch
 Patch2105: 0006-gdb-riscv-Remove-Contributed-by.-comments.patch
@@ -640,7 +582,7 @@ find -name "*.info*"|xargs rm -f
 %patch208 -p1
 %patch211 -p1
 %patch213 -p1
-%patch214 -p1
+#% patch214 -p1
 %patch216 -p1
 %patch217 -p1
 %patch225 -p1
@@ -648,7 +590,6 @@ find -name "*.info*"|xargs rm -f
 %patch231 -p1
 %patch234 -p1
 %patch245 -p1
-%patch247 -p1
 %patch254 -p1
 %patch258 -p1
 %patch260 -p1
@@ -664,23 +605,19 @@ find -name "*.info*"|xargs rm -f
 %patch309 -p1
 %patch311 -p1
 %patch315 -p1
-%patch317 -p1
 %patch320 -p1
 %patch330 -p1
 %patch343 -p1
 %patch348 -p1
 %patch381 -p1
 %patch382 -p1
-%patch391 -p1
 %patch392 -p1
 %patch397 -p1
 %patch403 -p1
 %patch407 -p1
 %patch408 -p1
-%patch459 -p1
 %patch475 -p1
 %patch490 -p1
-%patch491 -p1
 %patch496 -p1
 %patch526 -p1
 %patch542 -p1
@@ -688,7 +625,6 @@ find -name "*.info*"|xargs rm -f
 %patch548 -p1
 %patch565 -p1
 %patch567 -p1
-%patch579 -p1
 %patch616 -p1
 %patch627 -p1
 %patch634 -p1
@@ -698,37 +634,21 @@ find -name "*.info*"|xargs rm -f
 %patch832 -p1
 %patch861 -p1
 %patch888 -p1
-%patch918 -p1
 %patch925 -p1
 %patch977 -p1
 %patch978 -p1
 %patch984 -p1
 %patch991 -p1
 %patch992 -p1
-%patch1053 -p1
 %patch1073 -p1
 %patch642 -p1
-%patch337 -p1
 %patch1113 -p1
 %patch1123 -p1
-%patch1143 -p1
-%patch1152 -p1
 %patch1155 -p1
 
 %patch1075 -p1
 
 %patch2000 -p1
-
-%patch2100 -p1 -b .riscv1~
-%patch2101 -p1 -b .riscv2~
-%patch2102 -p1 -b .riscv3~
-%patch2103 -p1 -b .riscv4~
-%patch2104 -p1 -b .riscv5~
-%patch2105 -p1 -b .riscv6~
-%patch2106 -p1 -b .riscv7~
-%patch2107 -p1 -b .riscv8~
-%patch2108 -p1 -b .riscv9~
-%patch2109 -p1
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
