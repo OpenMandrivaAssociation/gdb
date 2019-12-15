@@ -45,7 +45,7 @@ Version:	8.3.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	2
+Release:	3
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -61,6 +61,9 @@ Conflicts: gdb-headless < 7.12-29
 
 Summary: A stub package for GNU source-level debugger
 Requires: gdb-headless = %{version}-%{release}
+
+# Require dnf debuginfo-install to be installed
+Requires: dnf-command(debuginfo-install)
 
 %description
 'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
@@ -84,9 +87,6 @@ Obsoletes: gdb64 < 5.3.91
 
 # eu-strip: -g recognizes .gdb_index as a debugging section. (#631997)
 Conflicts: elfutils < 0.149
-
-# Require an implementation of /usr/bin/debuginfo-install
-Requires: pkg-command(debuginfo-install)
 
 # GDB patches have the format `gdb-<version>-bz<red-hat-bz-#>-<desc>.patch'.
 # They should be created using patch level 1: diff -up ./gdb (or gdb-6.3/gdb).
