@@ -45,7 +45,7 @@ Version:	8.3.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	3
+Release:	4
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -117,6 +117,10 @@ Patch1: gdb-6.3-rh-dummykfail-20041202.patch
 # Match the Fedora's version info.
 #=fedora
 Patch2: gdb-6.3-rh-testversion-20041202.patch
+
+# Fix gdb-headless /usr/bin/ executables (BZ 1390251).
+#=fedora
+Patch098: gdb-libexec-add-index.patch
 
 # Better parse 64-bit PPC system call prologues.
 #=push: Write new testcase.
