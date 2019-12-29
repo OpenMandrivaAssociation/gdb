@@ -35,17 +35,13 @@
 
 Name: %{?scl_prefix}gdb
 
-# Freeze it when GDB gets branched
-%global snapsrc    20170420
-# See timestamp of source gnulib installed into gdb/gnulib/ .
-%global snapgnulib 20150822
 %global tarname gdb-%{version}
-Version:	8.3.1
+Version:	9.0.90.20191228
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	5
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -118,18 +114,9 @@ Patch1: gdb-6.3-rh-dummykfail-20041202.patch
 #=fedora
 Patch2: gdb-6.3-rh-testversion-20041202.patch
 
-# Fix gdb-headless /usr/bin/ executables (BZ 1390251).
-#=fedora
-Patch098: gdb-libexec-add-index.patch
-
 # Better parse 64-bit PPC system call prologues.
 #=push: Write new testcase.
 Patch105: gdb-6.3-ppc64syscall-20040622.patch
-
-# Include the pc's section when doing a symbol lookup so that the
-# correct symbol is found.
-#=push: Write new testcase.
-Patch111: gdb-6.3-ppc64displaysymbol-20041124.patch
 
 # Make upstream `set scheduler-locking step' as default.
 #=push+jan: How much is scheduler-locking relevant after non-stop?
@@ -172,10 +159,6 @@ Patch163: gdb-6.3-inheritancetest-20050726.patch
 #=push+jan: There was some mail thread about it, this patch may be a hack.
 Patch188: gdb-6.5-bz203661-emit-relocs.patch
 
-# Support TLS symbols (+`errno' suggestion if no pthread is found) (BZ 185337).
-#=push+jan: It should be replaced by Infinity project.
-Patch194: gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
-
 # Fix TLS symbols resolving for shared libraries with a relative pathname.
 # The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
 #=fedoratest: One should recheck if it is really fixed upstream.
@@ -196,14 +179,6 @@ Patch213: gdb-6.5-readline-long-line-crash-test.patch
 # Fix bogus 0x0 unwind of the thread's topmost function clone(3) (BZ 216711).
 #=fedora
 #Patch214: gdb-6.5-bz216711-clone-is-outermost.patch
-
-# Test sideeffects of skipping ppc .so libs trampolines (BZ 218379).
-#=fedoratest
-Patch216: gdb-6.5-bz218379-ppc-solib-trampoline-test.patch
-
-# Fix lockup on trampoline vs. its function lookup; unreproducible (BZ 218379).
-#=fedora
-Patch217: gdb-6.5-bz218379-solib-trampoline-lookup-lock-fix.patch
 
 # Find symbols properly at their original (included) file (BZ 109921).
 #=fedoratest
@@ -307,10 +282,6 @@ Patch381: gdb-simultaneous-step-resume-breakpoint-test.patch
 #=fedoratest: It should be in glibc: libc-alpha: <20091004161706.GA27450@.*>
 Patch382: gdb-core-open-vdso-warning.patch
 
-# Fix stepping with OMP parallel Fortran sections (BZ 533176).
-#=push+jan: It requires some better DWARF annotations.
-Patch392: gdb-bz533176-fortran-omp-step.patch
-
 # Fix regression by python on ia64 due to stale current frame.
 #=push+jan
 Patch397: gdb-follow-child-stale-parent.patch
@@ -365,10 +336,6 @@ Patch567: gdb-physname-pr12273-test.patch
 #=fedoratest
 Patch616: gdb-test-ivy-bridge.patch
 
-# Work around PR libc/13097 "linux-vdso.so.1" warning message.
-#=push+jan
-Patch627: gdb-glibc-vdso-workaround.patch
-
 # Hack for proper PIE run of the testsuite.
 #=fedoratest
 Patch634: gdb-runtest-pie-override.patch
@@ -376,10 +343,6 @@ Patch634: gdb-runtest-pie-override.patch
 # Work around readline-6.2 incompatibility not asking for --more-- (BZ 701131).
 #=fedora
 Patch642: gdb-readline62-ask-more-rh.patch
-
-# Workaround PR libc/14166 for inferior calls of strstr.
-#=fedora: Compatibility with RHELs (unchecked which ones).
-Patch690: gdb-glibc-strstr-workaround.patch
 
 # Include testcase for `Unable to see a variable inside a module (XLF)' (BZ 823789).
 #=fedoratest
@@ -438,8 +401,6 @@ Patch1044: gdb-pahole-python2.patch
 Patch1073: gdb-opcodes-clflushopt-test.patch
 
 # [testsuite] Fix false selftest.exp FAIL from system readline-6.3+ (Patrick Palka).
-#=fedoratest
-Patch1075: gdb-testsuite-readline63-sigint.patch
 #=fedoratest
 Patch1119: gdb-testsuite-readline63-sigint-revert.patch
 
@@ -570,9 +531,7 @@ find -name "*.info*"|xargs rm -f
 
 %patch1 -p1
 
-%patch098 -p1
 %patch105 -p1
-%patch111 -p1
 %patch118 -p1
 %patch122 -p1
 %patch125 -p1
@@ -582,14 +541,11 @@ find -name "*.info*"|xargs rm -f
 %patch161 -p1
 %patch163 -p1
 %patch188 -p1
-%patch194 -p1
 %patch196 -p1
 %patch208 -p1
 %patch211 -p1
 %patch213 -p1
 #% patch214 -p1
-%patch216 -p1
-%patch217 -p1
 %patch225 -p1
 %patch229 -p1
 %patch231 -p1
@@ -616,7 +572,6 @@ find -name "*.info*"|xargs rm -f
 %patch348 -p1
 %patch381 -p1
 %patch382 -p1
-%patch392 -p1
 %patch397 -p1
 %patch403 -p1
 %patch407 -p1
@@ -631,9 +586,7 @@ find -name "*.info*"|xargs rm -f
 %patch565 -p1
 %patch567 -p1
 %patch616 -p1
-%patch627 -p1
 %patch634 -p1
-%patch690 -p1
 %patch698 -p1
 %patch703 -p1
 %patch832 -p1
@@ -650,8 +603,6 @@ find -name "*.info*"|xargs rm -f
 %patch1113 -p1
 %patch1123 -p1
 %patch1155 -p1
-
-%patch1075 -p1
 
 %patch2000 -p1
 
@@ -670,13 +621,6 @@ rm -f bfd/doc/*.info
 rm -f bfd/doc/*.info-*
 rm -f gdb/doc/*.info
 rm -f gdb/doc/*.info-*
-
-# RL_STATE_FEDORA_GDB would not be found for:
-# Patch642: gdb-readline62-ask-more-rh.patch
-# --with-system-readline
-mv -f readline/doc readline-doc
-rm -rf readline/*
-mv -f readline-doc readline/doc
 
 rm -rf zlib
 
@@ -963,6 +907,9 @@ ln -s gstack $RPM_BUILD_ROOT%{_bindir}/pstack
  rm -f i386-linux.xml
 %endif
 )
+
+# Static libraries without headers are useless
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 # Documentation only for development.
 rm -f $RPM_BUILD_ROOT%{_infodir}/gdbint*

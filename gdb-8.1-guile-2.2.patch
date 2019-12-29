@@ -309,18 +309,18 @@ index 26361e4a0c..01fe617641 100644
 +      scm_syserror("ioscm_write");
 +    }
 +
-+  TRY
++  TRY_SJLJ
 +    {
 +      if (scm_is_eq (port, error_port_scm))
 +	fputsn_filtered (ptr, count, gdb_stderr);
 +      else
 +	fputsn_filtered (ptr, count, gdb_stdout);
 +    }
-+  CATCH (except, RETURN_MASK_ALL)
++  CATCH_SJLJ (except, RETURN_MASK_ALL)
 +    {
-+      GDBSCM_HANDLE_GDB_EXCEPTION (except);
++      GDBSCM_HANDLE_GDB_EXCEPTION (unpack (except));
 +    }
-+  END_CATCH
++  END_CATCH_SJLJ
 +
 +  return count;
 +}
