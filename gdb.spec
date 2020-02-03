@@ -36,7 +36,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	9.0.90.20191228
+Version:	9.0.90.20200203
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -46,7 +46,7 @@ License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
 # ftp://sourceware.org/pub/gdb/releases/FIXME{tarname}.tar.xz
-Source0: ftp://sourceware.org/pub/gdb/releases/%{tarname}.tar.xz
+Source0: ftp://sourceware.org/pub/gdb/releases/%{tarname}.tar.zst
 URL: http://gnu.org/software/gdb/
 
 # For our convenience
@@ -113,6 +113,8 @@ Patch1: gdb-6.3-rh-dummykfail-20041202.patch
 # Match the Fedora's version info.
 #=fedora
 Patch2: gdb-6.3-rh-testversion-20041202.patch
+
+Patch95: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-libexec-add-index.patch
 
 # Better parse 64-bit PPC system call prologues.
 #=push: Write new testcase.
@@ -392,17 +394,9 @@ Patch991: gdb-rhbz1186476-internal-error-unqualified-name-re-set-test.patch
 #=fedoratest
 Patch992: gdb-rhbz1350436-type-printers-error.patch
 
-# Fix the pahole command breakage due to its Python3 port (RH BZ 1264532).
-#=fedora
-Patch1044: gdb-pahole-python2.patch
-
 # Test clflushopt instruction decode (for RH BZ 1262471).
 #=fedoratest
 Patch1073: gdb-opcodes-clflushopt-test.patch
-
-# [testsuite] Fix false selftest.exp FAIL from system readline-6.3+ (Patrick Palka).
-#=fedoratest
-Patch1119: gdb-testsuite-readline63-sigint-revert.patch
 
 # [aarch64] Fix hardware watchpoints (RH BZ 1261564).
 #=fedoratest
@@ -416,14 +410,6 @@ Patch1123: gdb-rhbz1325795-framefilters-test.patch
 #=fedoratest
 Patch1155: gdb-rhbz1398387-tab-crash-test.patch
 
-# [rhel dts libipt] Fix [-Werror=implicit-fallthrough=] with gcc-7.1.1.
-#=push+jan
-Patch1171: v1.6.1-implicit-fallthrough.patch
-
-# Use inlined func name for printing breakpoints (RH BZ 1228556, Keith Seitz).
-Patch1261: gdb-rhbz1228556-bpt-inlined-func-name-1of2.patch
-Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
-
 # RL_STATE_FEDORA_GDB would not be found for:
 # Patch642: gdb-readline62-ask-more-rh.patch
 # --with-system-readline
@@ -432,13 +418,7 @@ Patch1262: gdb-rhbz1228556-bpt-inlined-func-name-2of2.patch
 Patch2000: gdb-8.1-guile-2.2.patch
 
 # RISC-V support patches from https://github.com/riscv/riscv-binutils-gdb
-Patch2103: 0004-gdb-riscv-Fix-type-when-reading-register-from-regcac.patch
-Patch2104: 0005-gdb-riscv-Remove-use-of-pseudo-registers.patch
-Patch2105: 0006-gdb-riscv-Remove-Contributed-by.-comments.patch
-Patch2106: 0007-gdb-riscv-Remove-partial-target-description-support.patch
-Patch2107: 0008-gdb-Add-riscv-to-list-of-architectures-with-a-save_r.patch
-Patch2108: 0009-gdb-riscv-Fix-some-ARI-issues.patch
-Patch2109: 0001-gdb-Fix-ia64-defining-TRAP_HWBKPT-before-including-g.patch
+# (currently in sync with gdb git)
 
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
@@ -515,7 +495,7 @@ This package provides INFO, HTML and PDF user manual for GDB.
 
 
 %prep
-%setup -q -n %{gdb_src}
+%autosetup -p1 -n %{gdb_src}
 
 # Files have `# <number> <file>' statements breaking VPATH / find-debuginfo.sh .
 (cd gdb;rm -fv $(perl -pe 's/\\\n/ /' <Makefile.in|sed -n 's/^YYFILES = //p'))
@@ -524,89 +504,7 @@ This package provides INFO, HTML and PDF user manual for GDB.
 # we build in %{gdb_build}, just to be sure.
 find -name "*.info*"|xargs rm -f
 
-# Apply patches defined above.
-
-# Match the Fedora's version info.
-%patch2 -p1
-
-%patch1 -p1
-
-%patch105 -p1
-%patch118 -p1
-%patch122 -p1
-%patch125 -p1
-%patch133 -p1
-%patch136 -p1
-%patch145 -p1
-%patch161 -p1
-%patch163 -p1
-%patch188 -p1
-%patch196 -p1
-%patch208 -p1
-%patch211 -p1
-%patch213 -p1
-#% patch214 -p1
-%patch225 -p1
-%patch229 -p1
-%patch231 -p1
-%patch234 -p1
-%patch245 -p1
-%patch254 -p1
-%patch258 -p1
-%patch260 -p1
-%patch263 -p1
-%patch271 -p1
-%patch282 -p1
-%patch284 -p1
-%patch287 -p1
-%patch289 -p1
-%patch290 -p1
-%patch296 -p1
-%patch298 -p1
-%patch309 -p1
-%patch311 -p1
-%patch315 -p1
-%patch320 -p1
-%patch330 -p1
-%patch343 -p1
-%patch348 -p1
-%patch381 -p1
-%patch382 -p1
-%patch397 -p1
-%patch403 -p1
-%patch407 -p1
-%patch408 -p1
-%patch475 -p1
-%patch490 -p1
-%patch496 -p1
-%patch526 -p1
-%patch542 -p1
-%patch547 -p1
-%patch548 -p1
-%patch565 -p1
-%patch567 -p1
-%patch616 -p1
-%patch634 -p1
-%patch698 -p1
-%patch703 -p1
-%patch832 -p1
-%patch861 -p1
-%patch888 -p1
-%patch925 -p1
-%patch977 -p1
-%patch978 -p1
-%patch984 -p1
-%patch991 -p1
-%patch992 -p1
-%patch1073 -p1
-%patch642 -p1
-%patch1113 -p1
-%patch1123 -p1
-%patch1155 -p1
-
-%patch2000 -p1
-
-find -name "*.orig" | xargs rm -f
+find -name "*.orig" -o -name "*~" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
 
 # Change the version that gets printed at GDB startup, so it is RH specific.
