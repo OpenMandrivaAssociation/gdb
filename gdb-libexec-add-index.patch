@@ -1,0 +1,16 @@
+diff --git a/gdb/contrib/gdb-add-index.sh b/gdb/contrib/gdb-add-index.sh
+index 5a37020..76e6838 100755
+--- a/gdb/contrib/gdb-add-index.sh
++++ b/gdb/contrib/gdb-add-index.sh
+@@ -22,6 +22,11 @@ GDB=${GDB:=gdb}
+ OBJCOPY=${OBJCOPY:=objcopy}
+ READELF=${READELF:=readelf}
+ 
++GDB2=/usr/libexec/gdb
++if test -x $GDB2 && ! which $GDB &>/dev/null; then
++    GDB=$GDB2
++fi
++
+ myname="${0##*/}"
+ 
+ dwarf5=""
