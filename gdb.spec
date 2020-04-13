@@ -23,7 +23,7 @@
 %bcond_without python
 %bcond_with babeltrace
 %bcond_with pdf
-%bcond_without guile
+%bcond_with guile
 
 %{?scl:%scl_package gdb}
 %{!?scl:
