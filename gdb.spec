@@ -438,7 +438,9 @@ BuildRequires:   texlive
 %if %{with babeltrace}
 BuildRequires: libbabeltrace-devel
 %endif
+%if %{with guile}
 BuildRequires: pkgconfig(guile-2.2)
+%endif
 %global have_libipt 0
 %ifarch %{ix86} x86_64
 #global have_libipt 1
