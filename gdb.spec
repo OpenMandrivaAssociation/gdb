@@ -23,7 +23,7 @@
 %bcond_without python
 %bcond_with babeltrace
 %bcond_with pdf
-%bcond_with guile
+%bcond_without guile
 
 %{?scl:%scl_package gdb}
 %{!?scl:
@@ -36,7 +36,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	9.0.90.20200203
+Version:	9.2
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -46,7 +46,7 @@ License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
 # ftp://sourceware.org/pub/gdb/releases/FIXME{tarname}.tar.xz
-Source0: ftp://sourceware.org/pub/gdb/releases/%{tarname}.tar.zst
+Source0: ftp://sourceware.org/pub/gdb/releases/%{tarname}.tar.xz
 URL: http://gnu.org/software/gdb/
 
 # For our convenience
@@ -416,6 +416,7 @@ Patch1155: gdb-rhbz1398387-tab-crash-test.patch
 
 # OMV specific
 Patch2000: gdb-8.1-guile-2.2.patch
+Patch2001: gdb-9.2-guile-3.0.patch
 
 # RISC-V support patches from https://github.com/riscv/riscv-binutils-gdb
 # (currently in sync with gdb git)
@@ -439,7 +440,7 @@ BuildRequires:   texlive
 BuildRequires: libbabeltrace-devel
 %endif
 %if %{with guile}
-BuildRequires: pkgconfig(guile-2.2)
+BuildRequires: pkgconfig(guile-3.0)
 %endif
 %global have_libipt 0
 %ifarch %{ix86} x86_64

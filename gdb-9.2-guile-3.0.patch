@@ -1,0 +1,25 @@
+diff -up gdb-9.2/configure.omv~ gdb-9.2/configure
+diff -up gdb-9.2/gdb/configure.ac.omv~ gdb-9.2/gdb/configure.ac
+--- gdb-9.2/gdb/configure.ac.omv~	2020-06-11 00:36:57.217058251 +0200
++++ gdb-9.2/gdb/configure.ac	2020-06-11 00:37:36.654576975 +0200
+@@ -1071,7 +1071,7 @@ AC_MSG_RESULT([$with_guile])
+ dnl We check guile with pkg-config.
+ AC_PATH_PROG(pkg_config_prog_path, pkg-config, missing)
+ 
+-try_guile_versions="guile-2.0 guile-2.2"
++try_guile_versions="guile-3.0 guile-2.0 guile-2.2"
+ have_libguile=no
+ case "${with_guile}" in
+ no)
+diff -up gdb-9.2/gdb/configure.omv~ gdb-9.2/gdb/configure
+--- gdb-9.2/gdb/configure.omv~	2020-06-11 00:38:36.951369231 +0200
++++ gdb-9.2/gdb/configure	2020-06-11 00:38:43.489455095 +0200
+@@ -10828,7 +10828,7 @@ fi
+ 
+ 
+ 
+-try_guile_versions="guile-2.0 guile-2.2"
++try_guile_versions="guile-3.0 guile-2.0 guile-2.2"
+ have_libguile=no
+ case "${with_guile}" in
+ no)
