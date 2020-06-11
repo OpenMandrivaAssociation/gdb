@@ -556,7 +556,7 @@ CFLAGS="$CFLAGS -DNEED_DETACH_SIGSTOP"
 %endif
 
 # --htmldir and --pdfdir are not used as they are used from %{gdb_build}.
-../configure							\
+if ! ../configure							\
 	--prefix=%{_prefix}					\
 	--libdir=%{_libdir}					\
 	--sysconfdir=%{_sysconfdir}				\
@@ -613,7 +613,10 @@ $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 %endif
 	      --with-auto-load-dir='$debugdir:$datadir/auto-load%{?scl::%{_root_datadir}/gdb/auto-load}'	\
 	--with-auto-load-safe-path='$debugdir:$datadir/auto-load%{?scl::%{_root_datadir}/gdb/auto-load}'	\
-	%{_target_platform}
+	%{_target_platform} ; then
+	cat config.log >&2
+	exit 1
+fi
 
 if [ -z "%{!?_with_profile:no}" ]
 then
