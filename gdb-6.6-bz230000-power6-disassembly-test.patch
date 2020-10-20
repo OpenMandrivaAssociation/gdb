@@ -1,14 +1,21 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.6-bz230000-power6-disassembly-test.patch
+
+;; Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
+;;=fedoratest
+
 https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=230000
 
 The original testcase
 	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=230000#c1
 requires too recent GCC.
 
-
-Index: gdb-7.5.50.20130215/gdb/testsuite/gdb.arch/powerpc-power6.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.5.50.20130215/gdb/testsuite/gdb.arch/powerpc-power6.exp	2013-02-25 14:31:06.658827177 +0100
+diff --git a/gdb/testsuite/gdb.arch/powerpc-power6.exp b/gdb/testsuite/gdb.arch/powerpc-power6.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/powerpc-power6.exp
 @@ -0,0 +1,54 @@
 +# Copyright 2007 Free Software Foundation, Inc.
 +
@@ -64,10 +71,10 @@ Index: gdb-7.5.50.20130215/gdb/testsuite/gdb.arch/powerpc-power6.exp
 +gdb_test "disass func" ":\tddivq  *f0,f2,f0\r\n.*" "Power6 disassembly ddivq"
 +gdb_test "disass func" ":\tdcmpu  *cr1,f2,f1\r\n.*" "Power6 disassembly dcmpu"
 +gdb_test "disass func" ":\tdcmpuq  *cr1,f2,f0\r\n.*" "Power6 disassembly dcmpuq"
-Index: gdb-7.5.50.20130215/gdb/testsuite/gdb.arch/powerpc-power6.s
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.5.50.20130215/gdb/testsuite/gdb.arch/powerpc-power6.s	2013-02-25 14:31:06.659827178 +0100
+diff --git a/gdb/testsuite/gdb.arch/powerpc-power6.s b/gdb/testsuite/gdb.arch/powerpc-power6.s
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/powerpc-power6.s
 @@ -0,0 +1,16 @@
 +	.text
 +	.globl	func

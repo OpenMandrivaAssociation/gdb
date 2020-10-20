@@ -1,7 +1,15 @@
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.c	2016-02-15 23:23:02.843498936 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-test-pie-20050107.patch
+
+;; VSYSCALL and PIE
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.pie/attach.c b/gdb/testsuite/gdb.pie/attach.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/attach.c
 @@ -0,0 +1,20 @@
 +/* This program is intended to be started outside of gdb, and then
 +   attached to by gdb.  Thus, it simply spins in a loop.  The loop
@@ -23,386 +31,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.c
 +    }
 +  return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach2.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach2.c	2016-02-15 23:23:02.843498936 +0100
-@@ -0,0 +1,24 @@
-+/* This program is intended to be started outside of gdb, and then
-+   attached to by gdb.  Thus, it simply spins in a loop.  The loop
-+   is exited when & if the variable 'should_exit' is non-zero.  (It
-+   is initialized to zero in this program, so the loop will never
-+   exit unless/until gdb sets the variable to non-zero.)
-+   */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+
-+int  should_exit = 0;
-+
-+int main ()
-+{
-+  int  local_i = 0;
-+
-+  sleep( 10 ); /* System call causes register fetch to fail */
-+               /* This is a known HPUX "feature"            */
-+  while (! should_exit)
-+    {
-+      local_i++;
-+    }
-+  return (0);
-+}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break.c	2016-02-15 23:23:02.844498943 +0100
-@@ -0,0 +1,146 @@
-+/* This testcase is part of GDB, the GNU debugger.
-+
-+   Copyright 1992, 1993, 1994, 1995, 1999, 2002, 2003 Free Software
-+   Foundation, Inc.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License as published by
-+   the Free Software Foundation; either version 2 of the License, or
-+   (at your option) any later version.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+ 
-+   You should have received a copy of the GNU General Public License
-+   along with this program; if not, write to the Free Software
-+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+
-+   Please email any bugs, comments, and/or additions to this file to:
-+   bug-gdb@prep.ai.mit.edu  */
-+
-+#ifdef vxworks
-+
-+#  include <stdio.h>
-+
-+/* VxWorks does not supply atoi.  */
-+static int
-+atoi (z)
-+     char *z;
-+{
-+  int i = 0;
-+
-+  while (*z >= '0' && *z <= '9')
-+    i = i * 10 + (*z++ - '0');
-+  return i;
-+}
-+
-+/* I don't know of any way to pass an array to VxWorks.  This function
-+   can be called directly from gdb.  */
-+
-+vxmain (arg)
-+char *arg;
-+{
-+  char *argv[2];
-+
-+  argv[0] = "";
-+  argv[1] = arg;
-+  main (2, argv, (char **) 0);
-+}
-+
-+#else /* ! vxworks */
-+#  include <stdio.h>
-+#  include <stdlib.h>
-+#endif /* ! vxworks */
-+
-+#ifdef PROTOTYPES
-+extern int marker1 (void);
-+extern int marker2 (int a);
-+extern void marker3 (char *a, char *b);
-+extern void marker4 (long d);
-+#else
-+extern int marker1 ();
-+extern int marker2 ();
-+extern void marker3 ();
-+extern void marker4 ();
-+#endif
-+
-+/*
-+ *	This simple classical example of recursion is useful for
-+ *	testing stack backtraces and such.
-+ */
-+
-+#ifdef PROTOTYPES
-+int factorial(int);
-+
-+int
-+main (int argc, char **argv, char **envp)
-+#else
-+int
-+main (argc, argv, envp)
-+int argc;
-+char *argv[], **envp;
-+#endif
-+{
-+#ifdef usestubs
-+    set_debug_traps();  /* set breakpoint 5 here */
-+    breakpoint();
-+#endif
-+    if (argc == 12345) {  /* an unlikely value < 2^16, in case uninited */ /* set breakpoint 6 here */
-+	fprintf (stderr, "usage:  factorial <number>\n");
-+	return 1;
-+    }
-+    printf ("%d\n", factorial (atoi ("6")));  /* set breakpoint 1 here */
-+    /* set breakpoint 12 here */
-+    marker1 ();  /* set breakpoint 11 here */
-+    marker2 (43); /* set breakpoint 20 here */
-+    marker3 ("stack", "trace"); /* set breakpoint 21 here */
-+    marker4 (177601976L);
-+    argc = (argc == 12345); /* This is silly, but we can step off of it */ /* set breakpoint 2 here */
-+    return argc;  /* set breakpoint 10 here */
-+}
-+
-+#ifdef PROTOTYPES
-+int factorial (int value)
-+#else
-+int factorial (value)
-+int value;
-+#endif
-+{
-+  if (value > 1) {  /* set breakpoint 7 here */
-+	value *= factorial (value - 1);
-+    }
-+    return (value); /* set breakpoint 19 here */
-+}
-+
-+#ifdef PROTOTYPES
-+int multi_line_if_conditional (int a, int b, int c)
-+#else
-+int multi_line_if_conditional (a, b, c)
-+  int a, b, c;
-+#endif
-+{
-+  if (a    /* set breakpoint 3 here */
-+      && b
-+      && c)
-+    return 0;
-+  else
-+    return 1;
-+}
-+
-+#ifdef PROTOTYPES
-+int multi_line_while_conditional (int a, int b, int c)
-+#else
-+int multi_line_while_conditional (a, b, c)
-+  int a, b, c;
-+#endif
-+{
-+  while (a /* set breakpoint 4 here */
-+      && b
-+      && c)
-+    {
-+      a--, b--, c--;
-+    }
-+  return 0;
-+}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break1.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break1.c	2016-02-15 23:23:02.844498943 +0100
-@@ -0,0 +1,44 @@
-+/* This testcase is part of GDB, the GNU debugger.
-+
-+   Copyright 1992, 1993, 1994, 1995, 1999, 2002, 2003 Free Software
-+   Foundation, Inc.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License as published by
-+   the Free Software Foundation; either version 2 of the License, or
-+   (at your option) any later version.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+ 
-+   You should have received a copy of the GNU General Public License
-+   along with this program; if not, write to the Free Software
-+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+
-+   Please email any bugs, comments, and/or additions to this file to:
-+   bug-gdb@prep.ai.mit.edu  */
-+
-+/* The code for this file was extracted from the gdb testsuite
-+   testcase "break.c". */
-+
-+/* The following functions do nothing useful.  They are included
-+   simply as places to try setting breakpoints at.  They are
-+   explicitly "one-line functions" to verify that this case works
-+   (some versions of gcc have or have had problems with this).
-+  
-+   These functions are in a separate source file to prevent an
-+   optimizing compiler from inlining them and optimizing them away. */
-+
-+#ifdef PROTOTYPES
-+int marker1 (void) { return (0); }	/* set breakpoint 15 here */
-+int marker2 (int a) { return (1); }	/* set breakpoint 8 here */
-+void marker3 (char *a, char *b) {}	/* set breakpoint 17 here */
-+void marker4 (long d) {}		/* set breakpoint 14 here */
-+#else
-+int marker1 () { return (0); }		/* set breakpoint 16 here */
-+int marker2 (a) int a; { return (1); }	/* set breakpoint 9 here */
-+void marker3 (a, b) char *a, *b; {}	/* set breakpoint 18 here */
-+void marker4 (d) long d; {}		/* set breakpoint 13 here */
-+#endif
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/coremaker.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/coremaker.c	2016-02-15 23:23:02.844498943 +0100
-@@ -0,0 +1,142 @@
-+/* Copyright 1992, 1993, 1994, 1995, 1996, 1999
-+   Free Software Foundation, Inc.
-+
-+   This file is part of GDB.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License as published by
-+   the Free Software Foundation; either version 2 of the License, or (at
-+   your option) any later version.
-+
-+   This program is distributed in the hope that it will be useful, but
-+   WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+   General Public License for more details.
-+
-+   You should have received a copy of the GNU General Public License
-+   along with this program; if not, write to the Free Software
-+   Foundation, Inc., 59 Temple Place - Suite 330,
-+   Boston, MA 02111-1307, USA.  */
-+
-+/* Simple little program that just generates a core dump from inside some
-+   nested function calls. */
-+
-+#include <stdio.h>
-+#include <sys/types.h>
-+#include <fcntl.h>
-+#include <sys/mman.h>
-+#include <signal.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+
-+#ifndef __STDC__
-+#define	const	/**/
-+#endif
-+
-+#define MAPSIZE (8 * 1024)
-+
-+/* Don't make these automatic vars or we will have to walk back up the
-+   stack to access them. */
-+
-+char *buf1;
-+char *buf2;
-+
-+int coremaker_data = 1;	/* In Data section */
-+int coremaker_bss;	/* In BSS section */
-+
-+const int coremaker_ro = 201;	/* In Read-Only Data section */
-+
-+/* Note that if the mapping fails for any reason, we set buf2
-+   to -1 and the testsuite notices this and reports it as
-+   a failure due to a mapping error.  This way we don't have
-+   to test for specific errors when running the core maker. */
-+
-+void
-+mmapdata ()
-+{
-+  int j, fd;
-+
-+  /* Allocate and initialize a buffer that will be used to write
-+     the file that is later mapped in. */
-+
-+  buf1 = (char *) malloc (MAPSIZE);
-+  for (j = 0; j < MAPSIZE; ++j)
-+    {
-+      buf1[j] = j;
-+    }
-+
-+  /* Write the file to map in */
-+
-+  fd = open ("coremmap.data", O_CREAT | O_RDWR, 0666);
-+  if (fd == -1)
-+    {
-+      perror ("coremmap.data open failed");
-+      buf2 = (char *) -1;
-+      return;
-+    }
-+  write (fd, buf1, MAPSIZE);
-+
-+  /* Now map the file into our address space as buf2 */
-+
-+  buf2 = (char *) mmap (0, MAPSIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-+  if (buf2 == (char *) -1)
-+    {
-+      perror ("mmap failed");
-+      return;
-+    }
-+
-+  /* Verify that the original data and the mapped data are identical.
-+     If not, we'd rather fail now than when trying to access the mapped
-+     data from the core file. */
-+
-+  for (j = 0; j < MAPSIZE; ++j)
-+    {
-+      if (buf1[j] != buf2[j])
-+	{
-+	  fprintf (stderr, "mapped data is incorrect");
-+	  buf2 = (char *) -1;
-+	  return;
-+	}
-+    }
-+}
-+
-+void
-+func2 ()
-+{
-+  int coremaker_local[5];
-+  int i;
-+
-+#ifdef SA_FULLDUMP
-+  /* Force a corefile that includes the data section for AIX.  */
-+  {
-+    struct sigaction sa;
-+
-+    sigaction (SIGABRT, (struct sigaction *)0, &sa);
-+    sa.sa_flags |= SA_FULLDUMP;
-+    sigaction (SIGABRT, &sa, (struct sigaction *)0);
-+  }
-+#endif
-+
-+  /* Make sure that coremaker_local doesn't get optimized away. */
-+  for (i = 0; i < 5; i++)
-+    coremaker_local[i] = i;
-+  coremaker_bss = 0;
-+  for (i = 0; i < 5; i++)
-+    coremaker_bss += coremaker_local[i];
-+  coremaker_data = coremaker_ro + 1;
-+  abort ();
-+}
-+
-+void
-+func1 ()
-+{
-+  func2 ();
-+}
-+
-+int main ()
-+{
-+  mmapdata ();
-+  func1 ();
-+  return 0;
-+}
-+
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.exp	2016-02-15 23:37:15.190560048 +0100
+diff --git a/gdb/testsuite/gdb.pie/attach.exp b/gdb/testsuite/gdb.pie/attach.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/attach.exp
 @@ -0,0 +1,416 @@
 +#   Copyright 1997, 1999, 2002 Free Software Foundation, Inc.
 +
@@ -820,10 +452,190 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/attach.exp
 +do_call_attach_tests
 +
 +return 0
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break.exp	2016-02-15 23:37:15.191560055 +0100
+diff --git a/gdb/testsuite/gdb.pie/attach2.c b/gdb/testsuite/gdb.pie/attach2.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/attach2.c
+@@ -0,0 +1,24 @@
++/* This program is intended to be started outside of gdb, and then
++   attached to by gdb.  Thus, it simply spins in a loop.  The loop
++   is exited when & if the variable 'should_exit' is non-zero.  (It
++   is initialized to zero in this program, so the loop will never
++   exit unless/until gdb sets the variable to non-zero.)
++   */
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++int  should_exit = 0;
++
++int main ()
++{
++  int  local_i = 0;
++
++  sleep( 10 ); /* System call causes register fetch to fail */
++               /* This is a known HPUX "feature"            */
++  while (! should_exit)
++    {
++      local_i++;
++    }
++  return (0);
++}
+diff --git a/gdb/testsuite/gdb.pie/break.c b/gdb/testsuite/gdb.pie/break.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/break.c
+@@ -0,0 +1,146 @@
++/* This testcase is part of GDB, the GNU debugger.
++
++   Copyright 1992, 1993, 1994, 1995, 1999, 2002, 2003 Free Software
++   Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++ 
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++
++   Please email any bugs, comments, and/or additions to this file to:
++   bug-gdb@prep.ai.mit.edu  */
++
++#ifdef vxworks
++
++#  include <stdio.h>
++
++/* VxWorks does not supply atoi.  */
++static int
++atoi (z)
++     char *z;
++{
++  int i = 0;
++
++  while (*z >= '0' && *z <= '9')
++    i = i * 10 + (*z++ - '0');
++  return i;
++}
++
++/* I don't know of any way to pass an array to VxWorks.  This function
++   can be called directly from gdb.  */
++
++vxmain (arg)
++char *arg;
++{
++  char *argv[2];
++
++  argv[0] = "";
++  argv[1] = arg;
++  main (2, argv, (char **) 0);
++}
++
++#else /* ! vxworks */
++#  include <stdio.h>
++#  include <stdlib.h>
++#endif /* ! vxworks */
++
++#ifdef PROTOTYPES
++extern int marker1 (void);
++extern int marker2 (int a);
++extern void marker3 (char *a, char *b);
++extern void marker4 (long d);
++#else
++extern int marker1 ();
++extern int marker2 ();
++extern void marker3 ();
++extern void marker4 ();
++#endif
++
++/*
++ *	This simple classical example of recursion is useful for
++ *	testing stack backtraces and such.
++ */
++
++#ifdef PROTOTYPES
++int factorial(int);
++
++int
++main (int argc, char **argv, char **envp)
++#else
++int
++main (argc, argv, envp)
++int argc;
++char *argv[], **envp;
++#endif
++{
++#ifdef usestubs
++    set_debug_traps();  /* set breakpoint 5 here */
++    breakpoint();
++#endif
++    if (argc == 12345) {  /* an unlikely value < 2^16, in case uninited */ /* set breakpoint 6 here */
++	fprintf (stderr, "usage:  factorial <number>\n");
++	return 1;
++    }
++    printf ("%d\n", factorial (atoi ("6")));  /* set breakpoint 1 here */
++    /* set breakpoint 12 here */
++    marker1 ();  /* set breakpoint 11 here */
++    marker2 (43); /* set breakpoint 20 here */
++    marker3 ("stack", "trace"); /* set breakpoint 21 here */
++    marker4 (177601976L);
++    argc = (argc == 12345); /* This is silly, but we can step off of it */ /* set breakpoint 2 here */
++    return argc;  /* set breakpoint 10 here */
++}
++
++#ifdef PROTOTYPES
++int factorial (int value)
++#else
++int factorial (value)
++int value;
++#endif
++{
++  if (value > 1) {  /* set breakpoint 7 here */
++	value *= factorial (value - 1);
++    }
++    return (value); /* set breakpoint 19 here */
++}
++
++#ifdef PROTOTYPES
++int multi_line_if_conditional (int a, int b, int c)
++#else
++int multi_line_if_conditional (a, b, c)
++  int a, b, c;
++#endif
++{
++  if (a    /* set breakpoint 3 here */
++      && b
++      && c)
++    return 0;
++  else
++    return 1;
++}
++
++#ifdef PROTOTYPES
++int multi_line_while_conditional (int a, int b, int c)
++#else
++int multi_line_while_conditional (a, b, c)
++  int a, b, c;
++#endif
++{
++  while (a /* set breakpoint 4 here */
++      && b
++      && c)
++    {
++      a--, b--, c--;
++    }
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.pie/break.exp b/gdb/testsuite/gdb.pie/break.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/break.exp
 @@ -0,0 +1,954 @@
 +#   Copyright 1988, 1990, 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999,
 +#   2000, 2002, 2003, 2004
@@ -1779,10 +1591,59 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/break.exp
 +    send_gdb "set args main\n"
 +    gdb_expect -re ".*$gdb_prompt $" {}
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/corefile.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/corefile.exp	2016-02-15 23:37:15.191560055 +0100
+diff --git a/gdb/testsuite/gdb.pie/break1.c b/gdb/testsuite/gdb.pie/break1.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/break1.c
+@@ -0,0 +1,44 @@
++/* This testcase is part of GDB, the GNU debugger.
++
++   Copyright 1992, 1993, 1994, 1995, 1999, 2002, 2003 Free Software
++   Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++ 
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++
++   Please email any bugs, comments, and/or additions to this file to:
++   bug-gdb@prep.ai.mit.edu  */
++
++/* The code for this file was extracted from the gdb testsuite
++   testcase "break.c". */
++
++/* The following functions do nothing useful.  They are included
++   simply as places to try setting breakpoints at.  They are
++   explicitly "one-line functions" to verify that this case works
++   (some versions of gcc have or have had problems with this).
++  
++   These functions are in a separate source file to prevent an
++   optimizing compiler from inlining them and optimizing them away. */
++
++#ifdef PROTOTYPES
++int marker1 (void) { return (0); }	/* set breakpoint 15 here */
++int marker2 (int a) { return (1); }	/* set breakpoint 8 here */
++void marker3 (char *a, char *b) {}	/* set breakpoint 17 here */
++void marker4 (long d) {}		/* set breakpoint 14 here */
++#else
++int marker1 () { return (0); }		/* set breakpoint 16 here */
++int marker2 (a) int a; { return (1); }	/* set breakpoint 9 here */
++void marker3 (a, b) char *a, *b; {}	/* set breakpoint 18 here */
++void marker4 (d) long d; {}		/* set breakpoint 13 here */
++#endif
+diff --git a/gdb/testsuite/gdb.pie/corefile.exp b/gdb/testsuite/gdb.pie/corefile.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/corefile.exp
 @@ -0,0 +1,233 @@
 +# Copyright 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000
 +# Free Software Foundation, Inc.
@@ -2017,3 +1878,150 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.pie/corefile.exp
 +gdb_test "up" "#\[0-9\]* *\[0-9xa-fH'\]* in .* \\(.*\\).*" "up in corefile.exp (reinit)"
 +
 +gdb_test "core" "No core file now."
+diff --git a/gdb/testsuite/gdb.pie/coremaker.c b/gdb/testsuite/gdb.pie/coremaker.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.pie/coremaker.c
+@@ -0,0 +1,142 @@
++/* Copyright 1992, 1993, 1994, 1995, 1996, 1999
++   Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or (at
++   your option) any later version.
++
++   This program is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.  */
++
++/* Simple little program that just generates a core dump from inside some
++   nested function calls. */
++
++#include <stdio.h>
++#include <sys/types.h>
++#include <fcntl.h>
++#include <sys/mman.h>
++#include <signal.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++#ifndef __STDC__
++#define	const	/**/
++#endif
++
++#define MAPSIZE (8 * 1024)
++
++/* Don't make these automatic vars or we will have to walk back up the
++   stack to access them. */
++
++char *buf1;
++char *buf2;
++
++int coremaker_data = 1;	/* In Data section */
++int coremaker_bss;	/* In BSS section */
++
++const int coremaker_ro = 201;	/* In Read-Only Data section */
++
++/* Note that if the mapping fails for any reason, we set buf2
++   to -1 and the testsuite notices this and reports it as
++   a failure due to a mapping error.  This way we don't have
++   to test for specific errors when running the core maker. */
++
++void
++mmapdata ()
++{
++  int j, fd;
++
++  /* Allocate and initialize a buffer that will be used to write
++     the file that is later mapped in. */
++
++  buf1 = (char *) malloc (MAPSIZE);
++  for (j = 0; j < MAPSIZE; ++j)
++    {
++      buf1[j] = j;
++    }
++
++  /* Write the file to map in */
++
++  fd = open ("coremmap.data", O_CREAT | O_RDWR, 0666);
++  if (fd == -1)
++    {
++      perror ("coremmap.data open failed");
++      buf2 = (char *) -1;
++      return;
++    }
++  write (fd, buf1, MAPSIZE);
++
++  /* Now map the file into our address space as buf2 */
++
++  buf2 = (char *) mmap (0, MAPSIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
++  if (buf2 == (char *) -1)
++    {
++      perror ("mmap failed");
++      return;
++    }
++
++  /* Verify that the original data and the mapped data are identical.
++     If not, we'd rather fail now than when trying to access the mapped
++     data from the core file. */
++
++  for (j = 0; j < MAPSIZE; ++j)
++    {
++      if (buf1[j] != buf2[j])
++	{
++	  fprintf (stderr, "mapped data is incorrect");
++	  buf2 = (char *) -1;
++	  return;
++	}
++    }
++}
++
++void
++func2 ()
++{
++  int coremaker_local[5];
++  int i;
++
++#ifdef SA_FULLDUMP
++  /* Force a corefile that includes the data section for AIX.  */
++  {
++    struct sigaction sa;
++
++    sigaction (SIGABRT, (struct sigaction *)0, &sa);
++    sa.sa_flags |= SA_FULLDUMP;
++    sigaction (SIGABRT, &sa, (struct sigaction *)0);
++  }
++#endif
++
++  /* Make sure that coremaker_local doesn't get optimized away. */
++  for (i = 0; i < 5; i++)
++    coremaker_local[i] = i;
++  coremaker_bss = 0;
++  for (i = 0; i < 5; i++)
++    coremaker_bss += coremaker_local[i];
++  coremaker_data = coremaker_ro + 1;
++  abort ();
++}
++
++void
++func1 ()
++{
++  func2 ();
++}
++
++int main ()
++{
++  mmapdata ();
++  func1 ();
++  return 0;
++}
++

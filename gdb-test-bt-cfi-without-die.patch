@@ -1,11 +1,18 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-test-bt-cfi-without-die.patch
+
+;; [delayed-symfile] Test a backtrace regression on CFIs without DIE (BZ 614604).
+;;=fedoratest
+
 http://sourceware.org/ml/archer/2010-q3/msg00028.html
-Subject: [delayed-symfile] [commit] Fix a regression on CFI without DIE  [Re:
 
 On Wed, 25 Feb 2009 00:14:29 +0100, Jan Kratochvil wrote:
 > commit 6a37c2b9962258ecf9299cc34a650e64a06acaa5
-> 
+>
 > There was a regression on gdb.base/savedregs.exp.
-> 
+>
 > quick_addrmap/require_partial_symbols should be used even for the unwind debug
 > info checking as its load has been also delayed by this branch.
 [...]
@@ -15,7 +22,7 @@ On Wed, 25 Feb 2009 00:14:29 +0100, Jan Kratochvil wrote:
 > @@ -1499,6 +1500,14 @@ dwarf2_frame_find_fde (CORE_ADDR *pc)
 >        struct dwarf2_fde *fde;
 >        CORE_ADDR offset;
->  
+>
 > +      if (objfile->quick_addrmap)
 > +	{
 > +	  if (!addrmap_find (objfile->quick_addrmap, *pc))
@@ -42,10 +49,8 @@ No regressions on {x86_64,x86_64-m32,i686}-fedora13-linux-gnu.
 
 Checked-in.
 
-
 Thanks,
 Jan
-
 
 eb8df8566acc1ed963e3e9b77c13b9c2c3db03fb
 
@@ -60,20 +65,11 @@ gdb/
 gdb/testsuite/
 	* gdb.base/cfi-without-die.exp, gdb.base/cfi-without-die-main.c,
 	gdb.base/cfi-without-die-caller.c: New files.
----
- gdb/dwarf2-frame.c                              |    8 +--
- gdb/testsuite/gdb.base/cfi-without-die-caller.c |   28 ++++++++++
- gdb/testsuite/gdb.base/cfi-without-die-main.c   |   32 +++++++++++
- gdb/testsuite/gdb.base/cfi-without-die.exp      |   67 +++++++++++++++++++++++
- 4 files changed, 130 insertions(+), 5 deletions(-)
- create mode 100644 gdb/testsuite/gdb.base/cfi-without-die-caller.c
- create mode 100644 gdb/testsuite/gdb.base/cfi-without-die-main.c
- create mode 100644 gdb/testsuite/gdb.base/cfi-without-die.exp
 
-Index: gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-caller.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-caller.c	2016-01-08 21:10:15.498079587 +0100
+diff --git a/gdb/testsuite/gdb.base/cfi-without-die-caller.c b/gdb/testsuite/gdb.base/cfi-without-die-caller.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/cfi-without-die-caller.c
 @@ -0,0 +1,28 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -103,10 +99,10 @@ Index: gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-caller.c
 +  /* Modify the return value to prevent any tail-call optimization.  */
 +  return (*callback) () - one;
 +}
-Index: gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-main.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-main.c	2016-01-08 21:10:15.498079587 +0100
+diff --git a/gdb/testsuite/gdb.base/cfi-without-die-main.c b/gdb/testsuite/gdb.base/cfi-without-die-main.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/cfi-without-die-main.c
 @@ -0,0 +1,32 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -140,10 +136,10 @@ Index: gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die-main.c
 +{
 +  return caller (callback);
 +}
-Index: gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.50.20160106/gdb/testsuite/gdb.base/cfi-without-die.exp	2016-01-08 21:13:04.529998009 +0100
+diff --git a/gdb/testsuite/gdb.base/cfi-without-die.exp b/gdb/testsuite/gdb.base/cfi-without-die.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/cfi-without-die.exp
 @@ -0,0 +1,71 @@
 +# Copyright 2010 Free Software Foundation, Inc.
 +

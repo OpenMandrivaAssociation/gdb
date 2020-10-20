@@ -1,3 +1,12 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhbz1149205-catch-syscall-after-fork-test.patch
+
+;; Fix '`catch syscall' doesn't work for parent after `fork' is called'
+;; (Philippe Waroquiers, RH BZ 1149205).
+;;=fedoratest
+
 URL: <https://sourceware.org/ml/gdb-patches/2013-05/msg00364.html>
 Message-ID: <1368136582.30058.7.camel@soleil>
 
@@ -33,10 +42,10 @@ Date:   Tue May 21 18:47:05 2013 +0000
 
     Fix internal error caused by interaction between catch signal and fork
 
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c	2016-10-20 21:03:09.584272695 +0200
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c b/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c
 @@ -0,0 +1,11 @@
 +#include <stdio.h>
 +#include <unistd.h>
@@ -49,10 +58,10 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.c
 +  chdir (".");
 +  return 0;
 +}
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.exp	2016-10-20 21:04:13.337771174 +0200
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.exp b/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1149205-catch-syscall-fork.exp
 @@ -0,0 +1,58 @@
 +# Copyright 2015 Free Software Foundation, Inc.
 +

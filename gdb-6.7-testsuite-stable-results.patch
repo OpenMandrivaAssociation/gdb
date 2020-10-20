@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.7-testsuite-stable-results.patch
+
+;; Testsuite fixes for more stable/comparable results.
+;;=fedoratest
+
 gdb/testsuite/gdb.base/fileio.c:
 gdb/testsuite/gdb.base/fileio.exp:
 2007-12-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
@@ -8,23 +16,19 @@ gdb/testsuite/gdb.base/fileio.exp:
 	* gdb.base/fileio.exp: Change the startup and finish cleanup.
 	Change the test file reference to be into the `fileio.dir' directory.
 
-
 sources/gdb/testsuite/gdb.base/dump.exp:
 Found on RHEL-5.s390x.
-
 
 gdb-6.8.50.20090209/gdb/testsuite/gdb.base/auxv.exp:
 random FAIL: gdb.base/auxv.exp: matching auxv data from live and gcore
 
-
 gdb-6.8.50.20090209/gdb/testsuite/gdb.base/annota1.exp:
 frames-invalid can happen asynchronously.
 
-Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.c
-===================================================================
---- gdb-7.12.orig/gdb/testsuite/gdb.base/fileio.c	2016-08-01 17:50:21.000000000 +0200
-+++ gdb-7.12/gdb/testsuite/gdb.base/fileio.c	2016-10-07 22:49:20.689346914 +0200
-@@ -556,6 +556,28 @@
+diff --git a/gdb/testsuite/gdb.base/fileio.c b/gdb/testsuite/gdb.base/fileio.c
+--- a/gdb/testsuite/gdb.base/fileio.c
++++ b/gdb/testsuite/gdb.base/fileio.c
+@@ -560,6 +560,28 @@ strerrno (int err)
  int
  main ()
  {
@@ -53,11 +57,10 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.c
    /* Don't change the order of the calls.  They partly depend on each other */
    test_open ();
    test_write ();
-Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.exp
-===================================================================
---- gdb-7.12.orig/gdb/testsuite/gdb.base/fileio.exp	2016-08-01 17:50:21.000000000 +0200
-+++ gdb-7.12/gdb/testsuite/gdb.base/fileio.exp	2016-10-07 22:54:44.680071906 +0200
-@@ -24,9 +24,9 @@
+diff --git a/gdb/testsuite/gdb.base/fileio.exp b/gdb/testsuite/gdb.base/fileio.exp
+--- a/gdb/testsuite/gdb.base/fileio.exp
++++ b/gdb/testsuite/gdb.base/fileio.exp
+@@ -24,9 +24,9 @@ if [target_info exists gdb,nofileio] {
  standard_testfile
  
  if {[is_remote host]} {
@@ -69,7 +72,7 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.exp
  }
  
  if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" \
-@@ -47,7 +47,8 @@
+@@ -47,7 +47,8 @@ set dir2 [standard_output_file dir2.fileio.test]
  if {[file exists $dir2] && ![file writable $dir2]} {
      system "chmod +w $dir2"
  }
@@ -79,7 +82,7 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.exp
  
  set oldtimeout $timeout
  set timeout [expr "$timeout + 60"]
-@@ -89,7 +90,7 @@
+@@ -89,7 +90,7 @@ gdb_test continue \
  
  gdb_test "continue" ".*" ""
  
@@ -88,7 +91,7 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/fileio.exp
  
  gdb_test continue \
  "Continuing\\..*open 5:.*EACCES$stop_msg" \
-@@ -276,9 +277,7 @@
+@@ -276,9 +277,7 @@ gdb_test continue \
  gdb_exit
  
  # Make dir2 writable again so rm -rf of a build tree Just Works.

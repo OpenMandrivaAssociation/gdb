@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-lineno-makeup-test.patch
+
+;; Testcase for "Do not make up line information" fix by Daniel Jacobowitz.
+;;=fedoratest
+
 New testcase for:
 https://bugzilla.redhat.com/show_bug.cgi?id=466222
 	(for the first / customer recommended fix)
@@ -6,10 +14,10 @@ http://sourceware.org/ml/gdb-patches/2006-11/msg00253.html
 	[rfc] Do not make up line information
 http://sourceware.org/ml/gdb-cvs/2006-11/msg00127.html
 
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup-func.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup-func.c	2016-02-15 23:29:16.595161971 +0100
+diff --git a/gdb/testsuite/gdb.base/lineno-makeup-func.c b/gdb/testsuite/gdb.base/lineno-makeup-func.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/lineno-makeup-func.c
 @@ -0,0 +1,21 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -32,10 +40,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup-func.c
 +func (void)
 +{
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup.c	2016-02-15 23:29:23.873213646 +0100
+diff --git a/gdb/testsuite/gdb.base/lineno-makeup.c b/gdb/testsuite/gdb.base/lineno-makeup.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/lineno-makeup.c
 @@ -0,0 +1,35 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -72,10 +80,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup.c
 +  func ();
 +  return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/lineno-makeup.exp	2016-02-15 23:29:23.873213646 +0100
+diff --git a/gdb/testsuite/gdb.base/lineno-makeup.exp b/gdb/testsuite/gdb.base/lineno-makeup.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/lineno-makeup.exp
 @@ -0,0 +1,78 @@
 +# Copyright 2009 Free Software Foundation, Inc.
 +

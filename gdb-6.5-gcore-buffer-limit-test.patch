@@ -1,7 +1,15 @@
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/gcore-excessive-memory.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/gcore-excessive-memory.c	2016-02-15 23:28:15.943731340 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.5-gcore-buffer-limit-test.patch
+
+;; Test gcore memory and time requirements for large inferiors.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/gcore-excessive-memory.c b/gdb/testsuite/gdb.base/gcore-excessive-memory.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gcore-excessive-memory.c
 @@ -0,0 +1,37 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -40,10 +48,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/gcore-excessive-memory.c
 +
 +  return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/gcore-excessive-memory.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/gcore-excessive-memory.exp	2016-02-15 23:28:22.720779458 +0100
+diff --git a/gdb/testsuite/gdb.base/gcore-excessive-memory.exp b/gdb/testsuite/gdb.base/gcore-excessive-memory.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gcore-excessive-memory.exp
 @@ -0,0 +1,94 @@
 +# Copyright 2008 Free Software Foundation, Inc.
 +

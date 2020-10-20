@@ -1,7 +1,15 @@
-Index: gdb-7.0.1/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c
-===================================================================
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhbz-818343-set-solib-absolute-prefix-testcase.patch
+
+;; Testcase for `Setting solib-absolute-prefix breaks vDSO' (BZ 818343).
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c b/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c
+new file mode 100644
 --- /dev/null
-+++ gdb-7.0.1/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c
++++ b/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c
 @@ -0,0 +1,26 @@
 +/* Copyright (C) 2012 Free Software Foundation, Inc.
 +
@@ -29,10 +37,10 @@ Index: gdb-7.0.1/gdb/testsuite/gdb.base/set-solib-absolute-prefix.c
 +  printf ("Hello, World.\n");
 +  abort ();
 +}
-Index: gdb-7.0.1/gdb/testsuite/gdb.base/set-solib-absolute-prefix.exp
-===================================================================
+diff --git a/gdb/testsuite/gdb.base/set-solib-absolute-prefix.exp b/gdb/testsuite/gdb.base/set-solib-absolute-prefix.exp
+new file mode 100644
 --- /dev/null
-+++ gdb-7.0.1/gdb/testsuite/gdb.base/set-solib-absolute-prefix.exp
++++ b/gdb/testsuite/gdb.base/set-solib-absolute-prefix.exp
 @@ -0,0 +1,39 @@
 +# Copyright 2012 Free Software Foundation, Inc.
 +

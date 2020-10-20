@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.7-ppc-clobbered-registers-O2-test.patch
+
+;; Test PPC hiding of call-volatile parameter register.
+;;=fedoratest
+
 2007-11-04  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* gdb.arch/ppc-clobbered-registers-O2.exp: `powerpc64' changed to
@@ -13,8 +21,10 @@ http://sourceware.org/ml/gdb-patches/2007-09/msg00228.html
 	* (rs6000_gdbarch_init): Install ppc_dwarf2_frame_init_reg as
 	default dwarf2_frame_set_init_reg function.
 
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.c	3 Nov 2007 22:22:28 -0000
+diff --git a/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.c b/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.c
 @@ -0,0 +1,21 @@
 +
 +unsigned * __attribute__((noinline))
@@ -37,8 +47,10 @@ http://sourceware.org/ml/gdb-patches/2007-09/msg00228.html
 +  y = 14;
 +  return (int)gen_movsd (&x, &y);
 +}
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.exp	3 Nov 2007 22:22:28 -0000
+diff --git a/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.exp b/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/ppc-clobbered-registers-O2.exp
 @@ -0,0 +1,54 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +#

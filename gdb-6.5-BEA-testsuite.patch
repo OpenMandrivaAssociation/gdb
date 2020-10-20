@@ -1,7 +1,15 @@
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.c	2016-02-15 23:37:39.884735379 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.5-BEA-testsuite.patch
+
+;; Improved testsuite results by the testsuite provided by the courtesy of BEA.
+;;=fedoratest: For upstream it should be rewritten as a dejagnu test, the test of no "??" was useful.
+
+diff --git a/gdb/testsuite/gdb.threads/threadcrash.c b/gdb/testsuite/gdb.threads/threadcrash.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threadcrash.c
 @@ -0,0 +1,301 @@
 +/*
 + * The point of this program is to crash in a multi-threaded app.
@@ -304,10 +312,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.c
 +   
 +   return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.exp	2016-02-15 23:38:58.486293458 +0100
+diff --git a/gdb/testsuite/gdb.threads/threadcrash.exp b/gdb/testsuite/gdb.threads/threadcrash.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threadcrash.exp
 @@ -0,0 +1,37 @@
 +# threadcrash.exp - The point of this program is to crash in a multi-threaded app.
 +
@@ -346,10 +354,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.exp
 +}
 +
 +return 0
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.sh
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.sh	2016-02-15 23:37:39.885735386 +0100
+diff --git a/gdb/testsuite/gdb.threads/threadcrash.sh b/gdb/testsuite/gdb.threads/threadcrash.sh
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threadcrash.sh
 @@ -0,0 +1,324 @@
 +#! /bin/bash
 +
@@ -675,10 +683,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.sh
 +rm -rf $WORKDIR
 +
 +exit $FAILURES
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.sh-orig
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threadcrash.sh-orig	2016-02-15 23:37:39.885735386 +0100
+diff --git a/gdb/testsuite/gdb.threads/threadcrash.sh-orig b/gdb/testsuite/gdb.threads/threadcrash.sh-orig
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threadcrash.sh-orig
 @@ -0,0 +1,248 @@
 +#! /bin/bash
 +

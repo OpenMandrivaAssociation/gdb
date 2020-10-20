@@ -1,7 +1,15 @@
-Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S	2014-02-06 22:02:21.981449555 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-bz601887-dwarf4-rh-test.patch
+
+;; Backport DWARF-4 support (BZ 601887, Tom Tromey).
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S
 @@ -0,0 +1,167 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -170,10 +178,10 @@ Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.S
 +	.string	"main"
 +	.ident	"GCC: (GNU) 4.4.4 20100503 (Red Hat 4.4.4-2)"
 +	.section	.note.GNU-stack,"",@progbits
-Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c	2014-02-06 22:02:21.981449555 +0100
+diff --git a/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c
 @@ -0,0 +1,22 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -197,10 +205,10 @@ Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.c
 +{
 +  return 0;
 +}
-Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.7/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.exp	2014-02-06 22:12:10.788032417 +0100
+diff --git a/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.exp b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/rh-dwarf4-x86_64.exp
 @@ -0,0 +1,42 @@
 +# Copyright 2010 Free Software Foundation, Inc.
 +

@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhbz1007614-memleak-infpy_read_memory-test.patch
+
+;; Fix 'memory leak in infpy_read_memory()' (RH BZ 1007614)
+;;=fedoratest
+
 Original message by Tom Tromey:
 
   <https://sourceware.org/ml/gdb-patches/2012-03/msg00955.html>
@@ -20,10 +28,10 @@ Date:   Wed Mar 28 17:38:08 2012 +0000
     	explicitly free 'buffer' on exit paths.  Decref 'membuf_object'
     	before returning.
 
-Index: gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.c
-===================================================================
+diff --git a/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.c b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.c
+new file mode 100644
 --- /dev/null
-+++ gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.c
++++ b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.c
 @@ -0,0 +1,27 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -52,10 +60,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_me
 +{
 +  return 0;
 +}
-Index: gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.exp
-===================================================================
+diff --git a/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.exp b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.exp
+new file mode 100644
 --- /dev/null
-+++ gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.exp
++++ b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.exp
 @@ -0,0 +1,68 @@
 +# Copyright 2014 Free Software Foundation, Inc.
 +
@@ -125,10 +133,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_me
 +} else {
 +    pass "there is not a memory leak on GDB (RHBZ 1007614)"
 +}
-Index: gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.py
-===================================================================
+diff --git a/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.py b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.py
+new file mode 100644
 --- /dev/null
-+++ gdb-7.2/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.py
++++ b/gdb/testsuite/gdb.python/py-gdb-rhbz1007614-memleak-infpy_read_memory.py
 @@ -0,0 +1,30 @@
 +# Copyright (C) 2014 Free Software Foundation, Inc.
 +

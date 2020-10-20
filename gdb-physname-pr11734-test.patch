@@ -1,9 +1,17 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-physname-pr11734-test.patch
+
+;; Fix regressions on C++ names resolving (PR 11734, PR 12273, Keith Seitz).
+;;=fedoratest
+
 http://sourceware.org/ml/gdb-patches/2010-12/msg00263.html
 
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-1.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734-1.cc	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734-1.cc b/gdb/testsuite/gdb.cp/pr11734-1.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734-1.cc
 @@ -0,0 +1,30 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -35,10 +43,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-1.cc
 +  return 0;
 +}
 +
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-2.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734-2.cc	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734-2.cc b/gdb/testsuite/gdb.cp/pr11734-2.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734-2.cc
 @@ -0,0 +1,27 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -67,10 +75,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-2.cc
 +{
 +}
 +
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-3.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734-3.cc	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734-3.cc b/gdb/testsuite/gdb.cp/pr11734-3.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734-3.cc
 @@ -0,0 +1,27 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -99,10 +107,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-3.cc
 +{
 +}
 +
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-4.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734-4.cc	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734-4.cc b/gdb/testsuite/gdb.cp/pr11734-4.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734-4.cc
 @@ -0,0 +1,27 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -131,10 +139,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734-4.cc
 +{
 +}
 +
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734.exp	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734.exp b/gdb/testsuite/gdb.cp/pr11734.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734.exp
 @@ -0,0 +1,55 @@
 +# Copyright 2010 Free Software Foundation, Inc.
 +#
@@ -191,10 +199,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734.exp
 +
 +gdb_exit
 +return 0
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr11734.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr11734.h	2011-02-03 22:28:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr11734.h b/gdb/testsuite/gdb.cp/pr11734.h
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr11734.h
 @@ -0,0 +1,28 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +

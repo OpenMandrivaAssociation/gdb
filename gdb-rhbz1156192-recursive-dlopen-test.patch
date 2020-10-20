@@ -1,7 +1,16 @@
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c	2016-10-22 22:10:13.262634144 +0200
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhbz1156192-recursive-dlopen-test.patch
+
+;; Testcase for '[SAP] Recursive dlopen causes SAP HANA installer to
+;; crash.' (RH BZ 1156192).
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c
 @@ -0,0 +1,30 @@
 +/* Testcase for recursive dlopen calls.
 +
@@ -33,10 +42,10 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libbar.c
 +{
 +  printf ("Called bar.\n");
 +}
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c	2016-10-22 22:10:13.262634144 +0200
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c
 @@ -0,0 +1,30 @@
 +/* Testcase for recursive dlopen calls.
 +
@@ -68,10 +77,10 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen-libfoo.c
 +{
 +  printf ("Called foo.\n");
 +}
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c	2016-10-22 22:10:13.262634144 +0200
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c
 @@ -0,0 +1,124 @@
 +/* Testcase for recursive dlopen calls.
 +
@@ -197,10 +206,10 @@ Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.c
 +
 +  return 0;
 +}
-Index: gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.exp	2016-10-24 23:21:58.043064177 +0200
+diff --git a/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.exp b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/gdb-rhbz1156192-recursive-dlopen.exp
 @@ -0,0 +1,137 @@
 +# Copyright 2014 Free Software Foundation, Inc.
 +#

@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-test-dw2-aranges.patch
+
+;; [archer-tromey-delayed-symfile] New test gdb.dwarf2/dw2-aranges.exp.
+;;=fedoratest
+
 [archer-tromey-delayed-symfile]
 
 commit 77fa7778a37b0d28a7e4e5235f074a10ecf1815d
@@ -5,25 +13,25 @@ Author: Jan Kratochvil <jkratoch@host1.dyn.jankratochvil.net>
 Date:   Sat Aug 15 15:05:54 2009 +0200
 
     Test for "handle incorrect aranges".
-    
+
     readelf:
     Contents of the .debug_aranges section:
-    
+
       Length:                   8
       Version:                  2
       Offset into .debug_info:  0x0
       Pointer Size:             0
       Segment Size:             0
-    
+
         Address    Length
     Floating point exception
-    
+
     	* gdb.dwarf2/dw2-aranges.exp, gdb.dwarf2/dw2-aranges.S: New files.
 
-Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/dw2-aranges.S
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.7/gdb/testsuite/gdb.dwarf2/dw2-aranges.S	2014-02-06 22:02:22.087449660 +0100
+diff --git a/gdb/testsuite/gdb.dwarf2/dw2-aranges.S b/gdb/testsuite/gdb.dwarf2/dw2-aranges.S
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/dw2-aranges.S
 @@ -0,0 +1,140 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -165,10 +173,10 @@ Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/dw2-aranges.S
 +	.byte		0			/* aranges segment_size */
 +
 +.Laranges_end:
-Index: gdb-7.7/gdb/testsuite/gdb.dwarf2/dw2-aranges.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.7/gdb/testsuite/gdb.dwarf2/dw2-aranges.exp	2014-02-06 22:09:08.322852771 +0100
+diff --git a/gdb/testsuite/gdb.dwarf2/dw2-aranges.exp b/gdb/testsuite/gdb.dwarf2/dw2-aranges.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/dw2-aranges.exp
 @@ -0,0 +1,40 @@
 +# Copyright 2004, 2005, 2007, 2008, 2009 Free Software Foundation, Inc.
 +

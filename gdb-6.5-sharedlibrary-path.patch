@@ -1,14 +1,20 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.5-sharedlibrary-path.patch
+
+;; Fix TLS symbols resolving for shared libraries with a relative pathname.
+;; The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
+;;=fedoratest: One should recheck if it is really fixed upstream.
+
 If you provided some relative path to the shared library, such as with
 	export LD_LIBRARY_PATH=.
 then gdb would fail to match the shared library name during the TLS lookup.
 
-
 Dropped the workaround/fix for gdb-6.8.50.20081128 - is it still needed?
-
 
 The testsuite needs `gdb-6.3-bz146810-solib_absolute_prefix_is_empty.patch'.
 The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
-
 
 2006-09-01  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
@@ -23,10 +29,10 @@ The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
 
 	Port to gdb-6.7.50.20080227.
 
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-main.c	2016-02-16 10:16:12.629875073 +0100
+diff --git a/gdb/testsuite/gdb.threads/tls-sepdebug-main.c b/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
 @@ -0,0 +1,25 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -53,10 +59,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-main.c
 +{
 +  return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c	2016-02-16 10:16:12.630875080 +0100
+diff --git a/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c b/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 @@ -0,0 +1,22 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -80,10 +86,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug-shared.c
 +   bug-gdb@prep.ai.mit.edu  */
 +
 +__thread int var = 42;
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/tls-sepdebug.exp	2016-02-16 10:16:31.241001010 +0100
+diff --git a/gdb/testsuite/gdb.threads/tls-sepdebug.exp b/gdb/testsuite/gdb.threads/tls-sepdebug.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/tls-sepdebug.exp
 @@ -0,0 +1,87 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +

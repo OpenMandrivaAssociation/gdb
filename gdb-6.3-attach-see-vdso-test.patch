@@ -1,7 +1,15 @@
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/attach-see-vdso.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/attach-see-vdso.c	2016-02-15 23:25:36.749601045 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-attach-see-vdso-test.patch
+
+;; Test kernel VDSO decoding while attaching to an i386 process.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/attach-see-vdso.c b/gdb/testsuite/gdb.base/attach-see-vdso.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/attach-see-vdso.c
 @@ -0,0 +1,25 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -28,10 +36,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/attach-see-vdso.c
 +  pause ();
 +  return 1;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/attach-see-vdso.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/attach-see-vdso.exp	2016-02-15 23:25:44.889658840 +0100
+diff --git a/gdb/testsuite/gdb.base/attach-see-vdso.exp b/gdb/testsuite/gdb.base/attach-see-vdso.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/attach-see-vdso.exp
 @@ -0,0 +1,72 @@
 +# Copyright 2007
 +

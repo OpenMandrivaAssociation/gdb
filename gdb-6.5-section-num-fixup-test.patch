@@ -1,7 +1,15 @@
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-lib.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-lib.c	2016-02-15 23:27:19.654331680 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.5-section-num-fixup-test.patch
+
+;; Test a crash on libraries missing the .text section.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/datalib-lib.c b/gdb/testsuite/gdb.base/datalib-lib.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/datalib-lib.c
 @@ -0,0 +1,22 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -25,10 +33,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-lib.c
 +   bug-gdb@prep.ai.mit.edu  */
 +
 +int var;
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-main.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-main.c	2016-02-15 23:27:19.654331680 +0100
+diff --git a/gdb/testsuite/gdb.base/datalib-main.c b/gdb/testsuite/gdb.base/datalib-main.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/datalib-main.c
 @@ -0,0 +1,26 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -56,10 +64,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib-main.c
 +{
 +  return 0;
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/datalib.exp	2016-02-15 23:27:25.968376510 +0100
+diff --git a/gdb/testsuite/gdb.base/datalib.exp b/gdb/testsuite/gdb.base/datalib.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/datalib.exp
 @@ -0,0 +1,51 @@
 +# Copyright 2008 Free Software Foundation, Inc.
 +

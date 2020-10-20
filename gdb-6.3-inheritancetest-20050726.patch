@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jeff Johnston <jjohnstn@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-inheritancetest-20050726.patch
+
+;; Verify printing of inherited members test
+;;=fedoratest
+
 2005-07-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* gdb.cp/b146835.exp: New testcase.
@@ -5,26 +13,10 @@
 	* gdb.cp/b146835b.cc: Ditto.
 	* gdb.cp/b146835.h: Ditto.
 
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835b.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835b.cc	2016-02-16 09:49:08.743886620 +0100
-@@ -0,0 +1,11 @@
-+#include "b146835.h"
-+
-+C::C() { d = 0; x = 3; }
-+
-+int C::z (char *s) { return 0; }
-+
-+C::~C() {}
-+
-+void A::funcD (class E *e, class D *d) {}
-+void A::funcE (E *e, D *d) {}
-+void A::funcF (unsigned long x, D *d) {}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.cc	2016-02-16 09:49:08.744886627 +0100
+diff --git a/gdb/testsuite/gdb.cp/b146835.cc b/gdb/testsuite/gdb.cp/b146835.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/b146835.cc
 @@ -0,0 +1,32 @@
 +#include "b146835.h"
 +#include <iostream>
@@ -58,10 +50,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.cc
 +   f.foo();
 +}
 +
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.exp	2016-02-16 09:51:48.601968339 +0100
+diff --git a/gdb/testsuite/gdb.cp/b146835.exp b/gdb/testsuite/gdb.cp/b146835.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/b146835.exp
 @@ -0,0 +1,47 @@
 +# This testcase is part of GDB, the GNU debugger.
 +
@@ -110,10 +102,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.exp
 +
 +# Verify that we can access the inherited member d
 +gdb_test "p d" " = \\(D \\*\\) *0x0" "Verify inherited member d accessible"
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.h	2016-02-16 09:49:08.744886627 +0100
+diff --git a/gdb/testsuite/gdb.cp/b146835.h b/gdb/testsuite/gdb.cp/b146835.h
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/b146835.h
 @@ -0,0 +1,36 @@
 +
 +class A {
@@ -151,3 +143,19 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.cp/b146835.h
 +   int z (char *s);
 +   virtual ~C();
 +};
+diff --git a/gdb/testsuite/gdb.cp/b146835b.cc b/gdb/testsuite/gdb.cp/b146835b.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/b146835b.cc
+@@ -0,0 +1,11 @@
++#include "b146835.h"
++
++C::C() { d = 0; x = 3; }
++
++int C::z (char *s) { return 0; }
++
++C::~C() {}
++
++void A::funcD (class E *e, class D *d) {}
++void A::funcE (E *e, D *d) {}
++void A::funcF (unsigned long x, D *d) {}

@@ -1,9 +1,17 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-physname-pr12273-test.patch
+
+;; Fix regressions on C++ names resolving (PR 11734, PR 12273, Keith Seitz).
+;;=fedoratest
+
 http://sourceware.org/ml/gdb-patches/2010-12/msg00264.html
 
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr12273.cc
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr12273.cc	2011-02-03 22:31:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr12273.cc b/gdb/testsuite/gdb.cp/pr12273.cc
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr12273.cc
 @@ -0,0 +1,37 @@
 +/* This test case is part of GDB, the GNU debugger.
 +
@@ -42,10 +50,10 @@ Index: gdb-7.2/gdb/testsuite/gdb.cp/pr12273.cc
 +	+ GDB<char>::even_harder<int> ('a');
 +   return GDB<int>::simple ();
 +}
-Index: gdb-7.2/gdb/testsuite/gdb.cp/pr12273.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.2/gdb/testsuite/gdb.cp/pr12273.exp	2011-02-03 22:31:01.000000000 +0100
+diff --git a/gdb/testsuite/gdb.cp/pr12273.exp b/gdb/testsuite/gdb.cp/pr12273.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.cp/pr12273.exp
 @@ -0,0 +1,46 @@
 +# Copyright 2010 Free Software Foundation, Inc.
 +#

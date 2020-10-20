@@ -1,7 +1,15 @@
-Index: gdb-7.12.50.20170226/gdb/testsuite/gdb.base/focus-cmd-prev.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.12.50.20170226/gdb/testsuite/gdb.base/focus-cmd-prev.exp	2017-03-02 09:39:14.508461085 +0100
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-focus-cmd-prev-test.patch
+
+;; Test a crash on `focus cmd', `focus prev' commands.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/focus-cmd-prev.exp b/gdb/testsuite/gdb.base/focus-cmd-prev.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/focus-cmd-prev.exp
 @@ -0,0 +1,40 @@
 +# Copyright 2008 Free Software Foundation, Inc.
 +

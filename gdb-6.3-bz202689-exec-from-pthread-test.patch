@@ -1,12 +1,19 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-bz202689-exec-from-pthread-test.patch
+
+;; Testcase for exec() from threaded program (BZ 202689).
+;;=fedoratest
+
 2007-01-17  Jan Kratochvil <jan.kratochvil@redhat.com>
 
 	* gdb.threads/threaded-exec.exp, gdb.threads/threaded-exec.c: New files.
 
-
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threaded-exec.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threaded-exec.c	2016-02-16 09:54:06.936904418 +0100
+diff --git a/gdb/testsuite/gdb.threads/threaded-exec.c b/gdb/testsuite/gdb.threads/threaded-exec.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threaded-exec.c
 @@ -0,0 +1,46 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -54,10 +61,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threaded-exec.c
 +	execl ("/bin/true", "/bin/true", NULL);
 +	abort ();
 +}
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threaded-exec.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/threaded-exec.exp	2016-02-16 09:54:19.965992585 +0100
+diff --git a/gdb/testsuite/gdb.threads/threaded-exec.exp b/gdb/testsuite/gdb.threads/threaded-exec.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/threaded-exec.exp
 @@ -0,0 +1,41 @@
 +# threaded-exec.exp -- Check reset of the tracked threads on exec*(2)
 +# Copyright (C) 2007 Free Software Foundation, Inc.

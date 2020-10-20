@@ -1,5 +1,15 @@
---- /dev/null	2016-09-12 21:37:05.332693927 +0200
-+++ gdb-7.11.90.20160907/gdb/testsuite/gdb.python/py-framefilter-thread.c	2016-09-12 21:43:56.448695513 +0200
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhbz1325795-framefilters-test.patch
+
+;; New test for Python "Cannot locate object file for block" (for RH BZ 1325795).
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.python/py-framefilter-thread.c b/gdb/testsuite/gdb.python/py-framefilter-thread.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-framefilter-thread.c
 @@ -0,0 +1,39 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -40,8 +50,10 @@
 +
 +  return 0;
 +}
---- /dev/null	2016-09-12 21:37:05.332693927 +0200
-+++ gdb-7.11.90.20160907/gdb/testsuite/gdb.python/py-framefilter-thread.exp	2016-09-12 21:46:54.623428493 +0200
+diff --git a/gdb/testsuite/gdb.python/py-framefilter-thread.exp b/gdb/testsuite/gdb.python/py-framefilter-thread.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-framefilter-thread.exp
 @@ -0,0 +1,54 @@
 +# Copyright (C) 2016 Free Software Foundation, Inc.
 +
@@ -97,8 +109,10 @@
 +#     block = self.frame.block()
 +# RuntimeError: Cannot locate object file for block.
 +gdb_test "bt" " in \[0-9\]+ \[^\r\n\]*" "bt with filters"
---- /dev/null	2016-09-12 21:37:05.332693927 +0200
-+++ gdb-7.11.90.20160907/gdb/testsuite/gdb.python/py-framefilter-thread.py	2016-09-12 21:49:16.150795235 +0200
+diff --git a/gdb/testsuite/gdb.python/py-framefilter-thread.py b/gdb/testsuite/gdb.python/py-framefilter-thread.py
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-framefilter-thread.py
 @@ -0,0 +1,60 @@
 +# Copyright (C) 2016 Free Software Foundation, Inc.
 +

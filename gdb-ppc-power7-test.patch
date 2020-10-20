@@ -1,3 +1,13 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-ppc-power7-test.patch
+
+;; Test power7 ppc disassembly.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.arch/powerpc-power7rh.exp b/gdb/testsuite/gdb.arch/powerpc-power7rh.exp
+new file mode 100644
 --- /dev/null
 +++ b/gdb/testsuite/gdb.arch/powerpc-power7rh.exp
 @@ -0,0 +1,178 @@
@@ -179,6 +189,8 @@
 +func_check 0x194 "frsqrtes f14,f15"
 +func_check 0x198 "frsqrtes. f14,f15"
 +func_check 0x19c "isel    r2,r3,r4,28"
+diff --git a/gdb/testsuite/gdb.arch/powerpc-power7rh.s b/gdb/testsuite/gdb.arch/powerpc-power7rh.s
+new file mode 100644
 --- /dev/null
 +++ b/gdb/testsuite/gdb.arch/powerpc-power7rh.s
 @@ -0,0 +1,107 @@

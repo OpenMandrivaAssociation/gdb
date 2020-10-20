@@ -1,0 +1,123 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Keith Seitz <keiths@redhat.com>
+Date: Mon, 8 Jun 2020 11:33:47 -0700
+Subject: gdb-rhbz1844458-use-fputX_unfiltered.patch
+
+;; Fix fput?_unfiltered functions
+;; RH BZ 1844458 (Sergio Durigan Junior and Tom Tromey)
+
+From 9effb44ccbf50c16da66aaab5fd535fe17e38e32 Mon Sep 17 00:00:00 2001
+From: Sergio Durigan Junior <sergiodj@redhat.com>
+Date: Wed, 19 Feb 2020 16:40:48 -0500
+Subject: [PATCH] Make '{putchar,fputc}_unfiltered' use 'fputs_unfiltered'
+
+There is currently a regression when using
+'{putchar,fputc}_unfiltered' with 'puts_unfiltered' which was
+introduced by one of the commits that reworked the unfiltered print
+code.
+
+The regression makes it impossible to use '{putchar,fputc}_unfiltered'
+with 'puts_unfiltered', because the former writes directly to the
+ui_file stream using 'stream->write', while the latter uses a buffered
+mechanism (see 'wrap_buffer') and delays the printing.
+
+If you do a quick & dirty hack on e.g. top.c:show_gdb_datadir:
+
+  @@ -2088,6 +2088,13 @@ static void
+   show_gdb_datadir (struct ui_file *file, int from_tty,
+                    struct cmd_list_element *c, const char *value)
+   {
+  +  putchar_unfiltered ('\n');
+  +  puts_unfiltered ("TEST");
+  +  putchar_unfiltered ('>');
+  +  puts_unfiltered ("PUTS");
+  +  puts_unfiltered ("PUTS");
+  +  putchar_unfiltered ('\n');
+
+rebuild GDB and invoke the "show data-directory" command, you will
+see:
+
+  (gdb) show data-directory
+
+  >
+  TESTPUTSGDB's data directory is "/usr/local/share/gdb".
+
+Note how the '>' was printed before the output, and "TEST" and "PUTS"
+were printed together.
+
+My first attempt to fix this was to always call 'flush_wrap_buffer' at
+the end of 'fputs_maybe_filtered', since it seemed to me that the
+function should always print what was requested.  But I wasn't sure
+this was the right thing to do, so I talked to Tom on IRC and he gave
+me another, simpler idea: make '{putchar,fputc}_unfiltered' call into
+the already existing 'fputs_unfiltered' function.
+
+This patch implements the idea.  I regtested it on the Buildbot, and
+no regressions were detected.
+
+gdb/ChangeLog:
+2020-02-20  Sergio Durigan Junior  <sergiodj@redhat.com>
+            Tom Tromey  <tom@tromey.com>
+
+        * utils.c (fputs_maybe_filtered): Call 'stream->puts' instead
+        of 'fputc_unfiltered'.
+        (putchar_unfiltered): Call 'fputc_unfiltered'.
+        (fputc_unfiltered): Call 'fputs_unfiltered'.
+
+diff --git a/gdb/utils.c b/gdb/utils.c
+--- a/gdb/utils.c
++++ b/gdb/utils.c
+@@ -1783,7 +1783,12 @@ fputs_maybe_filtered (const char *linebuffer, struct ui_file *stream,
+ 		     newline -- if chars_per_line is right, we
+ 		     probably just overflowed anyway; if it's wrong,
+ 		     let us keep going.  */
+-		  fputc_unfiltered ('\n', stream);
++		  /* XXX: The ideal thing would be to call
++		     'stream->putc' here, but we can't because it
++		     currently calls 'fputc_unfiltered', which ends up
++		     calling us, which generates an infinite
++		     recursion.  */
++		  stream->puts ("\n");
+ 		}
+ 	      else
+ 		{
+@@ -1828,7 +1833,12 @@ fputs_maybe_filtered (const char *linebuffer, struct ui_file *stream,
+ 	  wrap_here ((char *) 0);	/* Spit out chars, cancel
+ 					   further wraps.  */
+ 	  lines_printed++;
+-	  fputc_unfiltered ('\n', stream);
++	  /* XXX: The ideal thing would be to call
++	     'stream->putc' here, but we can't because it
++	     currently calls 'fputc_unfiltered', which ends up
++	     calling us, which generates an infinite
++	     recursion.  */
++	  stream->puts ("\n");
+ 	  lineptr++;
+ 	}
+     }
+@@ -1923,10 +1933,7 @@ fputs_highlighted (const char *str, const compiled_regex &highlight,
+ int
+ putchar_unfiltered (int c)
+ {
+-  char buf = c;
+-
+-  ui_file_write (gdb_stdout, &buf, 1);
+-  return c;
++  return fputc_unfiltered (c, gdb_stdout);
+ }
+ 
+ /* Write character C to gdb_stdout using GDB's paging mechanism and return C.
+@@ -1941,9 +1948,11 @@ putchar_filtered (int c)
+ int
+ fputc_unfiltered (int c, struct ui_file *stream)
+ {
+-  char buf = c;
++  char buf[2];
+ 
+-  ui_file_write (stream, &buf, 1);
++  buf[0] = c;
++  buf[1] = 0;
++  fputs_unfiltered (buf, stream);
+   return c;
+ }
+ 

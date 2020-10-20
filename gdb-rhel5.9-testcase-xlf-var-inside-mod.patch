@@ -1,7 +1,15 @@
-Index: gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.S
-===================================================================
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-rhel5.9-testcase-xlf-var-inside-mod.patch
+
+;; Include testcase for `Unable to see a variable inside a module (XLF)' (BZ 823789).
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.fortran/xlf-variable.S b/gdb/testsuite/gdb.fortran/xlf-variable.S
+new file mode 100644
 --- /dev/null
-+++ gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.S
++++ b/gdb/testsuite/gdb.fortran/xlf-variable.S
 @@ -0,0 +1,638 @@
 +/* Copyright (C) 2012 Free Software Foundation, Inc.
 +
@@ -641,10 +649,10 @@ Index: gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.S
 +	.long 0x00000000
 +
 +	.comm   __N__mod1,4,16
-Index: gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.exp
-===================================================================
+diff --git a/gdb/testsuite/gdb.fortran/xlf-variable.exp b/gdb/testsuite/gdb.fortran/xlf-variable.exp
+new file mode 100644
 --- /dev/null
-+++ gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.exp
++++ b/gdb/testsuite/gdb.fortran/xlf-variable.exp
 @@ -0,0 +1,37 @@
 +# Copyright 2012 Free Software Foundation, Inc.
 +
@@ -683,10 +691,10 @@ Index: gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.exp
 +gdb_test "step" ".*nullify \\(y\\).*" "nullify (y)"
 +gdb_test "print z" "= 3" "z = 3"
 +gdb_test "ptype z" "= REAL" "z is REAL"
-Index: gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.f
-===================================================================
+diff --git a/gdb/testsuite/gdb.fortran/xlf-variable.f b/gdb/testsuite/gdb.fortran/xlf-variable.f
+new file mode 100644
 --- /dev/null
-+++ gdb-7.4.50.20120603/gdb/testsuite/gdb.fortran/xlf-variable.f
++++ b/gdb/testsuite/gdb.fortran/xlf-variable.f
 @@ -0,0 +1,33 @@
 +c Copyright 2012 Free Software Foundation, Inc.
 +c

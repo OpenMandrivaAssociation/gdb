@@ -1,3 +1,12 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-core-open-vdso-warning.patch
+
+;; Fix GNU/Linux core open: Can't read pathname for load map: Input/output error.
+;; Fix regression of undisplayed missing shared libraries caused by a fix for.
+;;=fedoratest: It should be in glibc: libc-alpha: <20091004161706.GA27450@.*>
+
 http://sourceware.org/ml/gdb-patches/2009-10/msg00142.html
 Subject: [patch] Fix GNU/Linux core open: Can't read pathname for load map:  Input/output error.
 
@@ -7,10 +16,9 @@ commit 7d760051ffb8a23cdc51342d4e6243fbc462f73f
 Author: Ulrich Weigand <uweigand@de.ibm.com>
 Date:   Wed Sep 25 11:52:50 2013 +0000
 
-Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/solib-symbol.exp
-===================================================================
---- gdb-7.6.50.20130731-cvs.orig/gdb/testsuite/gdb.base/solib-symbol.exp	2013-08-02 16:27:28.833259471 +0200
-+++ gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/solib-symbol.exp	2013-08-02 16:28:22.549330973 +0200
+diff --git a/gdb/testsuite/gdb.base/solib-symbol.exp b/gdb/testsuite/gdb.base/solib-symbol.exp
+--- a/gdb/testsuite/gdb.base/solib-symbol.exp
++++ b/gdb/testsuite/gdb.base/solib-symbol.exp
 @@ -29,6 +29,7 @@ set testfile "solib-symbol-main"
  set srcfile ${srcdir}/${subdir}/${testfile}.c
  set binfile [standard_output_file ${testfile}]
@@ -19,7 +27,7 @@ Index: gdb-7.6.50.20130731-cvs/gdb/testsuite/gdb.base/solib-symbol.exp
  
  if [get_compiler_info] {
      return -1
-@@ -72,8 +73,26 @@ gdb_test "br foo2" \
+@@ -71,8 +72,26 @@ gdb_test "br foo2" \
  	 "Breakpoint.*: foo2. .2 locations..*" \
  	 "foo2 in mdlib"
  

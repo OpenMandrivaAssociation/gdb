@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.7-charsign-test.patch
+
+;; Fix displaying of numeric char arrays as strings (BZ 224128).
+;;=fedoratest: But it is failing anyway, one should check the behavior more.
+
 https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=224128
 
 2007-01-25  Jan Kratochvil <jan.kratochvil@redhat.com>
@@ -10,10 +18,10 @@ https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=224128
 	Port to GDB-6.7 - only the testcase left, patch has been reverted,
 	char-vectors restricted.
 
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/charsign.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/charsign.c	2016-02-15 23:26:06.429811778 +0100
+diff --git a/gdb/testsuite/gdb.base/charsign.c b/gdb/testsuite/gdb.base/charsign.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/charsign.c
 @@ -0,0 +1,37 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -52,10 +60,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/charsign.c
 +char_n n_typed[]="A";
 +char_s s_typed[]="A";
 +char_u u_typed[]="A";
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.base/charsign.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.base/charsign.exp	2016-02-15 23:26:12.409854237 +0100
+diff --git a/gdb/testsuite/gdb.base/charsign.exp b/gdb/testsuite/gdb.base/charsign.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/charsign.exp
 @@ -0,0 +1,63 @@
 +# Copyright 2007 Free Software Foundation, Inc.
 +

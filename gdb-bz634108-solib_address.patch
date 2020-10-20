@@ -1,7 +1,17 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-bz634108-solib_address.patch
+
+;; Verify GDB Python built-in function gdb.solib_address exists (BZ # 634108).
+;;=fedoratest
+
 Fix gdb.solib_address (fix by Phil Muldoon).
 
 s/solib_address/solib_name/ during upstreaming.
 
+diff --git a/gdb/testsuite/gdb.python/rh634108-solib_address.exp b/gdb/testsuite/gdb.python/rh634108-solib_address.exp
+new file mode 100644
 --- /dev/null
 +++ b/gdb/testsuite/gdb.python/rh634108-solib_address.exp
 @@ -0,0 +1,24 @@

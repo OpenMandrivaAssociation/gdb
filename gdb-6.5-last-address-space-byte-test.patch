@@ -1,9 +1,15 @@
-Index: ./gdb/testsuite/gdb.base/largecore-last-address-lock.exp
-===================================================================
-RCS file: ./gdb/testsuite/gdb.base/largecore-last-address-lock.exp
-diff -N ./gdb/testsuite/gdb.base/largecore-last-address-lock.exp
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ ./gdb/testsuite/gdb.base/largecore-last-address-lock.exp	15 Nov 2006 21:43:24 -0000
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Fedora GDB patches <invalid@email.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.5-last-address-space-byte-test.patch
+
+;; Testcase for deadlocking on last address space byte; for corrupted backtraces.
+;;=fedoratest
+
+diff --git a/gdb/testsuite/gdb.base/largecore-last-address-lock.exp b/gdb/testsuite/gdb.base/largecore-last-address-lock.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/largecore-last-address-lock.exp
 @@ -0,0 +1,49 @@
 +# Copyright 2006 Free Software Foundation, Inc.
 +

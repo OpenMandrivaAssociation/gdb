@@ -1,3 +1,11 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Jeff Johnston <jjohnstn@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-6.3-threaded-watchpoints2-20050225.patch
+
+;; Test sibling threads to set threaded watchpoints for x86 and x86-64
+;;=fedoratest
+
 2005-02-28  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* config/i386/nm-linux.h: Change dr register routines to
@@ -42,10 +50,10 @@
 
 FIXME: The testcase does not expects multiple watchpoints hits per one stop.
 
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/watchthreads-threaded.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/watchthreads-threaded.c	2016-02-15 23:37:39.766734541 +0100
+diff --git a/gdb/testsuite/gdb.threads/watchthreads-threaded.c b/gdb/testsuite/gdb.threads/watchthreads-threaded.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/watchthreads-threaded.c
 @@ -0,0 +1,66 @@
 +/* This testcase is part of GDB, the GNU debugger.
 +
@@ -113,10 +121,10 @@ Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/watchthreads-threaded.c
 +    pthread_exit(NULL);
 +}
 +
-Index: gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/watchthreads-threaded.exp
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-7.10.90.20160211/gdb/testsuite/gdb.threads/watchthreads-threaded.exp	2016-02-15 23:40:32.484960858 +0100
+diff --git a/gdb/testsuite/gdb.threads/watchthreads-threaded.exp b/gdb/testsuite/gdb.threads/watchthreads-threaded.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.threads/watchthreads-threaded.exp
 @@ -0,0 +1,126 @@
 +# This testcase is part of GDB, the GNU debugger.
 +
