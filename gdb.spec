@@ -23,7 +23,7 @@
 %bcond_without python
 %bcond_with babeltrace
 %bcond_with pdf
-%bcond_without guile
+%bcond_with guile
 
 %{?scl:%scl_package gdb}
 %{!?scl:
@@ -41,7 +41,7 @@ Version:	10.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	1
+Release:	2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -816,10 +816,8 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %doc README NEWS
 %{_bindir}/gdb
 %{_bindir}/gstack
-%if %{with guile}
 %{_bindir}/gcore
 %{_mandir}/*/gcore.1*
-%endif
 %{_mandir}/*/gstack.1*
 %{_bindir}/pstack
 %{_mandir}/*/pstack.1*
