@@ -433,7 +433,7 @@ BuildRequires: pkgconfig(guile-3.0)
 #global have_libipt 1
 #BuildRequires: libipt-devel
 %endif
-BuildRequires: sharutils 
+BuildRequires: sharutils
 BuildRequires: dejagnu
 # gcc-objc++ is not covered by the GDB testsuite.
 BuildRequires: gcc 
@@ -459,7 +459,7 @@ and printing their data.
 Summary: A standalone server for GDB (the GNU source-level debugger)
 Group:   Development/Tools
 Conflicts: gdb <= 7.12-16.mga6
- 
+
 %description gdbserver
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
 Java, and other languages, by executing them in a controlled fashion
@@ -740,7 +740,7 @@ echo ====================TESTING END=====================
 # Initially we're in the %{gdb_src} directory.
 cd %{gdb_build}
 
-%makeinstall_std
+%make_install
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/libexec
 mv -f $RPM_BUILD_ROOT%{_bindir}/gdb $RPM_BUILD_ROOT%{_prefix}/libexec/gdb
@@ -817,10 +817,10 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %{_bindir}/gdb
 %{_bindir}/gstack
 %{_bindir}/gcore
-%{_mandir}/*/gcore.1*
-%{_mandir}/*/gstack.1*
+%doc %{_mandir}/*/gcore.1*
+%doc %{_mandir}/*/gstack.1*
 %{_bindir}/pstack
-%{_mandir}/*/pstack.1*
+%doc %{_mandir}/*/pstack.1*
 # Provide gdb/jit-reader.h so that users are able to write their own GDB JIT
 # plugins.
 %{_includedir}/gdb
@@ -828,11 +828,11 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %files headless
 %{_prefix}/libexec/gdb
 %config %{_sysconfdir}/gdbinit
-%{_mandir}/*/gdb.1*
+%doc %{_mandir}/*/gdb.1*
 %{_sysconfdir}/gdbinit.d
-%{_mandir}/*/gdbinit.5*
+%doc %{_mandir}/*/gdbinit.5*
 %{_bindir}/gdb-add-index
-%{_mandir}/*/gdb-add-index.1*
+%doc %{_mandir}/*/gdb-add-index.1*
 %{_datadir}/gdb
 
 # don't include the files in include, they are part of binutils
@@ -847,7 +847,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %{_libdir}/libinproctrace.so
 %endif # %{have_inproctrace}
 %endif
-%{_mandir}/*/gdbserver.1*
+%doc %{_mandir}/*/gdbserver.1*
 
 %files doc
 %if %{with pdf}
