@@ -36,7 +36,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	10.2
+Version:	11.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -80,7 +80,7 @@ Patch005: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-gstack-200
 Patch006: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-pie-20050107.patch
 # Get selftest working with sep-debug-info
 #=fedoratest
-Patch007: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-self-20050110.patch
+#Patch007: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-self-20050110.patch
 # Test support of multiple destructors just like multiple constructors
 #=fedoratest
 Patch008: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-dtorfix-20050121.patch
@@ -98,7 +98,7 @@ Patch011: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inferior-n
 Patch012: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inheritancetest-20050726.patch
 # Support TLS symbols (+`errno' suggestion if no pthread is found) (BZ 185337).
 #=push+jan: It should be replaced by Infinity project.
-Patch013: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
+#Patch013: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
 # Fix TLS symbols resolving for shared libraries with a relative pathname.
 # The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
 #=fedoratest: One should recheck if it is really fixed upstream.
@@ -200,7 +200,7 @@ Patch044: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-core-open-vdso
 Patch045: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz533176-fortran-omp-step.patch
 # Workaround ccache making lineno non-zero for command-line definitions.
 #=fedoratest: ccache is rarely used and it is even fixed now.
-Patch046: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-ccache-workaround.patch
+#Patch046: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-ccache-workaround.patch
 #=push+jan: May get obsoleted by Tom's unrelocated objfiles patch.
 # NEEDS REBASING Patch047: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer-pie-addons.patch
 #=push+jan: Breakpoints disabling matching should not be based on address.
@@ -306,7 +306,7 @@ Patch079: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1149205-ca
 Patch080: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1186476-internal-error-unqualified-name-re-set-test.patch
 # Test 'info type-printers' Python error (RH BZ 1350436).
 #=fedoratest
-Patch081: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1350436-type-printers-error.patch
+#Patch081: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1350436-type-printers-error.patch
 # Fix '[ppc64] and [s390x] wrong prologue skip on -O2 -g code' (Jan
 # Kratochvil, RH BZ 1084404).
 #=fedoratest
