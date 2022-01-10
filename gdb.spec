@@ -20,7 +20,13 @@
 
 %bcond_without rpm
 %bcond_with testsuite
-%bcond_without python
+# FIXME as of gdb 11.1, python 3.9.8,
+# building with clang 13.0.0 or gcc 11.2,
+# gdb crashes while generating backtraces using the
+# python backtrace generator.
+# Disabling python isn't a nice fix, but better than
+# leaving gdb unusable...
+%bcond_with python
 %bcond_with babeltrace
 %bcond_with pdf
 %bcond_with guile
@@ -41,7 +47,7 @@ Version:	11.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	1
+Release:	2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
