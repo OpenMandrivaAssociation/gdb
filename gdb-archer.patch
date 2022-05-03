@@ -1,23 +1,7 @@
-From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
-From: Fedora GDB patches <invalid@email.com>
-Date: Fri, 27 Oct 2017 21:07:50 +0200
-Subject: gdb-archer.patch
-
-;; Python patches of: http://sourceware.org/gdb/wiki/ProjectArcher
-;;=push
-
-http://sourceware.org/gdb/wiki/ProjectArcher
-http://sourceware.org/gdb/wiki/ArcherBranchManagement
-
-GIT snapshot:
-commit 718a1618b2f691a7f407213bb50f100ac59f91c3
-
-tromey/python
-
-diff --git a/gdb/data-directory/Makefile.in b/gdb/data-directory/Makefile.in
---- a/gdb/data-directory/Makefile.in
-+++ b/gdb/data-directory/Makefile.in
-@@ -80,6 +80,7 @@ PYTHON_FILE_LIST = \
+diff -up gdb-12.1/gdb/data-directory/Makefile.in.70~ gdb-12.1/gdb/data-directory/Makefile.in
+--- gdb-12.1/gdb/data-directory/Makefile.in.70~	2022-05-04 00:08:48.408576984 +0200
++++ gdb-12.1/gdb/data-directory/Makefile.in	2022-05-04 00:08:48.417577040 +0200
+@@ -81,6 +81,7 @@ PYTHON_FILE_LIST = \
  	gdb/unwinder.py \
  	gdb/xmethod.py \
  	gdb/command/__init__.py \
@@ -25,7 +9,7 @@ diff --git a/gdb/data-directory/Makefile.in b/gdb/data-directory/Makefile.in
  	gdb/command/explore.py \
  	gdb/command/backtrace.py \
  	gdb/command/frame_filters.py \
-@@ -92,6 +93,7 @@ PYTHON_FILE_LIST = \
+@@ -93,6 +94,7 @@ PYTHON_FILE_LIST = \
  	gdb/function/as_string.py \
  	gdb/function/caller_is.py \
  	gdb/function/strfns.py \
@@ -33,9 +17,9 @@ diff --git a/gdb/data-directory/Makefile.in b/gdb/data-directory/Makefile.in
  	gdb/printer/__init__.py \
  	gdb/printer/bound_registers.py
  
-diff --git a/gdb/gdb-gdb.gdb.in b/gdb/gdb-gdb.gdb.in
---- a/gdb/gdb-gdb.gdb.in
-+++ b/gdb/gdb-gdb.gdb.in
+diff -up gdb-12.1/gdb/gdb-gdb.gdb.in.70~ gdb-12.1/gdb/gdb-gdb.gdb.in
+--- gdb-12.1/gdb/gdb-gdb.gdb.in.70~	2022-03-20 05:59:56.000000000 +0100
++++ gdb-12.1/gdb/gdb-gdb.gdb.in	2022-05-04 00:08:48.417577040 +0200
 @@ -1,5 +1,15 @@
  echo Setting up the environment for debugging gdb.\n
  
@@ -52,10 +36,9 @@ diff --git a/gdb/gdb-gdb.gdb.in b/gdb/gdb-gdb.gdb.in
  if !$gdb_init_done
    set variable $gdb_init_done = 1
  
-diff --git a/gdb/python/lib/gdb/command/ignore_errors.py b/gdb/python/lib/gdb/command/ignore_errors.py
-new file mode 100644
---- /dev/null
-+++ b/gdb/python/lib/gdb/command/ignore_errors.py
+diff -up gdb-12.1/gdb/python/lib/gdb/command/ignore_errors.py.70~ gdb-12.1/gdb/python/lib/gdb/command/ignore_errors.py
+--- gdb-12.1/gdb/python/lib/gdb/command/ignore_errors.py.70~	2022-05-04 00:08:48.417577040 +0200
++++ gdb-12.1/gdb/python/lib/gdb/command/ignore_errors.py	2022-05-04 00:08:48.417577040 +0200
 @@ -0,0 +1,37 @@
 +# Ignore errors in user commands.
 +
@@ -94,10 +77,9 @@ new file mode 100644
 +            pass
 +
 +IgnoreErrorsCommand ()
-diff --git a/gdb/python/lib/gdb/function/in_scope.py b/gdb/python/lib/gdb/function/in_scope.py
-new file mode 100644
---- /dev/null
-+++ b/gdb/python/lib/gdb/function/in_scope.py
+diff -up gdb-12.1/gdb/python/lib/gdb/function/in_scope.py.70~ gdb-12.1/gdb/python/lib/gdb/function/in_scope.py
+--- gdb-12.1/gdb/python/lib/gdb/function/in_scope.py.70~	2022-05-04 00:08:48.418577046 +0200
++++ gdb-12.1/gdb/python/lib/gdb/function/in_scope.py	2022-05-04 00:08:48.418577046 +0200
 @@ -0,0 +1,47 @@
 +# In-scope function.
 +
@@ -146,10 +128,10 @@ new file mode 100644
 +        return wanted == found
 +
 +InScope ()
-diff --git a/gdb/testsuite/gdb.python/py-frame.exp b/gdb/testsuite/gdb.python/py-frame.exp
---- a/gdb/testsuite/gdb.python/py-frame.exp
-+++ b/gdb/testsuite/gdb.python/py-frame.exp
-@@ -95,6 +95,8 @@ gdb_test "python print ('result = %s' % f0.read_var ('a'))" " = 1" "test Frame.r
+diff -up gdb-12.1/gdb/testsuite/gdb.python/py-frame.exp.70~ gdb-12.1/gdb/testsuite/gdb.python/py-frame.exp
+--- gdb-12.1/gdb/testsuite/gdb.python/py-frame.exp.70~	2022-03-20 05:59:56.000000000 +0100
++++ gdb-12.1/gdb/testsuite/gdb.python/py-frame.exp	2022-05-04 00:08:48.418577046 +0200
+@@ -106,6 +106,8 @@ gdb_test "python print ('result = %s' %
  
  gdb_test "python print ('result = %s' % (gdb.selected_frame () == f1))" " = True" "test gdb.selected_frame"
  
@@ -158,10 +140,10 @@ diff --git a/gdb/testsuite/gdb.python/py-frame.exp b/gdb/testsuite/gdb.python/py
  # Can read SP register.
  gdb_test "python print ('result = %s' % (gdb.selected_frame ().read_register ('sp') == gdb.parse_and_eval ('\$sp')))" \
    " = True" \
-diff --git a/gdb/testsuite/gdb.python/py-value.exp b/gdb/testsuite/gdb.python/py-value.exp
---- a/gdb/testsuite/gdb.python/py-value.exp
-+++ b/gdb/testsuite/gdb.python/py-value.exp
-@@ -419,6 +419,15 @@ proc test_value_after_death {} {
+diff -up gdb-12.1/gdb/testsuite/gdb.python/py-value.exp.70~ gdb-12.1/gdb/testsuite/gdb.python/py-value.exp
+--- gdb-12.1/gdb/testsuite/gdb.python/py-value.exp.70~	2022-05-01 20:46:31.000000000 +0200
++++ gdb-12.1/gdb/testsuite/gdb.python/py-value.exp	2022-05-04 00:09:32.490848404 +0200
+@@ -435,6 +435,15 @@ proc test_value_after_death {} {
      "print value's type"
  }
  
@@ -177,8 +159,8 @@ diff --git a/gdb/testsuite/gdb.python/py-value.exp b/gdb/testsuite/gdb.python/py
  # Regression test for invalid subscript operations.  The bug was that
  # the type of the value was not being checked before allowing a
  # subscript operation to proceed.
-@@ -606,6 +615,7 @@ test_value_in_inferior
- test_value_from_buffer
+@@ -695,6 +704,7 @@ test_value_from_buffer
+ test_value_sub_classes
  test_inferior_function_call
  test_value_after_death
 +test_cast_regression

@@ -42,12 +42,12 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	11.2
+Version:	12.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	2
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -77,10 +77,6 @@ Patch001: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-rh-testver
 # NEEDS REBASING Patch003: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-fortran-vla-strings.patch
 #=push+jan
 # NEEDS REBASING Patch004: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-stringbt-fix.patch
-# Add a wrapper script to GDB that implements pstack using the
-# --readnever option.
-#=push
-Patch005: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-gstack-20050411.patch
 # VSYSCALL and PIE
 #=fedoratest
 Patch006: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-pie-20050107.patch
@@ -395,10 +391,6 @@ Conflicts: elfutils < 0.149
 # Cleanup any leftover testsuite processes as it may stuck mock(1) builds.
 #=push+jan
 Source2: gdb-orphanripper.c
-
-# Man page for gstack(1).
-#=push+jan
-Source3: gdb-gstack.man
 
 # /etc/gdbinit (from Debian but with Fedora compliant location).
 #=fedora
@@ -776,12 +768,6 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/configure*
 rm -rf $RPM_BUILD_ROOT%{_includedir}/*.h
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/lib{bfd*,opcodes*,iberty*}
 
-# pstack obsoletion
-
-cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_mandir}/man1/gstack.1
-ln -s gstack.1 $RPM_BUILD_ROOT%{_mandir}/man1/pstack.1
-ln -s gstack $RPM_BUILD_ROOT%{_bindir}/pstack
-
 # Packaged GDB is not a cross-target one.
 (cd $RPM_BUILD_ROOT%{_datadir}/gdb/syscalls
  rm -f mips*.xml
@@ -821,12 +807,8 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
 %doc README NEWS
 %{_bindir}/gdb
-%{_bindir}/gstack
 %{_bindir}/gcore
 %doc %{_mandir}/*/gcore.1*
-%doc %{_mandir}/*/gstack.1*
-%{_bindir}/pstack
-%doc %{_mandir}/*/pstack.1*
 # Provide gdb/jit-reader.h so that users are able to write their own GDB JIT
 # plugins.
 %{_includedir}/gdb
@@ -861,3 +843,4 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %endif
 %{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
+%{_infodir}/ctf-spec.info*
