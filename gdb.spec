@@ -47,7 +47,7 @@ Version:	12.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	1
+Release:	2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -447,6 +447,8 @@ BuildRequires: rust
 %endif
 BuildRequires: gcc-plugin-devel
 BuildRequires: pkgconfig(zlib)
+BuildRequires: debuginfod
+BuildRequires: elfutils-devel
 
 %description headless
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
@@ -540,6 +542,7 @@ if ! ../configure							\
 	--infodir=%{_infodir}					\
 	--with-system-gdbinit=%{_sysconfdir}/gdbinit		\
 	--with-gdb-datadir=%{_datadir}/gdb			\
+	--with-debuginfod					\
 	--enable-gdb-build-warnings=,-Wno-unused		\
 	--enable-build-with-cxx					\
 	--disable-werror					\
