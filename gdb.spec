@@ -52,7 +52,7 @@ License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
 # ftp://sourceware.org/pub/gdb/releases/FIXME{tarname}.tar.xz
-Source0: ftp://sourceware.org/pub/gdb/releases/%{tarname}.tar.xz
+Source0: https://sourceware.org/pub/gdb/releases/%{tarname}.tar.xz
 URL: http://gnu.org/software/gdb/
 
 # For our convenience
@@ -447,7 +447,7 @@ BuildRequires: rust
 %endif
 BuildRequires: gcc-plugin-devel
 BuildRequires: pkgconfig(zlib)
-BuildRequires: debuginfod
+BuildRequires: dbginfod
 BuildRequires: elfutils-devel
 
 %description headless
