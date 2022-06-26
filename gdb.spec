@@ -363,6 +363,9 @@ Patch095: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer.patch
 # =fedoratest
 Patch097: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1553104-s390x-arch12-test.patch
 
+# OM only patches
+Patch500: gdb-12.1-readline-8.2.patch
+
 %description
 'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
 See package 'gdb-headless'.

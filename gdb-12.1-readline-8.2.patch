@@ -1,0 +1,23 @@
+diff -up gdb-12.1/gdb/completer.c.omv~ gdb-12.1/gdb/completer.c
+--- gdb-12.1/gdb/completer.c.omv~	2022-06-26 23:13:29.016233688 +0200
++++ gdb-12.1/gdb/completer.c	2022-06-26 23:24:09.170230405 +0200
+@@ -1974,7 +1974,7 @@ static const char *gdb_org_rl_basic_quot
+ /* Get the list of chars that are considered as word breaks
+    for the current command.  */
+ 
+-static char *
++static const char *
+ gdb_completion_word_break_characters_throw ()
+ {
+   /* New completion starting.  Get rid of the previous tracker and
+@@ -2022,7 +2022,7 @@ gdb_completion_word_break_characters ()
+ 
+   try
+     {
+-      return gdb_completion_word_break_characters_throw ();
++      return (char*)gdb_completion_word_break_characters_throw ();
+     }
+   catch (const gdb_exception &ex)
+     {
+diff -up gdb-12.1/gdb/completer.h.omv~ gdb-12.1/gdb/completer.h
+diff -up gdb-12.1/gdb/top.c.omv~ gdb-12.1/gdb/top.c
