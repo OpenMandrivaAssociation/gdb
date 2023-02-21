@@ -42,12 +42,12 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	12.1
+Version:	13.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	2
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -123,9 +123,6 @@ Patch018: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz218379-p
 # Find symbols properly at their original (included) file (BZ 109921).
 #=fedoratest
 Patch020: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz109921-DW_AT_decl_file-test.patch
-# Update PPC unwinding patches to their upstream variants (BZ 140532).
-#=fedoratest
-Patch021: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-bz140532-ppc-unwinding-test.patch
 # Testcase for exec() from threaded program (BZ 202689).
 #=fedoratest
 Patch022: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-bz202689-exec-from-pthread-test.patch
@@ -193,10 +190,6 @@ Patch042: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.8-bz466901-b
 # New test for step-resume breakpoint placed in multiple threads at once.
 #=fedoratest
 Patch043: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-simultaneous-step-resume-breakpoint-test.patch
-# Fix GNU/Linux core open: Can't read pathname for load map: Input/output error.
-# Fix regression of undisplayed missing shared libraries caused by a fix for.
-#=fedoratest: It should be in glibc: libc-alpha: <20091004161706.GA27450@.*>
-Patch044: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-core-open-vdso-warning.patch
 # Fix stepping with OMP parallel Fortran sections (BZ 533176).
 #=push+jan: It requires some better DWARF annotations.
 Patch045: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz533176-fortran-omp-step.patch
@@ -322,9 +315,6 @@ Patch084: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-fedora-libncur
 # Test clflushopt instruction decode (for RH BZ 1262471).
 #=fedoratest
 Patch085: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-opcodes-clflushopt-test.patch
-# [rhel6] DTS backward Python compatibility API (BZ 1020004, Phil Muldoon).
-#=fedora
-Patch086: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-dts-rhel6-python-compat.patch
 # [SCL] Skip deprecated .gdb_index warning for Red Hat built files (BZ 953585).
 #=push+jan
 # NEEDS REBASE Patch087: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-rpm-scl.patch
@@ -849,4 +839,4 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %endif
 %{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
-%{_infodir}/ctf-spec.info*
+%{_infodir}/sframe-spec.info*
