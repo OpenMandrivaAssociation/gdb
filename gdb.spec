@@ -537,6 +537,8 @@ if ! ../configure							\
 	--build=%{_build}					\
 	--host=%{_target_platform}				\
 	--target=%{_target_platform}				\
+	--with-libgmp-prefix=%{_prefix}/%{_target_platform}	\
+	--with-liblzma-prefix=%{_prefix}/%{_target_platform}	\
 %endif
 	--with-system-gdbinit=%{_sysconfdir}/gdbinit		\
 	--with-gdb-datadir=%{_datadir}/gdb			\
@@ -826,11 +828,9 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 
 # don't include the files in include, they are part of binutils
 %files gdbserver
-%ifnarch riscv64
-# GDB Server not ported yet on risc
-# 22 March 2019
 %{_bindir}/gdbserver
-# GDB Server not ported yet on risc
+%ifnarch riscv64
+# inproctrace not ported yet on risc
 # 22 March 2019
 %if %{have_inproctrace}
 %{_libdir}/libinproctrace.so
