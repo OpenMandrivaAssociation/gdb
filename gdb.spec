@@ -533,6 +533,11 @@ if ! ../configure							\
 	--sysconfdir=%{_sysconfdir}				\
 	--mandir=%{_mandir}					\
 	--infodir=%{_infodir}					\
+%if %{cross_compiling}
+	--build=%{_build}					\
+	--host=%{_target_platform}				\
+	--target=%{_target_platform}				\
+%endif
 	--with-system-gdbinit=%{_sysconfdir}/gdbinit		\
 	--with-gdb-datadir=%{_datadir}/gdb			\
 	--with-debuginfod					\
