@@ -4,10 +4,7 @@
 
 %define Werror_cflags %nil
 
-%if 0%{?omvver} >= 4000
-# RPM 4.16 has soversion 9
-%define rpmsover 9
-%endif
+%define rpmsover $(ls %{_libdir}/librpm.so.[0-9]* |head -n1 |cut -d. -f3)
 
 # rpmbuild parameters:
 # --with testsuite: Run the testsuite (biarch if possible).  Default is without.
@@ -42,7 +39,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	13.2
+Version:	14.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -101,10 +98,6 @@ Patch012: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inheritanc
 # Support TLS symbols (+`errno' suggestion if no pthread is found) (BZ 185337).
 #=push+jan: It should be replaced by Infinity project.
 #Patch013: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
-# Fix TLS symbols resolving for shared libraries with a relative pathname.
-# The testsuite needs `gdb-6.5-tls-of-separate-debuginfo.patch'.
-#=fedoratest: One should recheck if it is really fixed upstream.
-Patch014: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-sharedlibrary-path.patch
 # Improved testsuite results by the testsuite provided by the courtesy of BEA.
 #=fedoratest: For upstream it should be rewritten as a dejagnu test, the test of no "??" was useful.
 Patch015: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-BEA-testsuite.patch
@@ -309,9 +302,6 @@ Patch082: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1084404-pp
 # Never kill PID on: gdb exec PID (Jan Kratochvil, RH BZ 1219747).
 #=push+jan
 Patch083: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz1219747-attach-kills.patch
-# Force libncursesw over libncurses to match the includes (RH BZ 1270534).
-#=push+jan
-Patch084: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-fedora-libncursesw.patch
 # Test clflushopt instruction decode (for RH BZ 1262471).
 #=fedoratest
 Patch085: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-opcodes-clflushopt-test.patch
@@ -843,5 +833,6 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
 %endif
 %{_infodir}/annotate.info*
+%{_infodir}/ctf-spec.info*
 %{_infodir}/gdb.info*
 %{_infodir}/sframe-spec.info*

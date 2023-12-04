@@ -1,6 +1,6 @@
-diff -up gdb-13.1/gdb/data-directory/Makefile.in.67~ gdb-13.1/gdb/data-directory/Makefile.in
---- gdb-13.1/gdb/data-directory/Makefile.in.67~	2023-02-19 14:45:05.000000000 +0100
-+++ gdb-13.1/gdb/data-directory/Makefile.in	2023-02-21 23:31:39.729756613 +0100
+diff -up gdb-14.1/gdb/data-directory/Makefile.in.65~ gdb-14.1/gdb/data-directory/Makefile.in
+--- gdb-14.1/gdb/data-directory/Makefile.in.65~	2023-12-03 06:23:54.000000000 +0100
++++ gdb-14.1/gdb/data-directory/Makefile.in	2023-12-04 01:10:25.674881851 +0100
 @@ -80,6 +80,7 @@ PYTHON_FILE_LIST = \
  	gdb/unwinder.py \
  	gdb/xmethod.py \
@@ -9,7 +9,7 @@ diff -up gdb-13.1/gdb/data-directory/Makefile.in.67~ gdb-13.1/gdb/data-directory
  	gdb/command/explore.py \
  	gdb/command/frame_filters.py \
  	gdb/command/pretty_printers.py \
-@@ -91,6 +92,7 @@ PYTHON_FILE_LIST = \
+@@ -113,6 +114,7 @@ PYTHON_FILE_LIST = \
  	gdb/function/as_string.py \
  	gdb/function/caller_is.py \
  	gdb/function/strfns.py \
@@ -17,9 +17,9 @@ diff -up gdb-13.1/gdb/data-directory/Makefile.in.67~ gdb-13.1/gdb/data-directory
  	gdb/printer/__init__.py \
  	gdb/printer/bound_registers.py
  
-diff -up gdb-13.1/gdb/gdb-gdb.gdb.in.67~ gdb-13.1/gdb/gdb-gdb.gdb.in
---- gdb-13.1/gdb/gdb-gdb.gdb.in.67~	2023-02-19 14:45:05.000000000 +0100
-+++ gdb-13.1/gdb/gdb-gdb.gdb.in	2023-02-21 23:30:39.224312564 +0100
+diff -up gdb-14.1/gdb/gdb-gdb.gdb.in.65~ gdb-14.1/gdb/gdb-gdb.gdb.in
+--- gdb-14.1/gdb/gdb-gdb.gdb.in.65~	2023-10-08 09:51:13.000000000 +0200
++++ gdb-14.1/gdb/gdb-gdb.gdb.in	2023-12-04 01:10:25.674881851 +0100
 @@ -1,5 +1,15 @@
  echo Setting up the environment for debugging gdb.\n
  
@@ -36,9 +36,9 @@ diff -up gdb-13.1/gdb/gdb-gdb.gdb.in.67~ gdb-13.1/gdb/gdb-gdb.gdb.in
  if !$gdb_init_done
    set variable $gdb_init_done = 1
  
-diff -up gdb-13.1/gdb/python/lib/gdb/command/ignore_errors.py.67~ gdb-13.1/gdb/python/lib/gdb/command/ignore_errors.py
---- gdb-13.1/gdb/python/lib/gdb/command/ignore_errors.py.67~	2023-02-21 23:30:39.224312564 +0100
-+++ gdb-13.1/gdb/python/lib/gdb/command/ignore_errors.py	2023-02-21 23:30:39.224312564 +0100
+diff -up gdb-14.1/gdb/python/lib/gdb/command/ignore_errors.py.65~ gdb-14.1/gdb/python/lib/gdb/command/ignore_errors.py
+--- gdb-14.1/gdb/python/lib/gdb/command/ignore_errors.py.65~	2023-12-04 01:10:25.674881851 +0100
++++ gdb-14.1/gdb/python/lib/gdb/command/ignore_errors.py	2023-12-04 01:10:25.674881851 +0100
 @@ -0,0 +1,37 @@
 +# Ignore errors in user commands.
 +
@@ -77,9 +77,9 @@ diff -up gdb-13.1/gdb/python/lib/gdb/command/ignore_errors.py.67~ gdb-13.1/gdb/p
 +            pass
 +
 +IgnoreErrorsCommand ()
-diff -up gdb-13.1/gdb/python/lib/gdb/function/in_scope.py.67~ gdb-13.1/gdb/python/lib/gdb/function/in_scope.py
---- gdb-13.1/gdb/python/lib/gdb/function/in_scope.py.67~	2023-02-21 23:30:39.224312564 +0100
-+++ gdb-13.1/gdb/python/lib/gdb/function/in_scope.py	2023-02-21 23:30:39.224312564 +0100
+diff -up gdb-14.1/gdb/python/lib/gdb/function/in_scope.py.65~ gdb-14.1/gdb/python/lib/gdb/function/in_scope.py
+--- gdb-14.1/gdb/python/lib/gdb/function/in_scope.py.65~	2023-12-04 01:10:25.674881851 +0100
++++ gdb-14.1/gdb/python/lib/gdb/function/in_scope.py	2023-12-04 01:10:25.674881851 +0100
 @@ -0,0 +1,47 @@
 +# In-scope function.
 +
@@ -128,10 +128,10 @@ diff -up gdb-13.1/gdb/python/lib/gdb/function/in_scope.py.67~ gdb-13.1/gdb/pytho
 +        return wanted == found
 +
 +InScope ()
-diff -up gdb-13.1/gdb/testsuite/gdb.python/py-frame.exp.67~ gdb-13.1/gdb/testsuite/gdb.python/py-frame.exp
---- gdb-13.1/gdb/testsuite/gdb.python/py-frame.exp.67~	2023-02-19 14:45:05.000000000 +0100
-+++ gdb-13.1/gdb/testsuite/gdb.python/py-frame.exp	2023-02-21 23:30:39.224312564 +0100
-@@ -106,6 +106,8 @@ gdb_test "python print ('result = %s' %
+diff -up gdb-14.1/gdb/testsuite/gdb.python/py-frame.exp.65~ gdb-14.1/gdb/testsuite/gdb.python/py-frame.exp
+--- gdb-14.1/gdb/testsuite/gdb.python/py-frame.exp.65~	2023-10-08 09:51:13.000000000 +0200
++++ gdb-14.1/gdb/testsuite/gdb.python/py-frame.exp	2023-12-04 01:10:25.674881851 +0100
+@@ -139,6 +139,8 @@ gdb_test "python print ('result = %s' %
  
  gdb_test "python print ('result = %s' % (gdb.selected_frame () == f1))" " = True" "test gdb.selected_frame"
  
@@ -140,10 +140,10 @@ diff -up gdb-13.1/gdb/testsuite/gdb.python/py-frame.exp.67~ gdb-13.1/gdb/testsui
  # Can read SP register.
  gdb_test "python print ('result = %s' % (gdb.selected_frame ().read_register ('sp') == gdb.parse_and_eval ('\$sp')))" \
    " = True" \
-diff -up gdb-13.1/gdb/testsuite/gdb.python/py-value.exp.67~ gdb-13.1/gdb/testsuite/gdb.python/py-value.exp
---- gdb-13.1/gdb/testsuite/gdb.python/py-value.exp.67~	2023-02-19 14:45:05.000000000 +0100
-+++ gdb-13.1/gdb/testsuite/gdb.python/py-value.exp	2023-02-21 23:30:39.225312572 +0100
-@@ -407,6 +407,15 @@ proc test_value_after_death {} {
+diff -up gdb-14.1/gdb/testsuite/gdb.python/py-value.exp.65~ gdb-14.1/gdb/testsuite/gdb.python/py-value.exp
+--- gdb-14.1/gdb/testsuite/gdb.python/py-value.exp.65~	2023-12-03 06:23:54.000000000 +0100
++++ gdb-14.1/gdb/testsuite/gdb.python/py-value.exp	2023-12-04 01:11:08.451231350 +0100
+@@ -414,6 +414,15 @@ proc test_value_after_death {} {
      "print value's type"
  }
  
@@ -159,9 +159,9 @@ diff -up gdb-13.1/gdb/testsuite/gdb.python/py-value.exp.67~ gdb-13.1/gdb/testsui
  # Regression test for invalid subscript operations.  The bug was that
  # the type of the value was not being checked before allowing a
  # subscript operation to proceed.
-@@ -660,6 +669,7 @@ test_value_from_buffer
- test_value_sub_classes
+@@ -678,6 +687,7 @@ test_value_sub_classes
  test_inferior_function_call
+ test_assign
  test_value_after_death
 +test_cast_regression
  
