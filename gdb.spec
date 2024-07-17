@@ -39,7 +39,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	14.2
+Version:	15.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -98,9 +98,6 @@ Patch012: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inheritanc
 # Support TLS symbols (+`errno' suggestion if no pthread is found) (BZ 185337).
 #=push+jan: It should be replaced by Infinity project.
 #Patch013: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
-# Improved testsuite results by the testsuite provided by the courtesy of BEA.
-#=fedoratest: For upstream it should be rewritten as a dejagnu test, the test of no "??" was useful.
-Patch015: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-BEA-testsuite.patch
 # Testcase for deadlocking on last address space byte; for corrupted backtraces.
 #=fedoratest
 Patch016: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-last-address-space-byte-test.patch
@@ -335,8 +332,6 @@ Patch093: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-libexec-add-in
 #=fedoratest
 Patch094: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1398387-tab-crash-test.patch
 # Python patches of: http://sourceware.org/gdb/wiki/ProjectArcher
-#=push
-Patch095: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer.patch
 # Revert upstream commit 469412dd9ccc4de5874fd3299b105833f36b34cd
 # NEEDS REBASE Patch096: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-fix-print-char-array.patch
 # [s390x] Backport arch12 instructions decoding (RH BZ 1553104).
@@ -742,11 +737,13 @@ touch -r %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
 sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >$RPM_BUILD_ROOT%{_sysconfdir}/gdbinit
 touch -r %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit
 
+%if 0
 for i in `find $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb -name "*.py"`
 do
   # Files could be also patched getting the current time.
   touch -r $RPM_BUILD_DIR/%{gdb_src}/gdb/ChangeLog $i
 done
+%endif
 
 # Remove the files that are part of a gdb build but that are owned and
 # provided by other packages.
