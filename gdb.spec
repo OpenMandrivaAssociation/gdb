@@ -50,7 +50,7 @@ Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
 # ftp://sourceware.org/pub/gdb/releases/FIXME{tarname}.tar.xz
 Source0: https://sourceware.org/pub/gdb/releases/%{tarname}.tar.xz
-URL: http://gnu.org/software/gdb/
+URL: https://gnu.org/software/gdb/
 
 # For our convenience
 %global gdb_src %{tarname}
