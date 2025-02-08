@@ -17,13 +17,7 @@
 
 %bcond_without rpm
 %bcond_with testsuite
-# FIXME as of gdb 11.1, python 3.9.8,
-# building with clang 13.0.0 or gcc 11.2,
-# gdb crashes while generating backtraces using the
-# python backtrace generator.
-# Disabling python isn't a nice fix, but better than
-# leaving gdb unusable...
-%bcond_with python
+%bcond_without python
 %bcond_with babeltrace
 %bcond_with pdf
 %bcond_with guile
@@ -39,7 +33,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	15.2
+Version:	16.2
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
@@ -119,12 +113,6 @@ Patch022: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-bz202689-e
 # Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
 #=fedoratest
 Patch023: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-bz230000-power6-disassembly-test.patch
-# Allow running `/usr/bin/gcore' with provided but inaccessible tty (BZ 229517).
-#=fedoratest
-Patch024: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-bz229517-gcore-without-terminal.patch
-# Avoid too long timeouts on failing cases of "annota1.exp annota3.exp".
-#=fedoratest
-Patch025: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-testsuite-timeouts.patch
 # Support for stepping over PPC atomic instruction sequences (BZ 237572).
 #=fedoratest
 Patch026: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-bz237572-ppc-atomic-sequence-test.patch
@@ -219,9 +207,6 @@ Patch057: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz634108-solib
 # New test gdb.arch/x86_64-pid0-core.exp for kernel PID 0 cores (BZ 611435).
 #=fedoratest
 Patch058: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-pid0-core.patch
-# [archer-tromey-delayed-symfile] New test gdb.dwarf2/dw2-aranges.exp.
-#=fedoratest
-Patch059: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-dw2-aranges.patch
 # [archer-keiths-expr-cumulative+upstream] Import C++ testcases.
 #=fedoratest
 Patch060: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-expr-cumulative-archer.patch
@@ -263,13 +248,6 @@ Patch071: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1007614-me
 # but not corresponding binary pkg' (RH BZ 981154).
 #=push+jan
 Patch072: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-misleading-warning-missing-debuginfo-rhbz981154.patch
-#=fedoratest
-# NEEDS REBASE Patch073: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer-vla-tests.patch
-#=fedoratest
-# NEEDS REBASE Patch074: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-tests.patch
-# Continue backtrace even if a frame filter throws an exception (Phil Muldoon).
-#=push
-Patch075: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-btrobust.patch
 # Display Fortran strings in backtraces.
 #=fedoratest
 Patch076: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-fortran-frame-string.patch
@@ -296,9 +274,6 @@ Patch080: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1186476-in
 # Kratochvil, RH BZ 1084404).
 #=fedoratest
 Patch082: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1084404-ppc64-s390x-wrong-prologue-skip-O2-g-3of3.patch
-# Never kill PID on: gdb exec PID (Jan Kratochvil, RH BZ 1219747).
-#=push+jan
-Patch083: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz1219747-attach-kills.patch
 # Test clflushopt instruction decode (for RH BZ 1262471).
 #=fedoratest
 Patch085: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-opcodes-clflushopt-test.patch
@@ -798,7 +773,9 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 %doc README NEWS
 %{_bindir}/gdb
 %{_bindir}/gcore
+%{_bindir}/gstack
 %doc %{_mandir}/*/gcore.1*
+%doc %{_mandir}/*/gstack.1*
 # Provide gdb/jit-reader.h so that users are able to write their own GDB JIT
 # plugins.
 %{_includedir}/gdb
