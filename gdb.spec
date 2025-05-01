@@ -33,7 +33,7 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	16.2
+Version:	16.3
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
