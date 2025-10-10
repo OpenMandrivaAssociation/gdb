@@ -38,7 +38,7 @@ Version:	16.3
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	2
+Release:	3
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -54,9 +54,6 @@ Conflicts: gdb-headless < 7.12-29
 
 Summary: A stub package for GNU source-level debugger
 Requires: gdb-headless = %{version}-%{release}
-
-# Require dnf debuginfo-install to be installed
-Requires: dnf-command(debuginfo-install)
 
 # Match the Fedora's version info.
 #=fedora
