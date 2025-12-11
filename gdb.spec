@@ -381,6 +381,7 @@ BuildRequires: pkgconfig(guile-3.0)
 #global have_libipt 1
 #BuildRequires: libipt-devel
 %endif
+BuildRequires: make
 BuildRequires: sharutils
 BuildRequires: dejagnu
 # gcc-objc++ is not covered by the GDB testsuite.
