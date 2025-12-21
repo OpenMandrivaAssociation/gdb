@@ -33,12 +33,12 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	16.3
+Version:	17.1
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	4
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.

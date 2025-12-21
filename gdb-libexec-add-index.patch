@@ -1,22 +1,9 @@
-From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
-From: Fedora GDB patches <invalid@email.com>
-Date: Fri, 27 Oct 2017 21:07:50 +0200
-Subject: gdb-libexec-add-index.patch
-
-;; Fix gdb-headless /usr/bin/ executables (BZ 1390251).
-;;
-;; Also, make /usr/bin/gdb.minimal be the default GDB used, if it's
-;; present.  For rationale, see:
-;;
-;;   https://fedoraproject.org/wiki/Changes/Minimal_GDB_in_buildroot
-;;=fedora
-
-diff --git a/gdb/contrib/gdb-add-index.sh b/gdb/contrib/gdb-add-index.sh
---- a/gdb/contrib/gdb-add-index.sh
-+++ b/gdb/contrib/gdb-add-index.sh
-@@ -22,6 +22,20 @@ GDB=${GDB:=gdb}
- OBJCOPY=${OBJCOPY:=objcopy}
- READELF=${READELF:=readelf}
+diff -up gdb-17.1/gdb/contrib/gdb-add-index.sh.57~ gdb-17.1/gdb/contrib/gdb-add-index.sh
+--- gdb-17.1/gdb/contrib/gdb-add-index.sh.57~	2025-09-06 23:52:48.000000000 +0200
++++ gdb-17.1/gdb/contrib/gdb-add-index.sh	2025-12-21 18:17:47.905446085 +0100
+@@ -25,6 +25,20 @@ READELF=${READELF:=readelf}
+ PKGVERSION="@PKGVERSION@"
+ VERSION="@VERSION@"
  
 +GDB2=/usr/libexec/gdb
 +if test -x $GDB2 && ! which $GDB &>/dev/null; then
@@ -34,4 +21,4 @@ diff --git a/gdb/contrib/gdb-add-index.sh b/gdb/contrib/gdb-add-index.sh
 +
  myname="${0##*/}"
  
- dwarf5=""
+ print_usage() {
