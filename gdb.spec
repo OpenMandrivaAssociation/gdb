@@ -38,7 +38,7 @@ Version:	17.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	1
+Release:	2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -55,263 +55,14 @@ Conflicts: gdb-headless < 7.12-29
 Summary: A stub package for GNU source-level debugger
 Requires: gdb-headless = %{version}-%{release}
 
-# Match the Fedora's version info.
-#=fedora
-Patch001: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-rh-testversion-20041202.patch
-# VLA (Fortran dynamic arrays) from Intel + archer-jankratochvil-vla tests.
-#=push
-# NEEDS REBASING Patch002: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-fortran-strides.patch
-#=push
-# NEEDS REBASING Patch003: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-fortran-vla-strings.patch
-#=push+jan
-# NEEDS REBASING Patch004: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-stringbt-fix.patch
-# VSYSCALL and PIE
-#=fedoratest
-Patch006: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-pie-20050107.patch
-# Get selftest working with sep-debug-info
-#=fedoratest
-#Patch007: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-self-20050110.patch
-# Test support of multiple destructors just like multiple constructors
-#=fedoratest
-Patch008: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-dtorfix-20050121.patch
-# Fix to support executable moving
-#=fedoratest
-Patch009: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-test-movedir-20050125.patch
-# Test sibling threads to set threaded watchpoints for x86 and x86-64
-#=fedoratest
-Patch010: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-threaded-watchpoints2-20050225.patch
-# Notify observers that the inferior has been created
-#=fedoratest
-Patch011: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inferior-notification-20050721.patch
-# Verify printing of inherited members test
-#=fedoratest
-Patch012: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-inheritancetest-20050726.patch
-# Support TLS symbols (+`errno' suggestion if no pthread is found) (BZ 185337).
-#=push+jan: It should be replaced by Infinity project.
-#Patch013: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz185337-resolve-tls-without-debuginfo-v2.patch
-# Testcase for deadlocking on last address space byte; for corrupted backtraces.
-#=fedoratest
-Patch016: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-last-address-space-byte-test.patch
-# Fix readline segfault on excessively long hand-typed lines.
-#=fedoratest
-Patch017: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-readline-long-line-crash-test.patch
-# Test sideeffects of skipping ppc .so libs trampolines (BZ 218379).
-#=fedoratest
-Patch018: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz218379-ppc-solib-trampoline-test.patch
-# Fix lockup on trampoline vs. its function lookup; unreproducible (BZ 218379).
-#=fedora
-# NEEDS REBASING Patch019: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz218379-solib-trampoline-lookup-lock-fix.patch
-# Find symbols properly at their original (included) file (BZ 109921).
-#=fedoratest
-Patch020: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz109921-DW_AT_decl_file-test.patch
-# Testcase for exec() from threaded program (BZ 202689).
-#=fedoratest
-Patch022: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-bz202689-exec-from-pthread-test.patch
-# Testcase for PPC Power6/DFP instructions disassembly (BZ 230000).
-#=fedoratest
-Patch023: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-bz230000-power6-disassembly-test.patch
-# Support for stepping over PPC atomic instruction sequences (BZ 237572).
-#=fedoratest
-Patch026: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-bz237572-ppc-atomic-sequence-test.patch
-# Test kernel VDSO decoding while attaching to an i386 process.
-#=fedoratest
-Patch027: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-attach-see-vdso-test.patch
-# Test leftover zombie process (BZ 243845).
-#=fedoratest
-Patch028: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-bz243845-stale-testing-zombie-test.patch
-# New locating of the matching binaries from the pure core file (build-id).
-#=push+jan
-# NEEDS REBASING Patch029: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate.patch
-# Fix loading of core files without build-ids but with build-ids in executables.
-# Load strictly build-id-checked core files only if no executable is specified
-# (Jan Kratochvil, RH BZ 1339862).
-#=push+jan
-# NEEDS REBASING Patch030: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-solib-missing-ids.patch
-#=push+jan
-# NEEDS REBASING Patch031: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-rpm.patch
-# Fix displaying of numeric char arrays as strings (BZ 224128).
-#=fedoratest: But it is failing anyway, one should check the behavior more.
-Patch032: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.7-charsign-test.patch
-# Test PPC hiding of call-volatile parameter register.
-#=fedoratest
-Patch033: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.7-ppc-clobbered-registers-O2-test.patch
-# Testsuite fixes for more stable/comparable results.
-#=fedoratest
-Patch034: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.7-testsuite-stable-results.patch
-# Test ia64 memory leaks of the code using libunwind.
-#=fedoratest
-Patch035: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-ia64-libunwind-leak-test.patch
-# Test hiding unexpected breakpoints on intentional step commands.
-#=fedoratest
-Patch036: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-missed-trap-on-step-test.patch
-# Test gcore memory and time requirements for large inferiors.
-#=fedoratest
-Patch037: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-gcore-buffer-limit-test.patch
-# Test GCORE for shmid 0 shared memory mappings.
-#=fedoratest: But it is broken anyway, sometimes the case being tested is not reproducible.
-Patch038: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-mapping-zero-inode-test.patch
-# Test a crash on `focus cmd', `focus prev' commands.
-#=fedoratest
-Patch039: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.3-focus-cmd-prev-test.patch
-# Test various forms of threads tracking across exec() (BZ 442765).
-#=fedoratest
-Patch040: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.8-bz442765-threaded-exec-test.patch
-# Test a crash on libraries missing the .text section.
-#=fedoratest
-Patch041: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.5-section-num-fixup-test.patch
-# Fix resolving of variables at locations lists in prelinked libs (BZ 466901).
-#=fedoratest
-Patch042: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.8-bz466901-backtrace-full-prelinked.patch
-# New test for step-resume breakpoint placed in multiple threads at once.
-#=fedoratest
-Patch043: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-simultaneous-step-resume-breakpoint-test.patch
-# Fix stepping with OMP parallel Fortran sections (BZ 533176).
-#=push+jan: It requires some better DWARF annotations.
-Patch045: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz533176-fortran-omp-step.patch
-# Workaround ccache making lineno non-zero for command-line definitions.
-#=fedoratest: ccache is rarely used and it is even fixed now.
-#Patch046: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-ccache-workaround.patch
-#=push+jan: May get obsoleted by Tom's unrelocated objfiles patch.
-# NEEDS REBASING Patch047: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer-pie-addons.patch
-#=push+jan: Breakpoints disabling matching should not be based on address.
-# NEEDS REBASING Patch048: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer-pie-addons-keep-disabled.patch
-# Testcase for "Do not make up line information" fix by Daniel Jacobowitz.
-#=fedoratest
-Patch049: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-lineno-makeup-test.patch
-# Test power7 ppc disassembly.
-#=fedoratest
-Patch050: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-ppc-power7-test.patch
-# Workaround non-stop moribund locations exploited by kernel utrace (BZ 590623).
-#=push+jan: Currently it is still not fully safe.
-# NEEDS REBASING Patch051: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-moribund-utrace-workaround.patch
-# Fix follow-exec for C++ programs (bugreported by Martin Stransky).
-#=fedoratest
-Patch052: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-archer-next-over-throw-cxx-exec.patch
-# Backport DWARF-4 support (BZ 601887, Tom Tromey).
-#=fedoratest
-Patch053: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz601887-dwarf4-rh-test.patch
-#=push+jan
-# NEEDS REBASING Patch054: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-core-as-arg.patch
-# Workaround librpm BZ 643031 due to its unexpected exit() calls (BZ 642879).
-#=push+jan
-# NEEDS REBASING Patch055: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-rpm-librpm-workaround.patch
-# [delayed-symfile] Test a backtrace regression on CFIs without DIE (BZ 614604).
-#=fedoratest
-Patch056: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-bt-cfi-without-die.patch
-# Verify GDB Python built-in function gdb.solib_address exists (BZ # 634108).
-#=fedoratest
-Patch057: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-bz634108-solib_address.patch
-# New test gdb.arch/x86_64-pid0-core.exp for kernel PID 0 cores (BZ 611435).
-#=fedoratest
-Patch058: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-pid0-core.patch
-# [archer-keiths-expr-cumulative+upstream] Import C++ testcases.
-#=fedoratest
-Patch060: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-expr-cumulative-archer.patch
-# Fix regressions on C++ names resolving (PR 11734, PR 12273, Keith Seitz).
-#=fedoratest
-Patch061: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-physname-pr11734-test.patch
-# Fix regressions on C++ names resolving (PR 11734, PR 12273, Keith Seitz).
-#=fedoratest
-Patch062: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-physname-pr12273-test.patch
-# Test GDB opcodes/ disassembly of Intel Ivy Bridge instructions (BZ 696890).
-#=fedoratest
-Patch063: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-test-ivy-bridge.patch
-# Hack for proper PIE run of the testsuite.
-#=fedoratest
-Patch064: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-runtest-pie-override.patch
-# Print reasons for failed attach/spawn incl. SELinux deny_ptrace (BZ 786878).
-#=push+jan
-# NEEDS REBASING Patch065: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-attach-fail-reasons-5of5.patch
-# Workaround PR libc/14166 for inferior calls of strstr.
-#=fedoratest: Compatibility with RHELs (unchecked which ones).
-Patch066: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-glibc-strstr-workaround.patch
-# Include testcase for `Unable to see a variable inside a module (XLF)' (BZ 823789).
-#=fedoratest
-Patch067: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhel5.9-testcase-xlf-var-inside-mod.patch
-# Testcase for `Setting solib-absolute-prefix breaks vDSO' (BZ 818343).
-#=fedoratest
-Patch068: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz-818343-set-solib-absolute-prefix-testcase.patch
-# Import regression test for `gdb/findvar.c:417: internal-error:
-# read_var_value: Assertion `frame' failed.' (RH BZ 947564) from RHEL 6.5.
-#=fedoratest
-Patch069: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz947564-findvar-assertion-frame-failed-testcase.patch
-# Fix crash of -readnow /usr/lib/debug/usr/bin/gnatbind.debug (BZ 1069211).
-#=push+jan
-# NEEDS REBASING Patch070: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-gnat-dwarf-crash-3of3.patch
-# Fix 'memory leak in infpy_read_memory()' (RH BZ 1007614)
-#=fedoratest
-Patch071: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1007614-memleak-infpy_read_memory-test.patch
-# Fix 'gdb gives highly misleading error when debuginfo pkg is present,
-# but not corresponding binary pkg' (RH BZ 981154).
-#=push+jan
-Patch072: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-misleading-warning-missing-debuginfo-rhbz981154.patch
-# Display Fortran strings in backtraces.
-#=fedoratest
-Patch076: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-fortran-frame-string.patch
-# Testcase for '[SAP] Recursive dlopen causes SAP HANA installer to
-# crash.' (RH BZ 1156192).
-#=fedoratest
-Patch077: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1156192-recursive-dlopen-test.patch
-# Fix jit-reader.h for multi-lib.
-#=push+jan
-Patch078: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-jit-reader-multilib.patch
-# Fix '`catch syscall' doesn't work for parent after `fork' is called'
-# (Philippe Waroquiers, RH BZ 1149205).
-#=fedoratest
-Patch079: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1149205-catch-syscall-after-fork-test.patch
-# Fix 'backport GDB 7.4 fix to RHEL 6.6 GDB' [Original Sourceware bug
-# description: 'C++ (and objc): Internal error on unqualified name
-# re-set', PR 11657] (RH BZ 1186476).
-#=fedoratest
-Patch080: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1186476-internal-error-unqualified-name-re-set-test.patch
-# Test 'info type-printers' Python error (RH BZ 1350436).
-#=fedoratest
-#Patch081: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1350436-type-printers-error.patch
-# Fix '[ppc64] and [s390x] wrong prologue skip on -O2 -g code' (Jan
-# Kratochvil, RH BZ 1084404).
-#=fedoratest
-Patch082: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1084404-ppc64-s390x-wrong-prologue-skip-O2-g-3of3.patch
-# Test clflushopt instruction decode (for RH BZ 1262471).
-#=fedoratest
-Patch085: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-opcodes-clflushopt-test.patch
-# [SCL] Skip deprecated .gdb_index warning for Red Hat built files (BZ 953585).
-#=push+jan
-# NEEDS REBASE Patch087: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.6-buildid-locate-rpm-scl.patch
-# Make the GDB quit processing non-abortable to cleanup everything properly.
-#=fedora: It was useful only after gdb-6.8-attach-signalled-detach-stopped.patch .
-# NEEDS REBASE Patch088: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-6.8-quit-never-aborts.patch
-# [aarch64] Fix hardware watchpoints (RH BZ 1261564).
-#=fedoratest
-Patch089: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1261564-aarch64-hw-watchpoint-test.patch
-# Add messages suggesting more recent RHEL gdbserver (RH BZ 1321114).
-#=fedora
-# NEEDS REBASE Patch090: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-container-rh-pkg.patch
-# New test for Python "Cannot locate object file for block" (for RH BZ 1325795).
-#=fedoratest
-Patch091: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1325795-framefilters-test.patch
-# [dts+el7] [x86*] Bundle linux_perf.h for libipt (RH BZ 1256513).
-#=fedora
-# NEEDS REBASE Patch092: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-linux_perf-bundle.patch
-# Fix gdb-headless /usr/bin/ executables (BZ 1390251).
-#
-# Also, make /usr/bin/gdb.minimal be the default GDB used, if it's
-# present.  For rationale, see:
-#
-#   https://fedoraproject.org/wiki/Changes/Minimal_GDB_in_buildroot
-#=fedora
-Patch093: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-libexec-add-index.patch
-# New testcase for: Fix <tab>-completion crash (Gary Benson, RH BZ 1398387).
-#=fedoratest
-Patch094: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1398387-tab-crash-test.patch
-# Python patches of: http://sourceware.org/gdb/wiki/ProjectArcher
-# Revert upstream commit 469412dd9ccc4de5874fd3299b105833f36b34cd
-# NEEDS REBASE Patch096: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-vla-intel-fix-print-char-array.patch
-# [s390x] Backport arch12 instructions decoding (RH BZ 1553104).
-# =fedoratest
-Patch097: https://src.fedoraproject.org/rpms/gdb/raw/master/f/gdb-rhbz1553104-s390x-arch12-test.patch
+%patchlist
+# From fedora
+https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-test-show-version.patch
+https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
+https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
 
 # OM only patches
-Patch500: gdb-12.1-readline-8.2.patch
+gdb-12.1-readline-8.2.patch
 
 %description
 'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
@@ -363,7 +114,6 @@ BuildRequires: pkgconfig(liblzma)
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
 BuildRequires: pkgconfig(rpm) >= 4.14.0-0
 %endif
-%global __python %{__python3}
 BuildRequires:   pkgconfig(python3)
 Requires:   python >= 3
 %if %{with pdf}
@@ -484,6 +234,31 @@ CFLAGS="$CFLAGS -DDNF_DEBUGINFO_INSTALL"
 CFLAGS="$CFLAGS -DGDB_INDEX_VERIFY_VENDOR"
 %endif
 
+# Cross compilation with python support is ****ed up because we
+# get compiler flags from HOST python, potentially including
+# things like -march=...
+# So let's fake it -- --with-python=... is used only to launch
+# python-config.py, so something stupid that just dumps the
+# right answers is sufficient
+%if %{cross_compiling}
+cat >fakepython <<'EOF'
+#!/bin/sh
+case $2 in
+--exec-prefix)
+	echo %{_prefix}
+	;;
+--ldflags)
+	echo -lpython%{pyver}
+	;;
+--includes)
+	echo -I%{_includedir}/python%{pyver}
+	;;
+esac
+EOF
+chmod +x fakepython
+%endif
+
+
 # --htmldir and --pdfdir are not used as they are used from %{gdb_build}.
 if ! ../configure							\
 	--prefix=%{_prefix}					\
@@ -521,7 +296,11 @@ $(: ppc64 host build crashes on ppc variant of libexpat.so )	\
 	--without-libexpat-prefix				\
 	--enable-tui						\
 %if %{with python}
-	--with-python=%{__python}				\
+%if %{cross_compiling}
+	--with-python=$(pwd)/fakepython				\
+%else
+	--with-python						\
+%endif
 %else
 	--without-python					\
 %endif
@@ -757,14 +536,10 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/stabs*
 
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
-# These files are unrelated to Fedora Linux.
+# Drop files that aren't needed in an OpenMandriva context
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/elinos.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/wrs-linux.py
 rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
-
-rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/FrameWrapper.py
-rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/backtrace.py
-rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/python/gdb/command/backtrace.py
 
 %files
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
