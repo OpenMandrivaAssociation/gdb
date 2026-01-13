@@ -72,7 +72,7 @@ See package 'gdb-headless'.
 Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 Group:   Development/Tools
 
-%ifarch %{arm} riscv64
+%ifarch %{arm} %{riscv64} %{loongarch64}
 %global have_inproctrace 0
 %else
 %global have_inproctrace 1
