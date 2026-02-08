@@ -38,7 +38,7 @@ Version:	17.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	3
+Release:	4
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -62,6 +62,7 @@ https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
 https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
 
 # OM only patches
+gdb-rpm-suggestion-script-fixes-for-OM.patch
 gdb-12.1-readline-8.2.patch
 
 %description
