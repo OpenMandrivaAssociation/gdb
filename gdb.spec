@@ -33,12 +33,12 @@
 Name: %{?scl_prefix}gdb
 
 %global tarname gdb-%{version}
-Version:	17.1
+Version:	17.2
 %global gdb_version %{version}
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	5
+Release:	1
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -57,13 +57,13 @@ Requires: gdb-headless = %{version}-%{release}
 
 %patchlist
 # From fedora
-https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-test-show-version.patch
-https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
-https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-test-show-version.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
 
 # OM only patches
-gdb-12.1-readline-8.2.patch
-gdb-17.1-python-checks.patch
+# dropped (no longer applies): gdb-12.1-readline-8.2.patch
+# dropped (no longer applies): gdb-17.2-python-checks.patch
 
 %description
 'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
