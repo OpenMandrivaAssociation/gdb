@@ -520,11 +520,11 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/elinos.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/wrs-linux.py
 rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 
-# find-debuginfo runs after %install and calls gdb-add-index, which looks
-# for gdb on PATH. Until this merged package is published the buildroot
-# only has gdb-headless (/usr/libexec/gdb). Use the just-built binary.
-export PATH="$RPM_BUILD_ROOT%{_bindir}:$PATH"
-export GDB="$RPM_BUILD_ROOT%{_bindir}/gdb"
+# find-debuginfo runs gdb-add-index in parallel with eu-strip. Using the
+# just-installed gdb is ETXTBSY; the buildroot may only have gdb-headless
+# (no /usr/bin/gdb) until this merge is published. Index with a copy.
+cp -a $RPM_BUILD_ROOT%{_bindir}/gdb $RPM_BUILD_DIR/gdb-for-index
+export GDB=$RPM_BUILD_DIR/gdb-for-index
 
 %files
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
