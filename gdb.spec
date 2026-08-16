@@ -38,7 +38,7 @@ Version:	17.2
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	1
+Release:	2
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -50,10 +50,9 @@ URL: https://gnu.org/software/gdb/
 %global gdb_src %{tarname}
 %global gdb_build build-%{_target_platform}
 
-Conflicts: gdb-headless < 7.12-29
+Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 
-Summary: A stub package for GNU source-level debugger
-Requires: gdb-headless = %{version}-%{release}
+%rename gdb-headless
 
 %patchlist
 # From fedora
@@ -66,12 +65,9 @@ Requires: gdb-headless = %{version}-%{release}
 # dropped (no longer applies): gdb-17.2-python-checks.patch
 
 %description
-'gdb' package is only a stub to install gcc-gdb-plugin for 'compile' commands.
-See package 'gdb-headless'.
-
-%package headless
-Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
-Group:   Development/Tools
+GDB, the GNU debugger, allows you to debug programs written in C, C++,
+Java, and other languages, by executing them in a controlled fashion
+and printing their data.
 
 %ifarch %{arm} %{riscv64} %{loongarch64}
 %global have_inproctrace 0
@@ -151,11 +147,6 @@ BuildRequires: gcc-plugin-devel
 BuildRequires: pkgconfig(zlib)
 BuildRequires: dbginfod
 BuildRequires: elfutils-devel
-
-%description headless
-GDB, the GNU debugger, allows you to debug programs written in C, C++,
-Java, and other languages, by executing them in a controlled fashion
-and printing their data.
 
 %package gdbserver
 Summary: A standalone server for GDB (the GNU source-level debugger)
@@ -483,10 +474,6 @@ cd %{gdb_build}
 
 %make_install
 
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/libexec
-mv -f $RPM_BUILD_ROOT%{_bindir}/gdb $RPM_BUILD_ROOT%{_prefix}/libexec/gdb
-ln -s -r                                                 $RPM_BUILD_ROOT%{_prefix}/libexec/gdb  $RPM_BUILD_ROOT%{_bindir}/gdb
-
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
 touch -r %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/gdbinit.d
 sed 's#%%{_sysconfdir}#%{_sysconfdir}#g' <%{SOURCE4} >$RPM_BUILD_ROOT%{_sysconfdir}/gdbinit
@@ -550,20 +537,17 @@ rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 %{_bindir}/gdb
 %{_bindir}/gcore
 %{_bindir}/gstack
+%{_bindir}/gdb-add-index
 %doc %{_mandir}/*/gcore.1*
 %doc %{_mandir}/*/gstack.1*
+%doc %{_mandir}/*/gdb.1*
+%doc %{_mandir}/*/gdb-add-index.1*
+%doc %{_mandir}/*/gdbinit.5*
 # Provide gdb/jit-reader.h so that users are able to write their own GDB JIT
 # plugins.
 %{_includedir}/gdb
-
-%files headless
-%{_prefix}/libexec/gdb
 %config %{_sysconfdir}/gdbinit
-%doc %{_mandir}/*/gdb.1*
 %{_sysconfdir}/gdbinit.d
-%doc %{_mandir}/*/gdbinit.5*
-%{_bindir}/gdb-add-index
-%doc %{_mandir}/*/gdb-add-index.1*
 %{_datadir}/gdb
 
 # don't include the files in include, they are part of binutils
