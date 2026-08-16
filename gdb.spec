@@ -54,16 +54,6 @@ Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 
 %rename gdb-headless
 
-%patchlist
-# From fedora
-# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-test-show-version.patch
-# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
-# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
-
-# OM only patches
-# dropped (no longer applies): gdb-12.1-readline-8.2.patch
-# dropped (no longer applies): gdb-17.2-python-checks.patch
-
 %ifarch %{arm} %{riscv64} %{loongarch64}
 %global have_inproctrace 0
 %else
@@ -131,6 +121,16 @@ BuildRequires: gcc-plugin-devel
 BuildRequires: pkgconfig(zlib)
 BuildRequires: dbginfod
 BuildRequires: elfutils-devel
+
+%patchlist
+# From fedora
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-test-show-version.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-add-index.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/gdb/raw/rawhide/f/gdb-rpm-suggestion-script.patch
+
+# OM only patches
+# dropped (no longer applies): gdb-12.1-readline-8.2.patch
+# dropped (no longer applies): gdb-17.2-python-checks.patch
 
 %description
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
