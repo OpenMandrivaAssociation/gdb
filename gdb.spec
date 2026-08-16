@@ -64,11 +64,6 @@ Summary: A GNU source-level debugger for C, C++, Fortran, Go and other languages
 # dropped (no longer applies): gdb-12.1-readline-8.2.patch
 # dropped (no longer applies): gdb-17.2-python-checks.patch
 
-%description
-GDB, the GNU debugger, allows you to debug programs written in C, C++,
-Java, and other languages, by executing them in a controlled fashion
-and printing their data.
-
 %ifarch %{arm} %{riscv64} %{loongarch64}
 %global have_inproctrace 0
 %else
@@ -78,20 +73,10 @@ and printing their data.
 # eu-strip: -g recognizes .gdb_index as a debugging section. (#631997)
 Conflicts: elfutils < 0.149
 
-# GDB patches have the format `gdb-<version>-bz<red-hat-bz-#>-<desc>.patch'.
-# They should be created using patch level 1: diff -up ./gdb (or gdb-6.3/gdb).
-
-#=
-#push=Should be pushed upstream.
-#fedora=Should stay as a Fedora patch.
-#fedoratest=Keep it in Fedora only as a regression test safety.
-
 # Cleanup any leftover testsuite processes as it may stuck mock(1) builds.
-#=push+jan
 Source2: gdb-orphanripper.c
 
 # /etc/gdbinit (from Debian but with Fedora compliant location).
-#=fedora
 Source4: gdbinit
 
 Source1001: gdb.rpmlintrc
@@ -99,9 +84,6 @@ Source1001: gdb.rpmlintrc
 # OMV specific
 # NEEDS REBASE Patch2000: gdb-8.1-guile-2.2.patch
 # NEEDS REBASE Patch2001: gdb-9.2-guile-3.0.patch
-
-# RISC-V support patches from https://github.com/riscv/riscv-binutils-gdb
-# (currently in sync with gdb git)
 
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
@@ -113,11 +95,11 @@ BuildRequires: pkgconfig(liblzma)
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
 BuildRequires: pkgconfig(rpm) >= 4.14.0-0
 %endif
-BuildRequires:   pkgconfig(python3)
-Requires:   python >= 3
+BuildRequires: pkgconfig(python3)
+Requires: python >= 3
 %if %{with pdf}
 # gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
-BuildRequires:   texlive
+BuildRequires: texlive
 %endif
 %if %{with babeltrace}
 BuildRequires: libbabeltrace-devel
@@ -134,10 +116,10 @@ BuildRequires: make
 BuildRequires: sharutils
 BuildRequires: dejagnu
 # gcc-objc++ is not covered by the GDB testsuite.
-BuildRequires: gcc 
-BuildRequires: gcc-c++ 
+BuildRequires: gcc
+BuildRequires: gcc-c++
 %if %{with testsuite}
-BuildRequires: gcc-gfortran 
+BuildRequires: gcc-gfortran
 BuildRequires: gcc-objc
 BuildRequires: rust
 BuildRequires: fpc
@@ -149,6 +131,11 @@ BuildRequires: gcc-plugin-devel
 BuildRequires: pkgconfig(zlib)
 BuildRequires: dbginfod
 BuildRequires: elfutils-devel
+
+%description
+GDB, the GNU debugger, allows you to debug programs written in C, C++,
+Java, and other languages, by executing them in a controlled fashion
+and printing their data.
 
 %package gdbserver
 Summary: A standalone server for GDB (the GNU source-level debugger)
