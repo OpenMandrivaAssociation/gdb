@@ -106,6 +106,8 @@ Source1001: gdb.rpmlintrc
 BuildRequires: readline-devel >= 6.2-4
 BuildRequires: ncurses-devel texinfo gettext flex bison
 BuildRequires: pkgconfig(expat)
+BuildRequires: pkgconfig(gmp)
+BuildRequires: pkgconfig(mpfr)
 BuildRequires: pkgconfig(liblzma)
 %if %{with rpm}
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
