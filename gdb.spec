@@ -520,6 +520,12 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/elinos.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/wrs-linux.py
 rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 
+# find-debuginfo runs after %install and calls gdb-add-index, which looks
+# for gdb on PATH. Until this merged package is published the buildroot
+# only has gdb-headless (/usr/libexec/gdb). Use the just-built binary.
+export PATH="$RPM_BUILD_ROOT%{_bindir}:$PATH"
+export GDB="$RPM_BUILD_ROOT%{_bindir}/gdb"
+
 %files
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
 %doc README NEWS
