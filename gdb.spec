@@ -38,7 +38,7 @@ Version:	17.2
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	2
+Release:	3
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -523,8 +523,13 @@ rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 # find-debuginfo runs gdb-add-index in parallel with eu-strip. Using the
 # just-installed gdb is ETXTBSY; the buildroot may only have gdb-headless
 # (no /usr/bin/gdb) until this merge is published. Index with a copy.
+# Target gdb cannot run on the build host.
+%if %{cross_compiling}
+%undefine _include_gdb_index
+%else
 cp -a $RPM_BUILD_ROOT%{_bindir}/gdb $RPM_BUILD_DIR/gdb-for-index
 export GDB=$RPM_BUILD_DIR/gdb-for-index
+%endif
 
 %files
 %doc COPYING3 COPYING COPYING.LIB COPYING3.LIB
