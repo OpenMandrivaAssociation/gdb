@@ -17,7 +17,11 @@
 
 %bcond_without rpm
 %bcond_with testsuite
-%bcond_without python
+# Python support is off for this build. basesystem-build only needs
+# /usr/bin/gdb-add-index, and linking gdb to libpython blocks new
+# build chroots after a Python major update. Enable it again after
+# the new python is in the repository.
+%bcond_with python
 %bcond_with babeltrace
 %bcond_with pdf
 %bcond_with guile
@@ -38,7 +42,7 @@ Version:	17.2
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release:	3
+Release:	4
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ and GPLv2+ with exceptions and GPL+ and LGPLv2+ and LGPLv3+ and BSD and Public Domain and GFDL
 Group:   Development/Tools
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -85,8 +89,10 @@ BuildRequires: pkgconfig(liblzma)
 # dlopen() no longer makes rpm-libsFIXME{?_isa} (it's .so) a mandatory dependency.
 BuildRequires: pkgconfig(rpm) >= 4.14.0-0
 %endif
+%if %{with python}
 BuildRequires: pkgconfig(python3)
 Requires: python >= 3
+%endif
 %if %{with pdf}
 # gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
 BuildRequires: texlive
